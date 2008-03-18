@@ -8,15 +8,15 @@ CPP_SRCS += \
 ../src/model/Model.cpp \
 ../src/model/SceneBuilder.cpp 
 
-OBJS += \
-./src/model/BZWParser.o \
-./src/model/Model.o \
-./src/model/SceneBuilder.o 
-
 CPP_DEPS += \
 ./src/model/BZWParser.d \
 ./src/model/Model.d \
 ./src/model/SceneBuilder.d 
+
+OBJS += \
+./src/model/BZWParser.o \
+./src/model/Model.o \
+./src/model/SceneBuilder.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -3,6 +3,9 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
+CXX_SRCS += \
+../src/OSFile.cxx 
+
 CPP_SRCS += \
 ../src/BZWBAPI.cpp \
 ../src/BZWBPlugins.cpp \
@@ -10,16 +13,8 @@ CPP_SRCS += \
 ../src/commonControls.cpp \
 ../src/main.cpp 
 
-CXX_SRCS += \
-../src/OSFile.cxx 
-
-OBJS += \
-./src/BZWBAPI.o \
-./src/BZWBPlugins.o \
-./src/OSFile.o \
-./src/TextUtils.o \
-./src/commonControls.o \
-./src/main.o 
+CXX_DEPS += \
+./src/OSFile.d 
 
 CPP_DEPS += \
 ./src/BZWBAPI.d \
@@ -28,8 +23,13 @@ CPP_DEPS += \
 ./src/commonControls.d \
 ./src/main.d 
 
-CXX_DEPS += \
-./src/OSFile.d 
+OBJS += \
+./src/BZWBAPI.o \
+./src/BZWBPlugins.o \
+./src/OSFile.o \
+./src/TextUtils.o \
+./src/commonControls.o \
+./src/main.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes

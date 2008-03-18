@@ -29,32 +29,6 @@ CPP_SRCS += \
 ../src/objects/world.cpp \
 ../src/objects/zone.cpp 
 
-OBJS += \
-./src/objects/arc.o \
-./src/objects/base.o \
-./src/objects/box.o \
-./src/objects/bz2object.o \
-./src/objects/cone.o \
-./src/objects/define.o \
-./src/objects/dynamicColor.o \
-./src/objects/group.o \
-./src/objects/link.o \
-./src/objects/material.o \
-./src/objects/mesh.o \
-./src/objects/meshbox.o \
-./src/objects/meshpyr.o \
-./src/objects/options.o \
-./src/objects/physics.o \
-./src/objects/pyramid.o \
-./src/objects/sphere.o \
-./src/objects/teleporter.o \
-./src/objects/tetra.o \
-./src/objects/texturematrix.o \
-./src/objects/waterLevel.o \
-./src/objects/weapon.o \
-./src/objects/world.o \
-./src/objects/zone.o 
-
 CPP_DEPS += \
 ./src/objects/arc.d \
 ./src/objects/base.d \
@@ -80,6 +54,32 @@ CPP_DEPS += \
 ./src/objects/weapon.d \
 ./src/objects/world.d \
 ./src/objects/zone.d 
+
+OBJS += \
+./src/objects/arc.o \
+./src/objects/base.o \
+./src/objects/box.o \
+./src/objects/bz2object.o \
+./src/objects/cone.o \
+./src/objects/define.o \
+./src/objects/dynamicColor.o \
+./src/objects/group.o \
+./src/objects/link.o \
+./src/objects/material.o \
+./src/objects/mesh.o \
+./src/objects/meshbox.o \
+./src/objects/meshpyr.o \
+./src/objects/options.o \
+./src/objects/physics.o \
+./src/objects/pyramid.o \
+./src/objects/sphere.o \
+./src/objects/teleporter.o \
+./src/objects/tetra.o \
+./src/objects/texturematrix.o \
+./src/objects/waterLevel.o \
+./src/objects/weapon.o \
+./src/objects/world.o \
+./src/objects/zone.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
