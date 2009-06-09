@@ -14,7 +14,7 @@
 #define CONFIGURATIONDIALOG_H_
 
 #include "Fl_Dialog.h"
-#include "../DataEntry.h"
+#include "DataEntry.h"
 
 /**
  * This is the base class of all object configuration dialogs.

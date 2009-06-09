@@ -29,6 +29,9 @@ meshpyr::meshpyr(string& data) {
 }
 
 void meshpyr::setDefaults() {
+	// set the header
+	setHeader( "meshpyr" );
+
 	// define some basic values
 	divisions = 4;
 	physicsDriver = NULL;

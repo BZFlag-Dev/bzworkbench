@@ -258,6 +258,55 @@ void pyramid::setSize( osg::Vec3 newSize ) {
 	bz2object::setSize( newSize );
 }
 
+Point2D pyramid::getTexsize( int face ) {
+	return texSizes[face];
+}
+
+Point2D pyramid::getTexoffset( int face ) {
+	return texOffsets[face];
+}
+
+bool pyramid::getDrivethrough( int face ) {
+	return driveThroughs[face];
+}
+
+bool pyramid::getShootthrough( int face ) {
+	return shootThroughs[face];
+}
+
+bool pyramid::getRicochet( int face ) {
+	return ricochets[face];
+}
+
+bool pyramid::getFlipz() {
+	return flipz;
+}
+
+
+void pyramid::setTexsize( int face, Point2D value ) {
+	texSizes[face] = value;
+}
+
+void pyramid::setTexoffset( int face, Point2D value ) {
+	texOffsets[face] = value;
+}
+
+void pyramid::setDrivethrough( int face, bool value ) {
+	driveThroughs[face] = value;
+}
+
+void pyramid::setShootthrough( int face, bool value ) {
+	shootThroughs[face] = value;
+}
+
+void pyramid::setRicochet( int face, bool value ) {
+	ricochets[face] = value;
+}
+
+void pyramid::setFlipz( bool value ) {
+	flipz = value;
+}
+
 void pyramid::updateGeometry() {
 	osg::Node* node = Primitives::buildPyramid( osg::Vec3( 1, 1, 1 ) );
 

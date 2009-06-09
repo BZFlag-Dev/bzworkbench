@@ -63,6 +63,11 @@ public:
 	void setSweepAngle(float value);
 	
 	void setDivisions(int value);
+
+	bool getFlipz() { return flipz; }
+	void setFlipz(bool value) { flipz = value; }
+	Point2D getTexsize() { return texsize; }
+	void setTexsize( Point2D value ) { texsize = value; }
 	
 protected:
 	static const char* sideNames[MaterialCount];

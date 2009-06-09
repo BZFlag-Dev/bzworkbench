@@ -20,17 +20,13 @@
 #include "model/BZWParser.h"
 #include "bz2object.h"
 
-
 #include "model/SceneBuilder.h"
 #include "model/Primitives.h"
-
-#include "render/GeometryExtractorVisitor.h"
 
 #include <osg/Geometry>
 #include <osg/PrimitiveSet>
 #include <osg/Group>
 
-#include "objects/material.h"
 /**
  * Box data
  */
@@ -73,6 +69,18 @@ public:
 	string toString(void);
 
 	void setSize( osg::Vec3 newSize );
+
+	Point2D getTexsize( int face );
+	Point2D getTexoffset( int face );
+	bool getDrivethrough( int face );
+	bool getShootthrough( int face );
+	bool getRicochet( int face );
+
+	void setTexsize( int face, Point2D value );
+	void setTexoffset( int face, Point2D value );
+	void setDrivethrough( int face, bool value );
+	void setShootthrough( int face, bool value );
+	void setRicochet( int face, bool value );
 
 private:
 	osg::ref_ptr< physics > physDrvs[FaceCount];

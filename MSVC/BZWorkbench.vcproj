@@ -214,6 +214,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\ArcConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\BoxConfigurationDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\ConeConfigurationDialog.cpp"
 					>
 				</File>
@@ -239,6 +247,18 @@
 				</File>
 				<File
 					RelativePath="..\src\dialogs\MenuBar.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\MeshboxConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\MeshpyrConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\PyramidConfigurationDialog.cpp"
 					>
 				</File>
 				<File
@@ -680,6 +700,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\dialogs\ArcConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\BoxConfigurationDialog.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dialogs\ConeConfigurationDialog.h"
 					>
 				</File>
@@ -709,6 +737,18 @@
 				</File>
 				<File
 					RelativePath="..\include\dialogs\MenuBar.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\MeshboxConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\MeshpyrConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\PyramidConfigurationDialog.h"
 					>
 				</File>
 				<File

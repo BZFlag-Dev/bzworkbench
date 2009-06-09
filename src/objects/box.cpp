@@ -274,6 +274,48 @@ void box::setSize( osg::Vec3 newSize ) {
 	bz2object::setSize( newSize );
 }
 
+Point2D box::getTexsize( int face ) {
+	return texSizes[face];
+}
+
+Point2D box::getTexoffset( int face ) {
+	return texOffsets[face];
+}
+
+bool box::getDrivethrough( int face ) {
+	return driveThroughs[face];
+}
+
+bool box::getShootthrough( int face ) {
+	return shootThroughs[face];
+}
+
+bool box::getRicochet( int face ) {
+	return ricochets[face];
+}
+
+
+void box::setTexsize( int face, Point2D value ) {
+	texSizes[face] = value;
+}
+
+void box::setTexoffset( int face, Point2D value ) {
+	texOffsets[face] = value;
+}
+
+void box::setDrivethrough( int face, bool value ) {
+	driveThroughs[face] = value;
+}
+
+void box::setShootthrough( int face, bool value ) {
+	shootThroughs[face] = value;
+}
+
+void box::setRicochet( int face, bool value ) {
+	ricochets[face] = value;
+}
+
+
 void box::updateGeometry() {
 	// make 1 by 1 by 1 box which can be scaled to the proper size
 	osg::Group* group = Primitives::buildUntexturedBox( osg::Vec3( 1, 1, 1 ) );

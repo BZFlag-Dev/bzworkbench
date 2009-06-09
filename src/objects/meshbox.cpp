@@ -31,6 +31,9 @@ meshbox::meshbox(string& data) {
 }
 
 void meshbox::setDefaults() {
+	// set the header
+	setHeader( "meshbox" );
+
 	// define some basic values
 	ratio = 1.0f;
 	divisions = 4;

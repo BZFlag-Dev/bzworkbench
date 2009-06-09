@@ -29,6 +29,11 @@
 
 #include "dialogs/MasterConfigurationDialog.h"
 #include "dialogs/Fl_Error.h"
+#include "dialogs/BoxConfigurationDialog.h"
+#include "dialogs/PyramidConfigurationDialog.h"
+#include "dialogs/MeshpyrConfigurationDialog.h"
+#include "dialogs/ArcConfigurationDialog.h"
+#include "dialogs/MeshboxConfigurationDialog.h"
 
 #include "render/Point3D.h"
 #include "render/RGBA.h"
@@ -76,9 +81,9 @@
 
 // register the built-in objects
 void buildModelDatabase() {
-	Model::registerObject("arc", NULL, "end", arc::init);
+	Model::registerObject("arc", NULL, "end", arc::init, ArcConfigurationDialog::init);
 	Model::registerObject("base", NULL, "end", base::init);
-	Model::registerObject("box", NULL, "end", box::init);
+	Model::registerObject("box", NULL, "end", box::init, BoxConfigurationDialog::init);
 	Model::registerObject("cone", NULL, "end", cone::init, ConeConfigurationDialog::init);
 	Model::registerObject("dynamicColor", NULL, "end", dynamicColor::init);
 	Model::registerObject("group", NULL, "end", group::init);
@@ -88,11 +93,11 @@ void buildModelDatabase() {
 	// need to do this for faces
 	Model::addTerminatorSupport("face", "endface");
 
-	Model::registerObject("meshbox", NULL, "end", meshbox::init);
-	Model::registerObject("meshpyr", NULL, "end", meshpyr::init);
+	Model::registerObject("meshbox", NULL, "end", meshbox::init, MeshboxConfigurationDialog::init);
+	Model::registerObject("meshpyr", NULL, "end", meshpyr::init, MeshpyrConfigurationDialog::init);
 	Model::registerObject("options", NULL, "end", options::init);
 	Model::registerObject("physics", NULL, "end", physics::init);
-	Model::registerObject("pyramid", NULL, "end", pyramid::init);
+	Model::registerObject("pyramid", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
 	Model::registerObject("sphere", NULL, "end", sphere::init);
 	Model::registerObject("teleporter", NULL, "end", teleporter::init);
 	Model::registerObject("tetra", NULL, "end", tetra::init);

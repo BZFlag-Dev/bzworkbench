@@ -208,7 +208,7 @@ string arc::toString(void) {
 	for (int i = 0; i < MaterialCount; i++) {
 		osg::Group* group = (osg::Group*)getThisNode();
 		osg::StateSet* stateset = group->getChild(i)->getStateSet();
-		if (stateset->getName() != "")
+		if (stateset != NULL && stateset->getName() != "")
 			ret += "  " + string(sideNames[i]) + " matref " + stateset->getName();
 	}
 
@@ -240,6 +240,56 @@ void arc::setSize( osg::Vec3 newSize ) {
 osg::Vec3 arc::getSize() {
 	return realSize;
 }
+
+bool arc::getFlatshading() {
+	return flatShading;
+}
+
+bool arc::getSmoothbounce() {
+	return smoothbounce;
+}
+
+float arc::getSweepAngle() {
+	return angle;
+}
+
+float arc::getRatio() {
+	return ratio;
+}
+
+int arc::getDivisions() {
+	return divisions;
+}
+
+Point4D arc::getTexsize() {
+	return texsize;
+}
+
+
+void arc::setFlatshading( bool value ) {
+	flatShading = value;
+}
+
+void arc::setSmoothbounce( bool value ) {
+	smoothbounce = value;
+}
+
+void arc::setSweepAngle( float value ) {
+	angle = value;
+}
+
+void arc::setRatio( float value ) {
+	ratio = value;
+}
+
+void arc::setDivisions( int value ) {
+	divisions = value;
+}
+
+void arc::setTexsize( Point4D value ) {
+	texsize = value;
+}
+
 
 void arc::updateGeometry() {
 	osg::Group* arc = (osg::Group*)getThisNode();

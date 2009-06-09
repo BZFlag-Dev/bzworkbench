@@ -10,8 +10,8 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef CONECONFIGURATIONDIALOG_H_
-#define CONECONFIGURATIONDIALOG_H_
+#ifndef ARCCONFIGURATIONDIALOG_H_
+#define ARCCONFIGURATIONDIALOG_H_
 
 #include <FL/Fl.H>
 #include <FL/Fl_Value_Input.H>
@@ -22,47 +22,47 @@
 #include "../widgets/QuickLabel.h"
 #include "../defines.h"
 
-#include "objects/cone.h"
+#include "objects/arc.h"
 
-class ConeConfigurationDialog : public ConfigurationDialog {
+class ArcConfigurationDialog : public ConfigurationDialog {
 
 public:
 
 	// dimensions
-	static const int DEFAULT_WIDTH = 300;
+	static const int DEFAULT_WIDTH = 400;
 	static const int DEFAULT_HEIGHT = 175;
 
 	// constructor
-	ConeConfigurationDialog( cone* theCone );
+	ArcConfigurationDialog( arc* theArc );
 	
 	// static constructor
 	static ConfigurationDialog* init( DataEntry* d ) { 
-		cone* c = dynamic_cast< cone* > (d);
+		arc* c = dynamic_cast< arc* > (d);
 		if( c )
-			return new ConeConfigurationDialog( dynamic_cast< cone* >( d ) );
+			return new ArcConfigurationDialog( dynamic_cast< arc* >( d ) );
 		else
 			return NULL;
 	}
 	
 	// destructor
-	virtual ~ConeConfigurationDialog() { }
+	virtual ~ArcConfigurationDialog() { }
 	
 	// OK callback
 	static void OKCallback( Fl_Widget* w, void* data ) {
-		ConeConfigurationDialog* ccd = (ConeConfigurationDialog*)(data);
+		ArcConfigurationDialog* ccd = (ArcConfigurationDialog*)(data);
 		ccd->OKCallback_real( w );
 	}
 	
 	// CANCEL callback
 	static void CancelCallback( Fl_Widget* w, void* data ) {
-		ConeConfigurationDialog* ccd = (ConeConfigurationDialog*)(data);
+		ArcConfigurationDialog* ccd = (ArcConfigurationDialog*)(data);
 		ccd->CancelCallback_real( w );
 	}
 	
 private:
 	
 	// the cone
-	cone* theCone;
+	arc* theArc;
 	
 	// real callbacks
 	void OKCallback_real( Fl_Widget* w );
@@ -74,6 +74,8 @@ private:
 	// name field
 	Fl_Value_Input* texsizeXField;
 	Fl_Value_Input* texsizeYField;
+	Fl_Value_Input* texsizeZField;
+	Fl_Value_Input* texsizeWField;
 	
 	// subdivision label
 	QuickLabel* subdivisionLabel;
@@ -86,17 +88,19 @@ private:
 	
 	// angle sweep counter
 	Fl_Counter* sweepAngleCounter;
+
+	// ratio label
+	QuickLabel* ratioLabel;
+	
+	// ratio counter
+	Fl_Counter* ratioCounter;
 	
 	// flat shading check-button
 	Fl_Check_Button* flatShadingButton;
 	
 	// smooth bounce check-button
 	Fl_Check_Button* smoothBounceButton;
-
-	// Flip-z check-button
-	Fl_Check_Button* flipzButton;
-	
 	
 };
 
-#endif /*CONECONFIGURATIONDIALOG_H_*/
+#endif /*ARCCONFIGURATIONDIALOG_H_*/

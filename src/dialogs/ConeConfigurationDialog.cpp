@@ -20,9 +20,12 @@ ConeConfigurationDialog::ConeConfigurationDialog( cone* _theCone ) :
 	theCone = _theCone;
 	
 	// set up the dialog
-	nameLabel = new QuickLabel( "Name: ", 5, 5);
-	nameField = new Fl_Input( 60, 5, DEFAULT_WIDTH - 65, DEFAULT_TEXTSIZE + 6);
-	nameField->value( theCone->getName().c_str() );
+	texsizeLabel = new QuickLabel( "Texture Size: ", 5, 5);
+	texsizeXField = new Fl_Value_Input( 120, 5, 60, DEFAULT_TEXTSIZE + 6);
+	texsizeYField = new Fl_Value_Input( 180, 5, 60, DEFAULT_TEXTSIZE + 6);
+	texsizeXField->value( theCone->getTexsize().x() );
+	texsizeYField->value( theCone->getTexsize().y() );
+	
 	
 	subdivisionLabel = new QuickLabel("Subdivisions: ", 5, 30);
 	subdivisionCounter = new Fl_Counter( 120, 30, 120, DEFAULT_TEXTSIZE + 6 );
@@ -40,6 +43,9 @@ ConeConfigurationDialog::ConeConfigurationDialog( cone* _theCone ) :
 	
 	smoothBounceButton = new Fl_Check_Button(5, 105, DEFAULT_WIDTH - 10, DEFAULT_TEXTSIZE + 6, "Smooth Bounce");
 	smoothBounceButton->value( theCone->hasSmoothBounce() == true ? 1 : 0 );
+
+	flipzButton = new Fl_Check_Button(5, 130, DEFAULT_WIDTH - 10, DEFAULT_TEXTSIZE + 6, "Flip Z");
+	flipzButton->value( theCone->getFlipz() == true ? 1 : 0 );
 	
 	end();
 	
@@ -56,6 +62,8 @@ void ConeConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 	theCone->setSweepAngle( sweepAngleCounter->value() );
 	theCone->setDivisions( (int)subdivisionCounter->value() );
 	theCone->setFlatShading( flatShadingButton->value() == 1 ? true : false );
+	theCone->setTexsize( Point2D( texsizeXField->value(), texsizeYField->value() ) );
+	theCone->setFlipz( flipzButton->value() == 1 ? true : false );
 	
 	// don't delete this dialog box just yet...just hide it
 	hide();

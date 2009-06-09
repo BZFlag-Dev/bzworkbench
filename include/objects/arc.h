@@ -59,6 +59,21 @@ public:
 	void setSize( osg::Vec3 newSize);
 	osg::Vec3 getSize();
 
+	bool getFlatshading();
+	bool getSmoothbounce();
+	float getSweepAngle();
+	float getRatio();
+	int getDivisions();
+	Point4D getTexsize();
+
+	void setFlatshading( bool value );
+	void setSmoothbounce( bool value );
+	void setSweepAngle( float value );
+	void setRatio( float value );
+	void setDivisions( int value );
+	void setTexsize( Point4D value );
+
+
 protected:
 	static const char* sideNames[MaterialCount];
 

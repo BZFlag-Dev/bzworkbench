@@ -10,8 +10,8 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef CONECONFIGURATIONDIALOG_H_
-#define CONECONFIGURATIONDIALOG_H_
+#ifndef MESHPYRCONFIGURATIONDIALOG_H_
+#define MESHPYRCONFIGURATIONDIALOG_H_
 
 #include <FL/Fl.H>
 #include <FL/Fl_Value_Input.H>
@@ -22,47 +22,47 @@
 #include "../widgets/QuickLabel.h"
 #include "../defines.h"
 
-#include "objects/cone.h"
+#include "objects/meshpyr.h"
 
-class ConeConfigurationDialog : public ConfigurationDialog {
+class MeshpyrConfigurationDialog : public ConfigurationDialog {
 
 public:
 
 	// dimensions
 	static const int DEFAULT_WIDTH = 300;
-	static const int DEFAULT_HEIGHT = 175;
+	static const int DEFAULT_HEIGHT = 100;
 
 	// constructor
-	ConeConfigurationDialog( cone* theCone );
+	MeshpyrConfigurationDialog( meshpyr* _theMeshpyr );
 	
 	// static constructor
 	static ConfigurationDialog* init( DataEntry* d ) { 
-		cone* c = dynamic_cast< cone* > (d);
+		meshpyr* c = dynamic_cast< meshpyr* > (d);
 		if( c )
-			return new ConeConfigurationDialog( dynamic_cast< cone* >( d ) );
+			return new MeshpyrConfigurationDialog( dynamic_cast< meshpyr* >( d ) );
 		else
 			return NULL;
 	}
 	
 	// destructor
-	virtual ~ConeConfigurationDialog() { }
+	virtual ~MeshpyrConfigurationDialog() { }
 	
 	// OK callback
 	static void OKCallback( Fl_Widget* w, void* data ) {
-		ConeConfigurationDialog* ccd = (ConeConfigurationDialog*)(data);
+		MeshpyrConfigurationDialog* ccd = (MeshpyrConfigurationDialog*)(data);
 		ccd->OKCallback_real( w );
 	}
 	
 	// CANCEL callback
 	static void CancelCallback( Fl_Widget* w, void* data ) {
-		ConeConfigurationDialog* ccd = (ConeConfigurationDialog*)(data);
+		MeshpyrConfigurationDialog* ccd = (MeshpyrConfigurationDialog*)(data);
 		ccd->CancelCallback_real( w );
 	}
 	
 private:
 	
 	// the cone
-	cone* theCone;
+	cone* theMeshpyr;
 	
 	// real callbacks
 	void OKCallback_real( Fl_Widget* w );
@@ -74,24 +74,6 @@ private:
 	// name field
 	Fl_Value_Input* texsizeXField;
 	Fl_Value_Input* texsizeYField;
-	
-	// subdivision label
-	QuickLabel* subdivisionLabel;
-	
-	// subdivision counter
-	Fl_Counter* subdivisionCounter;
-	
-	// angle sweep label
-	QuickLabel* sweepAngleLabel;
-	
-	// angle sweep counter
-	Fl_Counter* sweepAngleCounter;
-	
-	// flat shading check-button
-	Fl_Check_Button* flatShadingButton;
-	
-	// smooth bounce check-button
-	Fl_Check_Button* smoothBounceButton;
 
 	// Flip-z check-button
 	Fl_Check_Button* flipzButton;
@@ -99,4 +81,4 @@ private:
 	
 };
 
-#endif /*CONECONFIGURATIONDIALOG_H_*/
+#endif /*MESHPYRCONFIGURATIONDIALOG_H_*/

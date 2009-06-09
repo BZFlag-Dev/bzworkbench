@@ -10,8 +10,8 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef CONECONFIGURATIONDIALOG_H_
-#define CONECONFIGURATIONDIALOG_H_
+#ifndef MESHBOXCONFIGURATIONDIALOG_H_
+#define MESHBOXCONFIGURATIONDIALOG_H_
 
 #include <FL/Fl.H>
 #include <FL/Fl_Value_Input.H>
@@ -22,47 +22,47 @@
 #include "../widgets/QuickLabel.h"
 #include "../defines.h"
 
-#include "objects/cone.h"
+#include "objects/meshbox.h"
 
-class ConeConfigurationDialog : public ConfigurationDialog {
+class MeshboxConfigurationDialog : public ConfigurationDialog {
 
 public:
 
 	// dimensions
-	static const int DEFAULT_WIDTH = 300;
-	static const int DEFAULT_HEIGHT = 175;
+	static const int DEFAULT_WIDTH = 400;
+	static const int DEFAULT_HEIGHT = 75;
 
 	// constructor
-	ConeConfigurationDialog( cone* theCone );
+	MeshboxConfigurationDialog( meshbox* theMeshbox );
 	
 	// static constructor
 	static ConfigurationDialog* init( DataEntry* d ) { 
-		cone* c = dynamic_cast< cone* > (d);
+		meshbox* c = dynamic_cast< meshbox* > (d);
 		if( c )
-			return new ConeConfigurationDialog( dynamic_cast< cone* >( d ) );
+			return new MeshboxConfigurationDialog( dynamic_cast< meshbox* >( d ) );
 		else
 			return NULL;
 	}
 	
 	// destructor
-	virtual ~ConeConfigurationDialog() { }
+	virtual ~MeshboxConfigurationDialog() { }
 	
 	// OK callback
 	static void OKCallback( Fl_Widget* w, void* data ) {
-		ConeConfigurationDialog* ccd = (ConeConfigurationDialog*)(data);
+		MeshboxConfigurationDialog* ccd = (MeshboxConfigurationDialog*)(data);
 		ccd->OKCallback_real( w );
 	}
 	
 	// CANCEL callback
 	static void CancelCallback( Fl_Widget* w, void* data ) {
-		ConeConfigurationDialog* ccd = (ConeConfigurationDialog*)(data);
+		MeshboxConfigurationDialog* ccd = (MeshboxConfigurationDialog*)(data);
 		ccd->CancelCallback_real( w );
 	}
 	
 private:
 	
 	// the cone
-	cone* theCone;
+	meshbox* theMeshbox;
 	
 	// real callbacks
 	void OKCallback_real( Fl_Widget* w );
@@ -74,29 +74,9 @@ private:
 	// name field
 	Fl_Value_Input* texsizeXField;
 	Fl_Value_Input* texsizeYField;
-	
-	// subdivision label
-	QuickLabel* subdivisionLabel;
-	
-	// subdivision counter
-	Fl_Counter* subdivisionCounter;
-	
-	// angle sweep label
-	QuickLabel* sweepAngleLabel;
-	
-	// angle sweep counter
-	Fl_Counter* sweepAngleCounter;
-	
-	// flat shading check-button
-	Fl_Check_Button* flatShadingButton;
-	
-	// smooth bounce check-button
-	Fl_Check_Button* smoothBounceButton;
-
-	// Flip-z check-button
-	Fl_Check_Button* flipzButton;
-	
+	Fl_Value_Input* texsizeZField;
+	Fl_Value_Input* texsizeWField;
 	
 };
 
-#endif /*CONECONFIGURATIONDIALOG_H_*/
+#endif /*MESHBOXCONFIGURATIONDIALOG_H_*/

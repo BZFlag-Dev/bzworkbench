@@ -65,6 +65,20 @@ public:
 
 	void setSize( osg::Vec3 newSize );
 
+	Point2D getTexsize( int face );
+	Point2D getTexoffset( int face );
+	bool getDrivethrough( int face );
+	bool getShootthrough( int face );
+	bool getRicochet( int face );
+	bool getFlipz();
+
+	void setTexsize( int face, Point2D value );
+	void setTexoffset( int face, Point2D value );
+	void setDrivethrough( int face, bool value );
+	void setShootthrough( int face, bool value );
+	void setRicochet( int face, bool value );
+	void setFlipz( bool value );
+
 private:
 	bool flipz;
 
