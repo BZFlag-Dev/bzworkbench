@@ -34,6 +34,8 @@
 #include "dialogs/MeshpyrConfigurationDialog.h"
 #include "dialogs/ArcConfigurationDialog.h"
 #include "dialogs/MeshboxConfigurationDialog.h"
+#include "dialogs/SphereConfigurationDialog.h"
+#include "dialogs/TeleporterConfigurationDialog.h"
 
 #include "render/Point3D.h"
 #include "render/RGBA.h"
@@ -98,8 +100,8 @@ void buildModelDatabase() {
 	Model::registerObject("options", NULL, "end", options::init);
 	Model::registerObject("physics", NULL, "end", physics::init);
 	Model::registerObject("pyramid", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
-	Model::registerObject("sphere", NULL, "end", sphere::init);
-	Model::registerObject("teleporter", NULL, "end", teleporter::init);
+	Model::registerObject("sphere", NULL, "end", sphere::init, SphereConfigurationDialog::init);
+	Model::registerObject("teleporter", NULL, "end", teleporter::init, TeleporterConfigurationDialog::init);
 	Model::registerObject("tetra", NULL, "end", tetra::init);
 	Model::registerObject("texturematrix", NULL, "end", texturematrix::init);
 	Model::registerObject("waterLevel", NULL, "end", waterLevel::init);

@@ -16,8 +16,7 @@
 #include "bz2object.h"
 #include "render/Point3D.h"
 #include "render/Index3D.h"
-#include "render/TexCoord2D.h"
-#include "render/Vector3D.h"
+#include "render/Point2D.h"
 #include "MeshFace.h"
 #include "LOD.h"
 #include "LODCommand.h"
@@ -34,6 +33,8 @@ public:
 	
 	// constructor with data
 	mesh(string& data);
+
+	~mesh();
 	
 	static DataEntry* init() { return new mesh(); }
 	static DataEntry* init(string& data) { return new mesh(data); }
@@ -56,10 +57,10 @@ private:
 	vector<Point3D> vertices;
 	
 	// texture coordinates
-	vector<TexCoord2D> texCoords;
+	vector<Point2D> texCoords;
 	
 	// normals
-	vector<Vector3D> normals;
+	vector<Point3D> normals;
 	
 	// inside points
 	vector<Point3D> insidePoints;
@@ -70,15 +71,14 @@ private:
 	// materials (faces map to materials)
 	map<string, string> materialMap;
 	
-	// boolean options
-	bool noClusters, smoothBounce;
-	
 	// faces
-	vector<MeshFace> faces;
+	vector<MeshFace*> faces;
 	
+	std::vector<std::string> lodOptions;
+	bool decorative;
+
 	// draw info
-	DrawInfo drawInfo;
-	bool useDrawInfo;
+	DrawInfo* drawInfo;
 };
 
 #endif /*MESH_H_*/

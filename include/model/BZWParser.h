@@ -89,6 +89,12 @@ class BZWParser {
   // the big tamale: the top-level file loader
   static vector<string> loadFile(const char* filename);
 
+  // get list of integers from a string
+  static vector<int> getIntList( const char* line );
+
+  // checks if a string is all whitespace
+  static bool allWhitespace( const char* line );
+
  private:
 
   static Model* _modelRef;

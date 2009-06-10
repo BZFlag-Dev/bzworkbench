@@ -15,8 +15,15 @@
 
 #include "bz2object.h"
 
+#include "render/Point2D.h"
+
 class sphere : public bz2object {
 public:
+	enum {
+		Edge,
+		Bottom,
+		MaterialCount
+    };
 	// default constructor
 	sphere();
 	
@@ -44,13 +51,28 @@ public:
 
 	void setSize( osg::Vec3 newSize );
 	osg::Vec3 getSize();
+
+	void setFlatshading( bool value );
+	void setSmoothbounce( bool value );
+	void setHemisphere( bool value );
+	void setDivisions( int value );
+	void setTexsize( Point2D value );
+
+	bool getFlatshading();
+	bool getSmoothbounce();
+	bool getHemisphere();
+	int getDivisions();
+	Point2D getTexsize();
 	
 private:
 	bool flatShading, smoothbounce, hemisphere;
 	int divisions;
 	osg::Vec3 realSize;
+	Point2D texsize;
 
 	void updateGeometry();
+
+	static const char* sideNames[MaterialCount];
 };
 
 #endif /*SPHERE_H_*/

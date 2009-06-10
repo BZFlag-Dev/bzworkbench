@@ -310,6 +310,8 @@ public:
 	
 	// binary getters
 	vector<Point3D>& getVertices() { return vertices; }
+
+	bool parse( std::vector<std::string>::iterator& itr ) { return false; } // FIXME: implement
 	
 private:
 
@@ -331,7 +333,6 @@ private:
 	/**
 	 * Helper method: convert an array of floats into a string
 	 */
-	 
 	string stringify(vector<float>& values) {
 		string ret = string("");
 		

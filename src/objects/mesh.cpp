@@ -17,14 +17,14 @@ mesh::mesh(void) :
 	bz2object("mesh", "<vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo>") {
 	
 	vertices = vector<Point3D>();
-	texCoords = vector<TexCoord2D>();
-	normals = vector<Vector3D>();
+	texCoords = vector<Point2D>();
+	normals = vector<Point3D>();
 	insidePoints = vector<Point3D>();
 	outsidePoints = vector<Point3D>();
-	noClusters = smoothBounce = useDrawInfo = false;
+	decorative = false;
 	materials = vector< material* >();
-	faces = vector<MeshFace>();
-	drawInfo = DrawInfo();
+	faces = vector<MeshFace*>();
+	drawInfo = NULL;
 	materialMap = map<string, string>();
 }
 
@@ -33,17 +33,28 @@ mesh::mesh(string& data) :
 	bz2object("mesh", "<vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo>", data.c_str()) {
 	
 	vertices = vector<Point3D>();
-	texCoords = vector<TexCoord2D>();
-	normals = vector<Vector3D>();
+	texCoords = vector<Point2D>();
+	normals = vector<Point3D>();
 	insidePoints = vector<Point3D>();
 	outsidePoints = vector<Point3D>();
-	noClusters = smoothBounce = useDrawInfo = false;
+	decorative = false;
 	materials = vector< material* >();
-	faces = vector<MeshFace>();
-	drawInfo = DrawInfo();
+	faces = vector<MeshFace*>();
+	drawInfo = NULL;
 	materialMap = map<string, string>();
 	
 	update(data);
+}
+
+mesh::~mesh() {
+	// clean up
+	if (drawInfo != NULL)
+		delete drawInfo;
+
+	for (vector<MeshFace*>::iterator itr = faces.begin(); itr != faces.end(); itr++) {
+		if ( *itr != NULL )
+			delete *itr;
+	}
 }
 
 // getter
@@ -54,54 +65,116 @@ int mesh::update(string& data) {
 	const char* header = getHeader().c_str();
 	
 	// get lines
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str(), "end", "<drawinfo><face>", "");
-	
-	// get the lines without the drawinfo (so we don't mistake drawinfo's data with the global data)
-	vector<string> linesNoDrawInfo = BZWParser::getSectionsByHeader(header, data.c_str(), "end", "<drawinfo><face>", "<drawinfo>");
-	
-	// get lines without faces and without drawinfo (so bz2object doesn't think there are multiple physics drivers)
-	vector<string> linesNoSubobjects = BZWParser::getSectionsByHeader(header, data.c_str(), "end", "<drawinfo><face>", "<drawinfo><face>");
+	vector<string> chunks = BZWParser::getSectionsByHeader(header, data.c_str(), "endface");
 	
 	// break if there are none
-	if(lines[0] == BZW_NOT_FOUND) {
+	if(chunks[0] == BZW_NOT_FOUND) {
 		printf("mesh not found\n");
 		return 0;
 	}
 		
 	// break if too many
-	if(!hasOnlyOne(lines, header))
+	if(!hasOnlyOne(chunks, header))
 		return 0;
 		
 	// get the data
-	const char* meshData = lines[0].c_str();
+	const char* meshData = chunks[0].c_str();
 	
-	// get drawinfo-less data
-	const char* meshDataNoDrawInfo = meshData;
-	if(linesNoDrawInfo.size() > 0)
-		meshDataNoDrawInfo = linesNoDrawInfo[0].c_str();
-		
-	// get no-subobject data
-	const char* meshDataNoSubobjects = meshData;
-	if(linesNoSubobjects.size() > 0)
-		meshDataNoSubobjects = linesNoSubobjects[0].c_str();
+	vector<string> lines = BZWParser::getLines(header, data.c_str());
+
+	MeshFace* face = NULL;
+	DrawInfo* drawInfo = NULL;
+	material* mat = NULL;
+	physics* phydrv = NULL;
+	bool smoothbounce = false;
+	bool noClusters = false;
+	bool driveThrough = false;
+	bool shootThrough = false;
+	for (vector<string>::iterator itr = lines.begin(); itr != lines.end(); itr++) {
+		const char* line = (*itr).c_str();
+
+		string key = BZWParser::key(line);
+
+		if ( key == "lod" ) {
+			lodOptions.push_back( BZWParser::value( "lod", line ) );
+		}
+		else if ( key == "endface" ) {
+			if (face == NULL) {
+				printf("mesh::update(): Warning! Extra 'endface' keyword found\n");
+			} else {
+				faces.push_back(face);
+				face = NULL;
+			}
+		}
+		else if ( face ) {
+			face->parse( line );
+		}
+		else if ( key == "face" ) {
+			if (face != NULL) {
+				printf("mesh::update(): Warning! Discarding incomplete mesh face.\n");
+				delete face;
+			}
+			face = new MeshFace();
+		}
+		else if ( key == "inside" ) {
+			insidePoints.push_back( Point3D( BZWParser::value( "inside", line ) ) );
+		}
+		else if ( key == "outside" ) {
+			outsidePoints.push_back( Point3D( BZWParser::value( "outside", line ) ) );
+		}
+		else if ( key == "vertex" ) {
+			vertices.push_back( Point3D( BZWParser::value( "vertex", line ) ) );
+		}
+		else if ( key == "normal" ) {
+			normals.push_back( Point3D( BZWParser::value( "normal", line ) ) );
+		}
+		else if ( key == "texcoord" ) {
+			texCoords.push_back( Point2D( BZWParser::value( "texcoord", line ) ) );
+		}
+		else if ( key == "phydrv" ) {
+			string drvname = BZWParser::value( "phydrv", line );
+			physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", drvname.c_str() );
+			if (phys != NULL)
+				phydrv = phys;
+			else
+				printf("mesh::update(): Error! Couldn't find physics driver %s\n", drvname.c_str());
+		}
+		else if ( key == "smoothbounce" ) {
+			smoothbounce = true;
+		}
+		else if ( key == "noclusters" ) {
+			noClusters = true;
+		}
+		else if ( key == "decorative" ) {
+			decorative = true;
+		}
+		else if ( key == "drawinfo" ) {
+			if (drawInfo != NULL) {
+				printf("mesh::update(): Warning! Multiple drawinfo sections, using first.\n");
+			}
+			else {
+				drawInfo = new DrawInfo();
+				if ( !drawInfo->parse( itr ) ) {
+					printf("mesh::update(): Error! Invalid drawInfo.\n");
+					delete drawInfo;
+					return 0;
+				}
+			}
+		}
+		else if ( key == "matref" ) {
+			string matname = BZWParser::value( "matref", line );
+			material* matref = (material*)Model::command( MODEL_GET, "material", matname );
+			if (matref != NULL)
+				mat = matref;
+			else
+				printf("mesh::update(): Error! Couldn't find physics driver %s\n", matname.c_str());
+		}
+		else {
+			printf("mesh::update(): Warning! Unrecognized key: %s\n", key.c_str());
+		}
+	}
 	
-	// get the vertices
-	vector<string> vertexVals = BZWParser::getValuesByKey("vertex", header, meshDataNoDrawInfo);
 	
-	// get the texcoords
-	vector<string> texCoordVals = BZWParser::getValuesByKey("texcoord", header, meshDataNoDrawInfo);
-	
-	// get the normals
-	vector<string> normalVals = BZWParser::getValuesByKey("normal", header, meshDataNoDrawInfo);
-		
-	// get inside points
-	vector<string> insidePointVals = BZWParser::getValuesByKey("inside", header, meshDataNoDrawInfo);
-	
-	// get outside points
-	vector<string> outsidePointVals = BZWParser::getValuesByKey("outside", header, meshDataNoDrawInfo);
-	
-	// get faces
-	vector<string> faceVals = BZWParser::getSectionsByHeader("face", meshDataNoDrawInfo, "endface");
 	
 	// get materials in the order they come in relation to faces.
 	// since we know how many faces there are in faceVals, we can
@@ -109,7 +182,7 @@ int mesh::update(string& data) {
 	// of faces between matrefs and later mapping those faces in faceVals
 	// to those materials since in both matrefs and faceVals the faces
 	// come in the same order.
-	vector<string> matFaceKeys = vector<string>();
+	/*vector<string> matFaceKeys = vector<string>();
 	matFaceKeys.push_back("face");
 	matFaceKeys.push_back("matref");
 	vector<string> matrefs = BZWParser::getLinesByKeys(matFaceKeys, header, meshDataNoDrawInfo);
@@ -269,7 +342,7 @@ int mesh::update(string& data) {
 	faces = faceParams;
 	noClusters = (noClusterVals.size() == 0 ? false : true);
 	smoothBounce = (smoothBounceVals.size() == 0 ? false : true);
-	materialMap = matmap;
+	materialMap = matmap;*/
 	
 	return 1;
 }
@@ -277,7 +350,7 @@ int mesh::update(string& data) {
 // to string
 string mesh::toString(void) {
 	// string-ify the vertices, normals, texcoords, inside points, outside points, and faces
-	string vertexString(""), normalString(""), texcoordString(""), insideString(""), outsideString(""), faceString("");
+	/*string vertexString(""), normalString(""), texcoordString(""), insideString(""), outsideString(""), faceString("");
 	
 	if(vertices.size() > 0) {
 		for(vector<Point3D>::iterator i = vertices.begin(); i != vertices.end(); i++) {
@@ -334,7 +407,9 @@ string mesh::toString(void) {
 				  texcoordString +
 				  faceString +
 				  (useDrawInfo == true ? "  " + drawInfo.toString() : "") + "\n" +
-				  "end\n";
+				  "end\n";*/
+
+	return string(); // FIXME: correct code
 }
 
 // render

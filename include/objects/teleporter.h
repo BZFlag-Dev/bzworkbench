@@ -53,12 +53,16 @@ public:
 
 	// binary getters and setters
 	float getBorder() { return border; }
+	float getTexsize() { return texsize; }
 
 	void setBorder( float newBorder );
+	void setTexsize( float value );
 
 private:
 
 	float border;
+
+	float texsize;
 
 	// the real size (not reflected in the node geometry)
 	Point3D realSize;

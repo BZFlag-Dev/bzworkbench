@@ -996,3 +996,24 @@ vector<string> BZWParser::loadFile(const char* filename) {
 	return ret;
 }
 
+vector<int> BZWParser::getIntList( const char* line ) {
+	vector<string> values = BZWParser::getLineElements( line );
+	vector<int> ret;
+
+	for ( vector<string>::iterator itr = values.begin(); itr != values.end(); itr++ ) {
+		ret.push_back( atoi( (*itr).c_str() ) );
+	}
+
+	return ret;
+}
+
+bool BZWParser::allWhitespace( const char* line ) {
+	const char* ptr;
+	
+	for ( ptr = line; *ptr != 0; ptr++ ) {
+		if ( *ptr != '\t' && *ptr != ' ' )
+			return false;
+	}
+
+	return true;
+}

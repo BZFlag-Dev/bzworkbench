@@ -46,10 +46,10 @@ void teleporter::setDefaults() {
 
 	setThisNode( teleporter );
 
-	setBorder( 0.5f );
-
-	osg::Vec3 scale = osg::Vec3( getBorder(), 10, 20 );
+	osg::Vec3 scale = osg::Vec3( 0.5f, 10, 20 );
 	realSize = scale;
+	this->border = scale.x() * 2.0f;
+	texsize = 0.0f;
 
 	setSize( scale );
 
@@ -169,6 +169,11 @@ void teleporter::setBorder( float newBorder ) {
 	updateGeometry();
 }
 
+void teleporter::setTexsize( float value ) {
+	texsize = value;
+	updateGeometry();
+}
+
 // build a teleporter
 void teleporter::updateGeometry() {
 	osg::Group* teleporter = (osg::Group*)getThisNode();
@@ -201,6 +206,16 @@ void teleporter::updateTeleporterUV( osg::Group* tele, osg::Vec3 size,
 
 	const bool wantBorder = (borderSize >= 0.001f);
 
+	float texScale;
+	if (texsize == 0.0f) {
+		texScale = 1.0f / this->border;
+	}
+	else if (texsize > 0.0f) {
+		texScale = 1.0f / texsize;
+	}
+	else {
+		texScale = -texsize;
+	}
 
 	const float br = borderSize;
 	const float hb = br * 0.5f;
@@ -224,8 +239,6 @@ void teleporter::updateTeleporterUV( osg::Group* tele, osg::Vec3 size,
 	portalUVs->push_back( osg::Vec2( 0.0f, ztxc ) ); // t3
 
 	if ( wantBorder ) {
-		float texScale = 1.0f / borderSize;
-
 		const osg::Vec2 xTexOffset( +yo, -zt );
 		const float xb2 = xb * 2.0f;
 		const float yo2 = yo * 2.0f;

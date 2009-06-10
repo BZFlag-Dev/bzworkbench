@@ -16,6 +16,8 @@
 #define M_PI           3.14159265358979323846
 #endif
 
+const char* sphere::sideNames[MaterialCount] = { "edge", "bottom" };
+
 sphere::sphere() :
 bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref>" ) {
 	setDefaults();
@@ -37,12 +39,16 @@ void sphere::setDefaults() {
 	group->addChild( bottom );
 	setThisNode( group );
 
+	SceneBuilder::assignTexture( "boxwall", group->getChild( 0 ) );
+	SceneBuilder::assignTexture( "roof", group->getChild( 1 ) );
+
 	// define some basic values
 	realSize = osg::Vec3( 10, 10, 10 );
+	texsize.set( -4.0f, -4.0f );
 	divisions = 16;
 	physicsDriver = NULL;
 	flatShading = false;
-	smoothbounce = true;
+	smoothbounce = false;
 	hemisphere = false;
 
 	updateGeometry();
@@ -65,6 +71,30 @@ int sphere::update(string& data) {
 	if(!hasOnlyOne(lines, "sphere"))
 		return 0;
 	const char* sphereData = lines[0].c_str();
+
+	// get the matrefs
+	osg::Group* group = (osg::Group*)getThisNode();
+	for (int i = 0; i < MaterialCount; i++) {
+		vector<string> faces;
+		faces.push_back(sideNames[i]);
+
+		vector<string> matrefs = BZWParser::getValuesByKeyAndFaces("matref", faces, header, sphereData);
+
+		if (matrefs.size() > 0) {
+			vector< material* > materials;
+			for (vector<string>::iterator itr = matrefs.begin(); itr != matrefs.end(); itr++) {
+				material* mat = (material*)Model::command( MODEL_GET, "material", *itr );
+				if (mat != NULL)
+					materials.push_back( mat );
+				else
+					printf("cone::update(): Error! Couldn't find material %s\n", (*itr).c_str());
+			}
+
+			material* finalMat = material::computeFinalMaterial(materials);
+
+			group->getChild(i)->setStateSet(finalMat);
+		}
+	}
 
 	// get the name
 	vector<string> names = BZWParser::getValuesByKey("name", header, sphereData);
@@ -185,6 +215,49 @@ osg::Vec3 sphere::getSize() {
 	return realSize;
 }
 
+void sphere::setFlatshading( bool value ) {
+	flatShading = value;
+}
+
+void sphere::setSmoothbounce( bool value ) {
+	smoothbounce = value;
+}
+
+void sphere::setHemisphere( bool value ) {
+	hemisphere = value;
+}
+
+void sphere::setDivisions( int value ) {
+	divisions = value;
+	updateGeometry();
+}
+
+void sphere::setTexsize( Point2D value ) {
+	texsize = value;
+	updateGeometry();
+}
+
+
+bool sphere::getFlatshading() {
+	return flatShading;
+}
+
+bool sphere::getSmoothbounce() {
+	return smoothbounce;
+}
+
+bool sphere::getHemisphere() {
+	return hemisphere;
+}
+
+int sphere::getDivisions() {
+	return divisions;
+}
+
+Point2D sphere::getTexsize() {
+	return texsize;
+}
+
 void sphere::updateGeometry() {
 	osg::Group* sphere = (osg::Group*)getThisNode();
 	osg::Geode* outside = (osg::Geode*)sphere->getChild( 0 );
@@ -194,8 +267,6 @@ void sphere::updateGeometry() {
 		outside->removeDrawables( 0 );
 	if ( bottom->getNumDrawables() > 0 )
 		bottom->removeDrawables( 0 );
-
-	osg::Vec2 texSize( 1, 1 );
 
 	int i, j, q;
 	const float minSize = 1.0e-6f; // cheezy / lazy
@@ -210,7 +281,7 @@ void sphere::updateGeometry() {
 	osg::Vec3 sz( fabsf(getSize().x()), fabsf(getSize().y()), fabsf(getSize().z()) );
 
 	// adjust the texture sizes
-	osg::Vec2 texsz(texSize.x(), texSize.y());
+	osg::Vec2 texsz(texsize.x(), texsize.y());
 	if (texsz.x() < 0.0f) {
 		// unless you want to do elliptic integrals, here's
 		// the Ramanujan approximation for the circumference
@@ -480,13 +551,10 @@ void sphere::updateGeometry() {
 			realTexcoords->push_back( (*texcoords)[i + bottomTexOffset] );
 		}
 
-		osg::DrawElementsUInt* faces = new osg::DrawElementsUInt( osg::DrawElements::QUADS, 0 );
+		osg::DrawElementsUInt* faces = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_FAN, 0 );
 		for (unsigned int i = 0; i < realVertices->size(); i++)
 			faces->push_back( i );
 
 		bottomGeom->addPrimitiveSet( faces );
 	}
-
-	SceneBuilder::assignTexture( "boxwall", outside, osg::StateAttribute::ON );
-	SceneBuilder::assignTexture( "roof", bottom, osg::StateAttribute::ON );
 }
