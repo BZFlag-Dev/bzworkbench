@@ -123,7 +123,7 @@ int material::update(string& data) {
 			if ( texmat != NULL)
 				setTextureMatrix( texmat );
 			else
-				printf("material::update(): Error! Could not find texmat %s", value.c_str());
+				printf("material::update(): Error! Could not find texmat %s\n", value.c_str());
 		}
 		else if ( key == "color" ) { // get the diffuse colors
 			diffuses.push_back( BZWParser::value( "color", line.c_str() ) );

@@ -12,19 +12,19 @@
 
 #include "MeshFace.h"
 
-MeshFace::MeshFace() : 
+MeshFace::MeshFace() :
 DataEntry("face", "<vertices><normals><texcoords><phydrv><matref><drivethrough><shootthrough><passable>") {
 	vertices = vector<int>();
 	normals = vector<int>();
 	texcoords = vector<int>();
-	physicsDriver = string("");
+	physicsDriver = NULL;
 	materials = vector<string>();
 	driveThrough = shootThrough = smoothbounce = false;
 	mat = NULL;
 }
 
 // constructor with data
-MeshFace::MeshFace(string mat, string phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough) : DataEntry("face", "<vertices><normals><texcoords><phydrv><matref><drivethrough><shootthrough><passable>") {
+MeshFace::MeshFace(string mat, physics* phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough) : DataEntry("face", "<vertices><normals><texcoords><phydrv><matref><drivethrough><shootthrough><passable>") {
 	vertices = vector<int>();
 	normals = vector<int>();
 	texcoords = vector<int>();
@@ -73,7 +73,12 @@ bool MeshFace::parse( const char* line ) {
 		}
 	}
 	else if ( key == "phydrv" ) {
-		physicsDriver = BZWParser::value( "phydrv", line );
+		string drvname = BZWParser::value( "phydrv", line );
+		physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", drvname.c_str() );
+		if (phys != NULL)
+			physicsDriver = phys;
+		else
+			printf("MeshFace::parse(): Error! Couldn't find physics driver %s\n", drvname.c_str());
 	}
 	else if ( key == "noclusters" ) {
 		noClusters = true;
@@ -260,7 +265,7 @@ string MeshFace::toString(void) {
 	string matstring = string("");
 	if(materials.size() > 0) {
 		for(vector<string>::iterator i = materials.begin(); i != materials.end(); i++) {
-			matstring += "    matref " + (*i) + "\n";	
+			matstring += "    matref " + (*i) + "\n";
 		}
 	}
 
@@ -271,7 +276,7 @@ string MeshFace::toString(void) {
 		(texcoords.size() > 0 ? "    texcoords " + stringify(texcoords) + "\n" : "") +
 		(normals.size() > 0 ? "    normals " + stringify(normals) + "\n" : "") +
 		matstring +
-		(physicsDriver.length() != 0 ? "    phydrv " + physicsDriver + "\n" : "") +
+		(physicsDriver != NULL ? "    phydrv " + physicsDriver->getName() + "\n" : "") +
 		(shootThrough == true ? "    shootthrough\n" : "") +
 		(driveThrough == true ? "    drivethrough\n" : "") +
 		"  endface\n";
@@ -288,8 +293,8 @@ string MeshFace::stringify(vector<int>& values) {
 
 	if(values.size() > 0) {
 		for(vector<int>::iterator i = values.begin(); i != values.end(); i++) {
-			ret += string(itoa(*i)) + " ";	
-		}	
+			ret += string(itoa(*i)) + " ";
+		}
 	}
 
 	return ret;

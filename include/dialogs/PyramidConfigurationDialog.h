@@ -17,7 +17,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/Fl_Check_Button.H>
-#include <FL/FL_Choice.H>
+#include <FL/Fl_Choice.H>
 
 #include "ConfigurationDialog.h"
 #include "widgets/QuickLabel.h"
@@ -35,25 +35,25 @@ public:
 
 	// constructor
 	PyramidConfigurationDialog( pyramid* thePyr );
-	
+
 	// static constructor
-	static ConfigurationDialog* init( DataEntry* d ) { 
+	static ConfigurationDialog* init( DataEntry* d ) {
 		pyramid* c = dynamic_cast< pyramid* > (d);
 		if( c )
 			return new PyramidConfigurationDialog( dynamic_cast< pyramid* >( d ) );
 		else
 			return NULL;
 	}
-	
+
 	// destructor
 	virtual ~PyramidConfigurationDialog() { }
-	
+
 	// OK callback
 	static void OKCallback( Fl_Widget* w, void* data ) {
 		PyramidConfigurationDialog* ccd = (PyramidConfigurationDialog*)(data);
 		ccd->OKCallback_real( w );
 	}
-	
+
 	// CANCEL callback
 	static void CancelCallback( Fl_Widget* w, void* data ) {
 		PyramidConfigurationDialog* ccd = (PyramidConfigurationDialog*)(data);
@@ -85,9 +85,9 @@ public:
 		PyramidConfigurationDialog* ccd = (PyramidConfigurationDialog*)(data);
 		ccd->ZNCallback_real( w );
 	}
-	
+
 private:
-	
+
 	// the cone
 	pyramid* thePyr;
 
@@ -104,8 +104,8 @@ private:
 	bool shootthrough[5];
 	bool ricochet[5];
 	int selectedFace;
-	
-	
+
+
 	// real callbacks
 	void OKCallback_real( Fl_Widget* w );
 	void CancelCallback_real( Fl_Widget* w );
@@ -114,36 +114,36 @@ private:
 	void YPCallback_real( Fl_Widget* w );
 	void YNCallback_real( Fl_Widget* w );
 	void ZNCallback_real( Fl_Widget* w );
-	
+
 	// box
 	Fl_Box* flbox;
-	
+
 	// face label
 	QuickLabel* faceLabel;
-	
+
 	// face choice
 	Fl_Choice* faceChoice;
-	
+
 	// texsize label
 	QuickLabel* texsizeLabel;
-	
+
 	// texsize value inputs
 	Fl_Value_Input* texsizeXInput;
 	Fl_Value_Input* texsizeYInput;
 
 	// texoffset label
 	QuickLabel* texoffsetLabel;
-	
+
 	// texoffset value inputs
 	Fl_Value_Input* texoffsetXInput;
 	Fl_Value_Input* texoffsetYInput;
-	
+
 	// Drive through check-button
 	Fl_Check_Button* drivethroughButton;
-	
+
 	// Shoot through check-button
 	Fl_Check_Button* shootthroughButton;
-	
+
 	// ricochet check-button
 	Fl_Check_Button* ricochetButton;
 

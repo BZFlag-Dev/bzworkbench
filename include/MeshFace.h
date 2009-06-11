@@ -25,27 +25,27 @@
  * a "mesh" object's faces.  It assists "mesh" similar to how "ColorCommand" assists
  * "dynamicColor" and "Transform" assists "bz2object"
  */
- 
+
 class MeshFace : public DataEntry {
-	
+
 public:
 
 	// default constructor
 	MeshFace();
-	
+
 	// constructor with data
-	MeshFace(std::string mat, std::string phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough);
-	
+	MeshFace(std::string mat, physics* phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough);
+
 	~MeshFace();
 
 	// getter
 	string get(void);
 
 	bool parse( const char* line );
-	
+
 	// toString
 	string toString(void);
-	
+
 	// render
 	int render(void);
 
@@ -86,7 +86,7 @@ public:
     };
 
     struct SpecialData {
-      SpecialData() 
+      SpecialData()
 		  : baseTeam(-1),
 			LinkSrcRebound(false),
 			LinkSrcNoGlow(false),
@@ -116,16 +116,16 @@ private:
 	/**
 	 * Helper method: convert an array of ints into a string
 	 */
-	 
+
 	string stringify(vector<int>& values);
 	void makeMaterial();
 	vector<int> vertices;
 	vector<int> normals;
 	vector<int> texcoords;
-	string physicsDriver;
+	physics* physicsDriver;
 	vector<string> materials;
 	material* mat;
-	
+
 	bool driveThrough;
 	bool shootThrough;
 	bool noClusters;

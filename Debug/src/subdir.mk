@@ -6,6 +6,7 @@
 CPP_SRCS += \
 ../src/BZWBAPI.cpp \
 ../src/BZWBPlugins.cpp \
+../src/MeshFace.cpp \
 ../src/OSFile.cpp \
 ../src/TextUtils.cpp \
 ../src/commonControls.cpp \
@@ -14,6 +15,7 @@ CPP_SRCS += \
 OBJS += \
 ./src/BZWBAPI.o \
 ./src/BZWBPlugins.o \
+./src/MeshFace.o \
 ./src/OSFile.o \
 ./src/TextUtils.o \
 ./src/commonControls.o \
@@ -22,6 +24,7 @@ OBJS += \
 CPP_DEPS += \
 ./src/BZWBAPI.d \
 ./src/BZWBPlugins.d \
+./src/MeshFace.d \
 ./src/OSFile.d \
 ./src/TextUtils.d \
 ./src/commonControls.d \
