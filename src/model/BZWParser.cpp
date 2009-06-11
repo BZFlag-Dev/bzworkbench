@@ -381,7 +381,8 @@ const vector<string> BZWParser::getSectionsByHeader(const char* _header, const c
 			section += line + "\n";
 
 			// see if it has the end
-			if(lineElements[0].compare(0, footer.length(), footer) == 0) {
+			
+			if(TextUtils::compare_nocase(lineElements[0], footer) == 0) {
 				found = true;
 				// printf("BZWParser: found footer; breaking...\n");
 				break;

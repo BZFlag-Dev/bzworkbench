@@ -65,7 +65,7 @@ int mesh::update(string& data) {
 	const char* header = getHeader().c_str();
 	
 	// get lines
-	vector<string> chunks = BZWParser::getSectionsByHeader(header, data.c_str(), "endface");
+	vector<string> chunks = BZWParser::getSectionsByHeader(header, data.c_str(), "end");
 	
 	// break if there are none
 	if(chunks[0] == BZW_NOT_FOUND) {
@@ -174,7 +174,7 @@ int mesh::update(string& data) {
 		}
 	}
 	
-	
+	updateGeometry();
 	
 	// get materials in the order they come in relation to faces.
 	// since we know how many faces there are in faceVals, we can
@@ -426,26 +426,38 @@ void mesh::updateGeometry() {
 	osg::Vec2Array* texcoords = NULL;
 	int arrayPos = 0;
 	material* lastmat = NULL;
+	bool lastNoTexcoords = false;
+	bool first = true;
 
 	for (vector<MeshFace*>::iterator itr = faces.begin(); itr != faces.end(); itr++) {
 		MeshFace* face = *itr;
 		material* mat = face->getMaterial();
+		bool noTexcoords = false;
+		if (face->getTexcoords().size() == 0)
+			noTexcoords = true;
 
 		// need to make a new geode if the material changes
-		if (lastmat == NULL || mat != lastmat) {
+		if (first || mat != lastmat || lastNoTexcoords != noTexcoords) {
 			geode = new osg::Geode();
 			geometry = new osg::Geometry();
 			vertices = new osg::Vec3Array();
-			texcoords = new osg::Vec2Array();
+
+			if (!noTexcoords) {
+				texcoords = new osg::Vec2Array();
+				geometry->setTexCoordArray( 0, texcoords );
+			}
+
 			group->addChild( geode );
 			geode->addDrawable( geometry );
 			geode->setStateSet( mat );
 			geometry->setVertexArray( vertices );
-			geometry->setTexCoordArray( 0, texcoords );
+			
 			arrayPos = 0;
+			first = false;
 		}
 
 		osg::DrawElementsUInt* indices = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_STRIP, 0 );
+		geometry->addPrimitiveSet( indices );
 
 		vector<int> vertIdx = face->getVertices();
 		vector<int> texcoordIdx = face->getTexcoords();
@@ -457,5 +469,9 @@ void mesh::updateGeometry() {
 				indices->push_back( arrayPos++ );
 		}
 
+		lastmat = mat;
+		lastNoTexcoords = noTexcoords;
 	}
+
+	setThisNode(group);
 }
