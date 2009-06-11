@@ -6,7 +6,7 @@ Aside from usual dependency on a GNU build environment, BZWorkbench has
 the following library and source dependencies:
 
 	(*)	FLTK 1.1.7
-	(*)	OpenSceneGraph 2.0
+	(*)	OpenSceneGraph 2.8
 	(*)	OpenGL 1.4
 
 
