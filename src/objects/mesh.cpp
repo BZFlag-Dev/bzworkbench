@@ -48,13 +48,13 @@ mesh::mesh(string& data) :
 
 mesh::~mesh() {
 	// clean up
-	if (drawInfo != NULL)
+	/*if (drawInfo != NULL)
 		delete drawInfo;
 
 	for (vector<MeshFace*>::iterator itr = faces.begin(); itr != faces.end(); itr++) {
 		if ( *itr != NULL )
 			delete *itr;
-	}
+	}*/
 }
 
 // getter
@@ -415,4 +415,47 @@ string mesh::toString(void) {
 // render
 int mesh::render(void) {
 	return 0;
+}
+
+void mesh::updateGeometry() {
+	osg::Group* group = new osg::Group();
+
+	osg::Geode* geode = NULL;
+	osg::Geometry* geometry = NULL;
+	osg::Vec3Array* vertices = NULL;
+	osg::Vec2Array* texcoords = NULL;
+	int arrayPos = 0;
+	material* lastmat = NULL;
+
+	for (vector<MeshFace*>::iterator itr = faces.begin(); itr != faces.end(); itr++) {
+		MeshFace* face = *itr;
+		material* mat = face->getMaterial();
+
+		// need to make a new geode if the material changes
+		if (lastmat == NULL || mat != lastmat) {
+			geode = new osg::Geode();
+			geometry = new osg::Geometry();
+			vertices = new osg::Vec3Array();
+			texcoords = new osg::Vec2Array();
+			group->addChild( geode );
+			geode->addDrawable( geometry );
+			geode->setStateSet( mat );
+			geometry->setVertexArray( vertices );
+			geometry->setTexCoordArray( 0, texcoords );
+			arrayPos = 0;
+		}
+
+		osg::DrawElementsUInt* indices = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_STRIP, 0 );
+
+		vector<int> vertIdx = face->getVertices();
+		vector<int> texcoordIdx = face->getTexcoords();
+
+		for (vector<int>::iterator vitr = vertIdx.begin(), titr = texcoordIdx.begin();
+			vitr != vertIdx.end() && titr != texcoordIdx.end(); vitr++, titr++) {
+				vertices->push_back( this->vertices[ *vitr ] );
+				texcoords->push_back( this->texCoords[ *titr ] );
+				indices->push_back( arrayPos++ );
+		}
+
+	}
 }

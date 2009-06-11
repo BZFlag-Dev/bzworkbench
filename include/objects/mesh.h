@@ -79,6 +79,8 @@ private:
 
 	// draw info
 	DrawInfo* drawInfo;
+
+	void updateGeometry();
 };
 
 #endif /*MESH_H_*/

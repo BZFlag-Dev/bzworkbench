@@ -16,6 +16,7 @@
 #include "DataEntry.h"
 #include "model/BZWParser.h"
 #include "objects/physics.h"
+#include "objects/material.h"
 #include <vector>
 #include <string>
 
@@ -35,6 +36,8 @@ public:
 	// constructor with data
 	MeshFace(std::string mat, std::string phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough);
 	
+	~MeshFace();
+
 	// getter
 	string get(void);
 
@@ -46,6 +49,11 @@ public:
 	// render
 	int render(void);
 
+	vector<int> getVertices() { return vertices; }
+	vector<int> getNormals() { return normals; }
+	vector<int> getTexcoords() { return texcoords; }
+	material* getMaterial() { return mat; }
+
 	    struct LinkGeometry {
       LinkGeometry()
       : centerIndex(-1) // index to a vertex
@@ -56,6 +64,9 @@ public:
       , tScale(1.0f)
       , pScale(0.0f) // note the 0.0f
       , angle(0.0f)
+	  , LinkAutoSscale(true)
+	  , LinkAutoTscale(true)
+	  , LinkAutoPscale(true)
       {}
       int centerIndex;
       int sDirIndex;
@@ -69,11 +80,19 @@ public:
       float tScale;
       float pScale;
       float angle;   // calculated
+	  bool LinkAutoSscale;
+      bool LinkAutoTscale;
+      bool LinkAutoPscale ;
     };
 
     struct SpecialData {
       SpecialData() 
-		  : baseTeam(-1)
+		  : baseTeam(-1),
+			LinkSrcRebound(false),
+			LinkSrcNoGlow(false),
+			LinkSrcNoRadar(false),
+			LinkSrcNoSound(false),
+			LinkSrcNoEffect(false)
       {}
 
       unsigned short stateBits; // uses SpecialBits enum
@@ -85,6 +104,12 @@ public:
       LinkGeometry linkDstGeo;
       std::string  linkSrcShotFail;
       std::string  linkSrcTankFail;
+
+	  bool LinkSrcRebound;
+	  bool LinkSrcNoGlow;
+	  bool LinkSrcNoRadar;
+	  bool LinkSrcNoSound;
+	  bool LinkSrcNoEffect;
     };
 
 private:
@@ -93,11 +118,13 @@ private:
 	 */
 	 
 	string stringify(vector<int>& values);
+	void makeMaterial();
 	vector<int> vertices;
 	vector<int> normals;
 	vector<int> texcoords;
 	string physicsDriver;
 	vector<string> materials;
+	material* mat;
 	
 	bool driveThrough;
 	bool shootThrough;
