@@ -36,6 +36,8 @@
 #include "dialogs/MeshboxConfigurationDialog.h"
 #include "dialogs/SphereConfigurationDialog.h"
 #include "dialogs/TeleporterConfigurationDialog.h"
+#include "dialogs/ZoneConfigurationDialog.h"
+#include "dialogs/BaseConfigurationDialog.h"
 
 #include "render/Point3D.h"
 #include "render/RGBA.h"
@@ -84,7 +86,7 @@
 // register the built-in objects
 void buildModelDatabase() {
 	Model::registerObject("arc", NULL, "end", arc::init, ArcConfigurationDialog::init);
-	Model::registerObject("base", NULL, "end", base::init);
+	Model::registerObject("base", NULL, "end", base::init, BaseConfigurationDialog::init);
 	Model::registerObject("box", NULL, "end", box::init, BoxConfigurationDialog::init);
 	Model::registerObject("cone", NULL, "end", cone::init, ConeConfigurationDialog::init);
 	Model::registerObject("dynamicColor", NULL, "end", dynamicColor::init);
@@ -107,7 +109,7 @@ void buildModelDatabase() {
 	Model::registerObject("waterLevel", NULL, "end", waterLevel::init);
 	Model::registerObject("weapon", NULL, "end", weapon::init);
 	Model::registerObject("world", NULL, "end", world::init);
-	Model::registerObject("zone", NULL, "end", zone::init);
+	Model::registerObject("zone", NULL, "end", zone::init, ZoneConfigurationDialog::init);
 
 	Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
 }

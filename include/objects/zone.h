@@ -59,6 +59,9 @@ public:
 			flag = fl;
 			qty = atoi( n.c_str() );
 		}
+
+		string getFlag() { return flag; }
+		int getQty() { return qty; }
 		
 		string flag;
 		int qty;
@@ -88,6 +91,17 @@ public:
 	
 	// render
 	int render(void);
+
+	vector<int> getTeams() { return teams; }
+	vector<int> getSafety() { return safety; }
+	vector<FlagElement> getZoneflags() { return zoneflags; }
+	vector<string> getFlags() { return flags; }
+
+	void setTeams( vector<int> value ) { teams = value; }
+	void setSafety( vector<int> value ) { safety = value; }
+	void setZoneflags( vector<FlagElement> value ) { zoneflags = value; }
+	void setFlags( vector<string> value ) { flags = value; }
+
 
 private:
 	vector<int> teams;
