@@ -26,11 +26,11 @@
 #include <FL/Fl_Scroll.H>
 #include "ConfigurationDialog.h"
 #include "AdvancedOptionsDialog.h"
-#include "../widgets/QuickLabel.h"
-#include "../widgets/TransformWidget.h"
-#include "../DataEntry.h"
-#include "../render/Point3D.h"
-#include "../objects/bz2object.h"
+#include "widgets/QuickLabel.h"
+#include "widgets/TransformWidget.h"
+#include "DataEntry.h"
+#include "render/Point3D.h"
+#include "objects/bz2object.h"
 
 #include <string>
 #include <vector>

@@ -147,7 +147,7 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	if(transformationFormat.length() > 0 && transforms.size() > 0) {
 		
 		// add the transforms
-		for(vector< osg::ref_ptr<BZTransform> >::iterator i = transforms.end() - 1; i != transforms.begin() - 1; i--) {
+		for(vector< osg::ref_ptr<BZTransform> >::reverse_iterator i = transforms.rbegin(); i != transforms.rend(); i++) {
 			// don't include transformations that won't be written
 			if( !(*i)->isApplied() )
 				continue;
@@ -241,10 +241,10 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 	osg::Vec3 rotation = osg::Vec3( 0.0, 0.0, zRotation );
 	
 	// get the transformations
-	vector< osg::ref_ptr< BZTransform > > transforms = vector< osg::ref_ptr< BZTransform > >();
+	vector< osg::ref_ptr< BZTransform > > transforms;
 	
 	if(transformations.size() != 0) {
-		for(vector<TransformWidget*>::iterator i = transformations.end() - 1; i != transformations.begin() - 1; i--) {
+		for(vector<TransformWidget*>::reverse_iterator i = transformations.rbegin(); i != transformations.rend(); i++) {
 			if( (*i)->active() ) {
 				string widgetData = (*i)->toString();
 				transforms.push_back( new BZTransform( widgetData ) );

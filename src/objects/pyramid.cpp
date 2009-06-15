@@ -22,12 +22,12 @@ const char* pyramid::faceNames[FaceCount] = {
   "bottom"
 };
 
-pyramid::pyramid() : bz2object("pyramid", "<position><rotation><size>") {
+pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin>") {
 	setDefaults();
 }
 
 // constructor with string
-pyramid::pyramid(string& data) : bz2object("pyramid", "<position><rotation><size>") {
+pyramid::pyramid(string& data) : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin>") {
 	setDefaults();
 
 	this->update(data);

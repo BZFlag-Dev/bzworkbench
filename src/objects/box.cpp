@@ -22,11 +22,11 @@ const char* box::faceNames[FaceCount] = {
 };
 
 // constructors
-box::box() : bz2object("box", "<name><position><rotation><size><matref><phydrv><drivethrough><shootthrough><passable><ricochet><texsize><texoffset>") {
+box::box() : bz2object("box", "<name><position><rotation><size><matref><phydrv><drivethrough><shootthrough><passable><ricochet><texsize><texoffset><shift><shear><scale><spin>") {
 	setDefaults();
 }
 
-box::box(string& data) : bz2object("box", "<name><position><rotation><size><matref><phydrv><drivethrough><shootthrough><passable><ricochet><texsize><texoffset>") {
+box::box(string& data) : bz2object("box", "<name><position><rotation><size><matref><phydrv><drivethrough><shootthrough><passable><ricochet><texsize><texoffset><shift><shear><scale><spin>") {
 	setDefaults();
 
 	this->update( data );

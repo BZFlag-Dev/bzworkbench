@@ -16,14 +16,14 @@
 
 // constructor
 base::base() :
-	bz2object("base", "<position><rotation><size><team><color><oncap>") {
+	bz2object("base", "<position><rotation><size><team><color><oncap><shift><shear><scale><spin>") {
 
 	setDefaults();
 }
 
 // constructor with data
 base::base(string& data) :
-	bz2object("base", "<position><rotation><size><team><color><oncap>", data.c_str()) {
+	bz2object("base", "<position><rotation><size><team><color><oncap><shift><shear><scale><spin>", data.c_str()) {
 
 	setDefaults();
 
