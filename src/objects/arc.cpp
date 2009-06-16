@@ -162,6 +162,8 @@ int arc::update(string& data) {
 }
 
 int arc::update(UpdateMessage& message) {
+	int result = bz2object::update( message );
+
 	switch( message.type ) {
 		case UpdateMessage::SET_POSITION: 	// handle a new position
 			setPos( *(message.getAsPosition()) );
@@ -188,7 +190,7 @@ int arc::update(UpdateMessage& message) {
 			break;
 
 		default:	// unknown event; don't handle
-			return 0;
+			return result;
 	}
 
 	return 1;

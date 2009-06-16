@@ -213,6 +213,7 @@ int pyramid::update(string& data) {
 // setter with messaging
 // NOTE: don't call the superclass method, because it deals solely with transformations (which are n/a here)
 int pyramid::update(UpdateMessage& message) {
+	int result = bz2object::update( message );
 
 	switch( message.type ) {
 		case UpdateMessage::SET_POSITION: 	// handle a new position
@@ -240,7 +241,7 @@ int pyramid::update(UpdateMessage& message) {
 			break;
 
 		default:	// unknown event; don't handle
-			return 0;
+			return result;
 	}
 
 	return 1;

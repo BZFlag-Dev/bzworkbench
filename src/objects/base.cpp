@@ -124,6 +124,7 @@ void base::setTeam( int t ) {
 // setter (with binary data)
 // NOTE: don't call superclass update method, because it deals only with transformations (which are n/a here)
 int base::update(UpdateMessage& message) {
+	int result = bz2object::update( message );
 
 	switch( message.type ) {
 		case UpdateMessage::SET_POSITION: 	// handle a new position
@@ -151,7 +152,7 @@ int base::update(UpdateMessage& message) {
 			break;
 
 		default:	// unknown event; don't handle
-			return 0;
+			return result;
 	}
 
 	return 1;
