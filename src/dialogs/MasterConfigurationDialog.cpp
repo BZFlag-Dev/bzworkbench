@@ -99,10 +99,11 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	}
 	
 	// size
-	if( object->isKey("size") )
-		sizeLabel = new QuickLabel("Size", 5, 75);
-	else if( object->isKey("scale") )
+	if( object->isKey("scale") )
 		sizeLabel = new QuickLabel("Scale", 5, 75);
+	else
+		sizeLabel = new QuickLabel("Size", 5, 75);
+	
 		
 	sizeXField = new Fl_Float_Input(5 + 100, 75, 100, DEFAULT_TEXTSIZE + 6, "dx");
 	sizeYField = new Fl_Float_Input(5 + 100 + 120, 75, 100, DEFAULT_TEXTSIZE + 6, "dy");

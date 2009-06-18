@@ -388,7 +388,7 @@ void MenuBar::configureWorldCallback_real(Fl_Widget* w) {
 
 // handle world weapon creation
 void MenuBar::worldWeaponCallback_real(Fl_Widget* w) {
-	printf("world weapon created\n");
+	makeObject( "weapon" );
 	value(0);
 }
 

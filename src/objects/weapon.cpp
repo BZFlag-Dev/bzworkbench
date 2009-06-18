@@ -12,29 +12,36 @@
 
 #include "objects/weapon.h"
 
+#include <osg/Geometry>
+#include <osg/Geode>
+#include <osg/Vec3>
+#include <osg/PolygonMode>
+
 // default constructor
 weapon::weapon() : 
 	bz2object("weapon", "<name><rotation><position><color><tilt><initdelay><delay><type><trigger><eventteam>") {
-	type = string("");
-	trigger = string("");
-	eventTeam = string("");
-	tilt = 0.0f;
-	initdelay = 0.0f;
-	delay = vector<float>();
-	team = 0;
+	setDefaults();
 }
 
 // constructor with data
 weapon::weapon(string& data) :
 	bz2object("weapon", "<name><rotation><position><color><tilt><initdelay><delay><type><trigger><eventteam>", data.c_str()) {
+	setDefaults();
+
+	update(data);
+}
+
+void weapon::setDefaults() {
 	type = string("");
 	trigger = string("");
-	eventTeam = string("");
+	eventTeam = 0;
 	tilt = 0.0f;
 	initdelay = 0.0f;
 	delay = vector<float>();
 	team = 0;
-	update(data);
+	setSize( osg::Vec3( 5, 5, 5 ) );
+	
+	updateGeometry();
 }
 
 // getter
@@ -154,7 +161,7 @@ int weapon::update(string& data) {
 	
 	type = typeVals[0];
 	trigger = (triggerVals.size() != 0 ? triggerVals[0] : string(""));
-	eventTeam = (eventTeamVals.size() > 0 ? eventTeamVals[0] : "");
+	eventTeam = (eventTeamVals.size() > 0 ? atoi( eventTeamVals[0].c_str() ) : 0);
 	initdelay = atof( initDelayVals[0].c_str() );
 	tilt = (tiltVals.size() != 0 ? atof( tiltVals[0].c_str() ) : 0.0f);
 	team = (colorVals.size() > 0 ? atoi( colorVals[0].c_str() ) : 0);
@@ -177,7 +184,7 @@ string weapon::toString(void) {
 				  BZWLines( this ) +
 				  (type.length() == 0 ? "# type\n" : "  type " + type + "\n") +
 				  (trigger.length() == 0 ? "# trigger\n" : "  trigger " + trigger + "\n") +
-				  (eventTeam.length() == 0 ? "# eventteam\n" : "  eventteam " + eventTeam + "\n") +
+				  (eventTeam != 0 ? "# eventteam\n" : "  eventteam " + string( itoa( eventTeam ) ) + "\n") +
 				  "  initdelay " + string(ftoa(initdelay)) + "\n" +
 				  "  tilt " + string(ftoa(tilt)) + "\n" +
 				  "  color " + string(ftoa(team)) + "\n" +
@@ -187,5 +194,47 @@ string weapon::toString(void) {
 
 // render
 int weapon::render(void) {
-	return 0;	
+	return 0;
+}
+
+void weapon::updateGeometry() {
+	osg::Geode* geode = new osg::Geode();
+	osg::Geometry* geom = new osg::Geometry();
+	osg::Vec3Array* vertices = new osg::Vec3Array();
+
+	vertices->push_back( osg::Vec3( 0, 0, 1 ) ); // top
+	vertices->push_back( osg::Vec3( 1, 0, 0 ) ); // +x
+	vertices->push_back( osg::Vec3( 0, 1, 0 ) ); // +y
+	vertices->push_back( osg::Vec3( -1, 0, 0 ) ); // -x
+	vertices->push_back( osg::Vec3( 0, -1, 0 ) ); // -y
+	vertices->push_back( osg::Vec3( 0, 0, -1 ) ); // bottom
+
+	osg::DrawElementsUInt* indicesTop = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_FAN, 0 );
+	indicesTop->push_back( 0 );
+	indicesTop->push_back( 1 );
+	indicesTop->push_back( 2 );
+	indicesTop->push_back( 3 );
+	indicesTop->push_back( 4 );
+
+	osg::DrawElementsUInt* indicesBottom = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_FAN, 0 );
+	indicesBottom->push_back( 5 );
+	indicesBottom->push_back( 1 );
+	indicesBottom->push_back( 2 );
+	indicesBottom->push_back( 3 );
+	indicesBottom->push_back( 4 );
+
+	geode->addDrawable( geom );
+	geom->setVertexArray( vertices );
+	geom->addPrimitiveSet( indicesTop );
+	geom->addPrimitiveSet( indicesBottom );
+
+	// make wireframe material
+	osg::StateSet* stateset = geode->getOrCreateStateSet();
+	osg::PolygonMode* polyMode = new osg::PolygonMode();
+	polyMode->setMode( osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE );
+	stateset->setAttribute( polyMode, osg::StateAttribute::ON);
+
+	geode->setStateSet( stateset );
+
+	setThisNode( geode );
 }

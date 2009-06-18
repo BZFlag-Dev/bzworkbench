@@ -38,6 +38,7 @@
 #include "dialogs/TeleporterConfigurationDialog.h"
 #include "dialogs/ZoneConfigurationDialog.h"
 #include "dialogs/BaseConfigurationDialog.h"
+#include "dialogs/WeaponConfigurationDialog.h"
 
 #include "render/Point3D.h"
 #include "render/RGBA.h"
@@ -107,7 +108,7 @@ void buildModelDatabase() {
 	Model::registerObject("tetra", NULL, "end", tetra::init);
 	Model::registerObject("texturematrix", NULL, "end", texturematrix::init);
 	Model::registerObject("waterLevel", NULL, "end", waterLevel::init);
-	Model::registerObject("weapon", NULL, "end", weapon::init);
+	Model::registerObject("weapon", NULL, "end", weapon::init, WeaponConfigurationDialog::init);
 	Model::registerObject("world", NULL, "end", world::init);
 	Model::registerObject("zone", NULL, "end", zone::init, ZoneConfigurationDialog::init);
 

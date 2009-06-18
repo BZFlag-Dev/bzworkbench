@@ -14,7 +14,7 @@
 
 // constructor
 ZoneConfigurationDialog::ZoneConfigurationDialog( zone* _theZone ) :
-	ConfigurationDialog( _theZone, "Cone Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
+	ConfigurationDialog( _theZone, "Zone Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
 	begin();
 	
 	theZone = _theZone;

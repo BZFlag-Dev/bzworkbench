@@ -30,6 +30,8 @@ public:
 	static DataEntry* init() { return new weapon(); }
 	static DataEntry* init(string& data) { return new weapon(data); }
 	
+	void setDefaults();
+
 	// getter
 	string get(void);
 	
@@ -42,11 +44,31 @@ public:
 	// render
 	int render(void);
 	
+	int getColor() { return team; }
+	string getType() { return type; }
+	string getTrigger() { return trigger; }
+	float getInitdelay() { return initdelay; }
+	float getTilt() { return tilt; }
+	vector<float> getDelay() { return delay; }
+	int getEventTeam() { return eventTeam; }
+
+	void setColor( int value ) { team = value; }
+	void setType( string value ) { type = value; }
+	void setTrigger( string value ) { trigger = value; }
+	void setInitdelay( float value ) { initdelay = value; }
+	void setTilt( float value ) { tilt = value; }
+	void setDelay( vector<float> value ) { delay = value; }
+	void setEventTeam( int value ) { eventTeam = value; }
+
+
 private:
-	string type, trigger, eventTeam;
+	string type, trigger;
 	float initdelay, tilt;
 	vector<float> delay;
 	int team;
+	int eventTeam;
+
+	void updateGeometry();
 };
 
 #endif /*WEAPON_H_*/
