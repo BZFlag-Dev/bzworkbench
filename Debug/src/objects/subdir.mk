@@ -12,6 +12,7 @@ CPP_SRCS += \
 ../src/objects/define.cpp \
 ../src/objects/dynamicColor.cpp \
 ../src/objects/group.cpp \
+../src/objects/info.cpp \
 ../src/objects/link.cpp \
 ../src/objects/material.cpp \
 ../src/objects/mesh.cpp \
@@ -38,6 +39,7 @@ OBJS += \
 ./src/objects/define.o \
 ./src/objects/dynamicColor.o \
 ./src/objects/group.o \
+./src/objects/info.o \
 ./src/objects/link.o \
 ./src/objects/material.o \
 ./src/objects/mesh.o \
@@ -64,6 +66,7 @@ CPP_DEPS += \
 ./src/objects/define.d \
 ./src/objects/dynamicColor.d \
 ./src/objects/group.d \
+./src/objects/info.d \
 ./src/objects/link.d \
 ./src/objects/material.d \
 ./src/objects/mesh.d \

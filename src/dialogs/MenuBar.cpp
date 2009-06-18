@@ -18,8 +18,10 @@
 #include "objects/group.h"
 #include "objects/teleporter.h"
 
+#include "dialogs/InfoConfigurationDialog.h"
+
 void MenuBar::buildMenu(void) {
-	
+
 	add("File", 0, 0, 0, FL_SUBMENU);
 		add("File/New...", FL_CTRL + 'n', new_world, this);
 		add("File/Open...", FL_CTRL + 'o', open_world, this);
@@ -27,7 +29,7 @@ void MenuBar::buildMenu(void) {
 		add("File/Save As...", 0, save_world_as, this);
 		add("File/Save Selection...", 0, save_selection, this, FL_MENU_DIVIDER);
 		add("File/Exit", 0, exit_bzwb, this);
-	
+
 	add("Edit", 0, 0, 0, FL_SUBMENU);
 		add("Edit/Undo", FL_CTRL + 'z', undo, this);
 		add("Edit/Redo", FL_CTRL + 'y', redo, this, FL_MENU_DIVIDER);
@@ -39,7 +41,7 @@ void MenuBar::buildMenu(void) {
 		add("Edit/Delete", FL_Delete, delete_callback, this, FL_MENU_DIVIDER);
 		add("Edit/Select All", FL_CTRL + 'a', select_all, this);
 		add("Edit/Unselect All", FL_CTRL + FL_ALT + 'a', unselect_all, this);
-		
+
 	add("Objects", 0, 0, 0, FL_SUBMENU);
 		add("Objects/Add box", FL_CTRL+'b', addBoxCallback, this);
 		add("Objects/Add pyramid", FL_CTRL+'p', addPyramidCallback, this);
@@ -56,16 +58,17 @@ void MenuBar::buildMenu(void) {
 			add("Objects/Add base/Add Red Base", 0, addRedBaseCallback, this);
 			add("Objects/Add base/Add Green Base", 0, addGreenBaseCallback, this);
 			add("Objects/Add base/Add Blue Base", 0, addBlueBaseCallback, this);
-			
+
 	add("Scene", 0, 0, 0, FL_SUBMENU );
 		add("Scene/Import object...", 0, importObjectCallback, this, FL_MENU_DIVIDER);
-		
+
 		add("Scene/(Un)Group Selection", FL_CTRL+'g', groupCallback, this);
 		add("Scene/(Un)Hide Selection", FL_CTRL+'h', hideCallback, this, FL_MENU_DIVIDER);
-		
+
 		add("Scene/Configure World...", 0, configureWorldCallback, this);
-		add("Scene/Configure Object...", FL_CTRL+'o', configureObjectCallback, this, FL_MENU_DIVIDER);
-	
+		add("Scene/Configure Object...", FL_CTRL+'o', configureObjectCallback, this);
+		add("Scene/Configure Info...", 0, configureInfoCallback, this, FL_MENU_DIVIDER);
+
 		add("Scene/Define World Weapon...", FL_CTRL+'w', worldWeaponCallback, this);
 		add("Scene/Link Teleporters", 0, linkCallback, this);
 }
@@ -75,22 +78,22 @@ MenuBar::MenuBar( MainWindow* mw ) : Fl_Menu_Bar(0, 0, mw->w(), 30) {
 	this->parent = mw;
 	printf("MenuBar: parent mw addr: %p\n", parent);
 	printf("MenuBar: parent mw model addr: %p\n", parent->getModel());
-	this->buildMenu();	
+	this->buildMenu();
 }
 
 void MenuBar::new_world_real( Fl_Widget* w ) {
 	Model* model = this->parent->getModel();
 	model->_newWorld();
-	
+
 	// configure the new world
 	WorldOptionsDialog* wod = new WorldOptionsDialog( model->_getWorldData(),
 													  model->_getOptionsData(),
 													  model->_getWaterLevelData());
 	wod->show();
-	
+
 	// wait for configuration to end
 	while( wod->shown() ) { Fl::wait(); }
-	
+
 	// reset the world
 	ObserverMessage obs(ObserverMessage::UPDATE_WORLD, model->_getWorldData() );
 	model->notifyObservers( &obs );
@@ -106,21 +109,21 @@ void MenuBar::open_world_real( Fl_Widget* w ) {
 	/*Fl_File_Chooser* fc = new Fl_File_Chooser("share/", "*.bzw", Fl_File_Chooser::SINGLE, "Open..." );
 	fc->value("*.bzw");
 	fc->show();
-	
+
 	// wait for a value
 	while( fc->shown() ) { Fl::wait(); }
-	
+
 	// get a value (the selected filename )
 	if(fc->value() == NULL)
 		return;
-	
+
 	string filename = fc->value(); */
-	
+
 	printf("file: %s\n", filename.c_str());
-	
+
 	// invoke BZWParser and load it
 	vector<string> world = BZWParser::loadFile( filename.c_str() );
-	
+
 	// invoke the Model to build the world
 	parent->getModel()->_build( world );
 }
@@ -131,64 +134,64 @@ void MenuBar::save_world_real( Fl_Widget* w ) {
 		save_world_as_real( w );
 		return;
 	}
-	
+
 	// save the world
 	string path = parent->getWorldName();
-	
+
 	// do a world save
 	do_world_save( path.c_str() );
 }
 
 void MenuBar::save_world_as_real( Fl_Widget* w ) {
-	
+
 	string filename;
 
 	if (!callSaveFileDialog(filename,parent->getWorldName().c_str(),"share/","*.bzw","Open..."))
 		return;
-	
+
 	// set the world name
 	parent->setWorldName( filename.c_str() );
-	
+
 	// save the world
 	string path = parent->getWorldName();
-	
+
 	// do the world save
-	do_world_save( path.c_str() ); 
+	do_world_save( path.c_str() );
 }
 
 // save the world
 void MenuBar::do_world_save( const char* filename ) {
-	
+
 	ofstream fileOutput( filename );
-	
+
 	// if we can't open a new file (access permissions, etc), then bail
 	if(!fileOutput.is_open()) {
 		parent->error( TextUtils::format("Could not open %s for writing\n", filename).c_str() );
-		return;	
+		return;
 	}
-	
+
 	string text = parent->getModel()->toString();
-	
+
 	fileOutput.write( text.c_str(), text.size() );
 	fileOutput.close();
-	
+
 }
 
 void MenuBar::save_selection_real( Fl_Widget* w ) {
-	
+
 }
 
 void MenuBar::exit_bzwb_real( Fl_Widget* w ) {
 	while (Fl::first_window())
-		Fl::first_window()->hide();	
+		Fl::first_window()->hide();
 }
 
 void MenuBar::undo_real( Fl_Widget* w ) {
-	
+
 }
 
 void MenuBar::redo_real( Fl_Widget* w ) {
-	
+
 }
 
 void MenuBar::cut_real( Fl_Widget* w ) {
@@ -204,15 +207,15 @@ void MenuBar::paste_real( Fl_Widget* w ) {
 }
 
 void MenuBar::paste_saved_selection_real( Fl_Widget* w ) {
-	
+
 }
 
 void MenuBar::select_all_real( Fl_Widget* w ) {
-	
+
 }
 
 void MenuBar::unselect_all_real( Fl_Widget* w ) {
-	
+
 }
 
 // add a box
@@ -284,40 +287,40 @@ void MenuBar::importObjectCallback_real(Fl_Widget* w) {
 // add base 1
 void MenuBar::addPurpleBaseCallback_real(Fl_Widget* w) {
 	base* newObj = dynamic_cast< base* >( makeObject( "base" ) );
-	
+
 	// set the base
 	if (newObj)
 		newObj->setTeam( BASE_PURPLE );
-	
+
 	value(0);
 }
 
 // add base 2
 void MenuBar::addRedBaseCallback_real(Fl_Widget* w) {
 	base* newObj = dynamic_cast< base* >( makeObject( "base" ) );
-	
+
 	// set the base
 	if (newObj)
 		newObj->setTeam( BASE_RED );
-	
+
 	value(0);
 }
 
 // add base 3
 void MenuBar::addGreenBaseCallback_real(Fl_Widget* w) {
 	base* newObj = dynamic_cast< base* >( makeObject( "base" ) );
-	
+
 	// set the base
 	if (newObj)
 		newObj->setTeam( BASE_GREEN );
-	
+
 	value(0);
 }
 
 // add base 4
 void MenuBar::addBlueBaseCallback_real(Fl_Widget* w) {
 	base* newObj = dynamic_cast< base* >( makeObject( "base" ) );
-	
+
 	// set the base
 	if (newObj)
 		newObj->setTeam( BASE_BLUE );
@@ -329,7 +332,7 @@ void MenuBar::addBlueBaseCallback_real(Fl_Widget* w) {
 void MenuBar::duplicate_real(Fl_Widget* w) {
 	parent->getModel()->_copySelection();
 	parent->getModel()->_pasteSelection();
-	
+
 	value(0);
 }
 
@@ -343,17 +346,17 @@ void MenuBar::delete_real(Fl_Widget* w) {
 void MenuBar::groupCallback_real(Fl_Widget* w) {
 	// get the selection
 	Model::objRefList objects = this->parent->getModel()->_getSelection();
-	
+
 	if( objects.size() < 0 )
 		return;
-		
+
 	// only do an un-group if the only object selected is a group
 	if( objects.size() == 1 && objects[0]->getHeader() == "group" )
 		parent->getModel()->_ungroupObjects( dynamic_cast< group* > (objects[0].get()) );
 	else {
 		parent->getModel()->_groupObjects( objects );
 	}
-	
+
 	value(0);
 }
 
@@ -376,10 +379,10 @@ void MenuBar::configureWorldCallback_real(Fl_Widget* w) {
 													  parent->getModel()->_getOptionsData(),
 													  parent->getModel()->_getWaterLevelData());
 	wod->show();
-	
+
 	// wait for configuration to end
 	while( wod->shown() ) { Fl::wait(); }
-	
+
 	// reset the world
 	ObserverMessage obs(ObserverMessage::UPDATE_WORLD, parent->getModel()->_getWorldData() );
 	parent->getModel()->notifyObservers( &obs );
@@ -394,17 +397,38 @@ void MenuBar::worldWeaponCallback_real(Fl_Widget* w) {
 
 // handle object configuration
 void MenuBar::configureObjectCallback_real(Fl_Widget* w) {
-	printf("configured an object\n");	
+	// launch a MasterConfigurationDialog
+	Model::objRefList selection = parent->getModel()->_getSelection();
+	if( selection.size() > 1 || selection.size() == 0 )
+		return;
+
+	bz2object* obj = selection[0].get();
+	MasterConfigurationDialog* mcd = new MasterConfigurationDialog( obj );
+	mcd->show();
+
+	if( parent->getModel()->_hasInitializer( obj ) )
+		mcd->setAdditionalConfiguration( parent->getModel()->_configureObject( obj ) );
+
+	value(0);
+}
+
+void MenuBar::configureInfoCallback_real(Fl_Widget* w) {
+	InfoConfigurationDialog* icd = new InfoConfigurationDialog( parent->getModel()->_getInfoData() );
+	icd->show();
+
+	// wait for configuration to end
+	while( icd->shown() ) { Fl::wait(); }
+
 	value(0);
 }
 
 // handle teleporter linking
 void MenuBar::linkCallback_real(Fl_Widget* w) {
 	// get all selected objects
-	Model::objRefList selection = this->parent->getModel()->_getSelection(); 
+	Model::objRefList selection = this->parent->getModel()->_getSelection();
 	if( selection.size() <= 0 )
 		return;
-		
+
 	// map of teleporter links to create
 	map< teleporter*, teleporter* > teleporterMap;
 	for( Model::objRefList::iterator i = selection.begin(); i != selection.end(); i++ ) {
@@ -412,45 +436,45 @@ void MenuBar::linkCallback_real(Fl_Widget* w) {
 			teleporter* t1 = dynamic_cast< teleporter* > (i->get());
 			if( !t1 )
 				continue;
-			
+
 			// get other teleporters
 			if( selection.size() >= 2 ) {
 				for( Model::objRefList::iterator j = i+1; j != selection.end(); j++ ) {
-						
+
 					if( (*j)->getHeader() == "teleporter" ) {
 						teleporter* t2 = dynamic_cast< teleporter* >( j->get() );
 						if( !t2 )
 							continue;
-							
+
 						teleporterMap[ t1 ] = t2;
 					}
 				}
 			}
 		}
 	}
-	
+
 	// make the links
 	if( teleporterMap.size() > 0 ) {
 		for( map< teleporter*, teleporter* >::iterator i = teleporterMap.begin(); i != teleporterMap.end(); i++ ) {
 			parent->getModel()->_linkTeleporters( i->first, i->second );
 		}
 	}
-	
+
 	value(0);
 }
 
 bz2object* MenuBar::makeObject( const char* objectName ) {
 	// make a new box using the Model's object registry
 	DataEntry* newBox = this->parent->getModel()->_buildObject( objectName );
-	
+
 	// make it into a bz2object
 	bz2object* newObj = dynamic_cast< bz2object* >( newBox );
-	
+
 	if(!newObj)
 		return NULL;
-		
+
 	newObj->setName( SceneBuilder::makeUniqueName( objectName ) );
-	
+
 	// add the object to the model
 	parent->getModel()->_unselectAll();
 	parent->getModel()->_addObject( newObj );

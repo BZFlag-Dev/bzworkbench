@@ -66,6 +66,7 @@
 #include "objects/dynamicColor.h"
 #include "objects/mesh.h"
 #include "objects/define.h"
+#include "objects/info.h"
 
 #include "TextUtils.h"
 
@@ -111,6 +112,7 @@ void buildModelDatabase() {
 	Model::registerObject("weapon", NULL, "end", weapon::init, WeaponConfigurationDialog::init);
 	Model::registerObject("world", NULL, "end", world::init);
 	Model::registerObject("zone", NULL, "end", zone::init, ZoneConfigurationDialog::init);
+	Model::registerObject("info", NULL, "end", info::init);
 
 	Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
 }

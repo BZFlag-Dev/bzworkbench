@@ -16,9 +16,9 @@
 ZoneConfigurationDialog::ZoneConfigurationDialog( zone* _theZone ) :
 	ConfigurationDialog( _theZone, "Zone Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
 	begin();
-	
+
 	theZone = _theZone;
-	
+
 	// set up the dialog
 	teamLabel = new QuickLabel( "Team: ", 5, 5);
 	rogueTeamButton = new Fl_Check_Button( 60, 5, 60, DEFAULT_TEXTSIZE + 6, "Rogue");
@@ -37,7 +37,7 @@ ZoneConfigurationDialog::ZoneConfigurationDialog( zone* _theZone ) :
 		}
 	}
 
-	safetyLabel = new QuickLabel( "Safety: ", 30, 5);
+	safetyLabel = new QuickLabel( "Safety: ", 5, 30);
 	redSafetyButton = new Fl_Check_Button( 120, 30, 60, DEFAULT_TEXTSIZE + 6, "Red");
 	greenSafetyButton = new Fl_Check_Button( 180, 30, 60, DEFAULT_TEXTSIZE + 6, "Green");
 	blueSafetyButton = new Fl_Check_Button( 240, 30, 60, DEFAULT_TEXTSIZE + 6, "Blue");
@@ -83,7 +83,7 @@ ZoneConfigurationDialog::ZoneConfigurationDialog( zone* _theZone ) :
 			flagBrowser->checked( NUM_GOODFLAGS + NUM_BADFLAGS + 2, 1 );
 		}
 	}
-	
+
 	zoneflagLabel = new QuickLabel( "Zone Flags: ", 5, 175 );
 	zoneflagBrowser = new Fl_Multi_Browser( 5, 195, 370, 90 );
 	vector<zone::FlagElement> zoneflags = theZone->getZoneflags();
@@ -103,14 +103,14 @@ ZoneConfigurationDialog::ZoneConfigurationDialog( zone* _theZone ) :
 	zoneflagAddButton->callback( AddCallback, this );
 	zoneflagRemoveButton = new Fl_Button( 70, 310, 60, DEFAULT_TEXTSIZE + 6, "Remove" );
 	zoneflagRemoveButton->callback( RemoveCallback, this );
-	
-	
+
+
 	end();
-	
+
 	// add the callbacks
 	setOKEventHandler( OKCallback, this );
 	setCancelEventHandler( CancelCallback, this );
-	
+
 }
 
 // OK callback
@@ -144,7 +144,7 @@ void ZoneConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 		zoneflags.push_back(zone::FlagElement( elems[1], atoi( elems[3].c_str() ) ) );
 	}
 	theZone->setZoneflags( zoneflags );
-	
+
 	// don't delete this dialog box just yet...just hide it
 	hide();
 }
@@ -156,7 +156,7 @@ void ZoneConfigurationDialog::CancelCallback_real( Fl_Widget* w ) {
 }
 
 void ZoneConfigurationDialog::AddCallback_real( Fl_Widget* w ) {
-	zoneflagBrowser->add( (string("Flag: ") + string(zoneflagFlagInput->text()) + 
+	zoneflagBrowser->add( (string("Flag: ") + string(zoneflagFlagInput->text()) +
 		" \tQuantity: " + string( itoa( zoneflagQtyInput->value() ) )).c_str() );
 }
 

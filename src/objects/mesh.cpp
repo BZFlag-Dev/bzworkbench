@@ -284,7 +284,7 @@ void mesh::updateGeometry() {
 		}
 
 		osg::DrawElementsUInt* indices = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_STRIP, 0 );
-		geometry->addPrimitiveSet( indices );
+
 
 		vector<int> vertIdx = face->getVertices();
 		vector<int> texcoordIdx = face->getTexcoords();
@@ -295,6 +295,7 @@ void mesh::updateGeometry() {
 				texcoords->push_back( this->texCoords[ *titr ] );
 				indices->push_back( arrayPos++ );
 		}
+		geometry->addPrimitiveSet( indices );
 
 		lastmat = mat;
 		lastNoTexcoords = noTexcoords;
