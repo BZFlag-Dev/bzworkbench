@@ -15,6 +15,8 @@ CPP_SRCS += \
 ../src/dialogs/Fl_Tweak.cpp \
 ../src/dialogs/InfoConfigurationDialog.cpp \
 ../src/dialogs/MasterConfigurationDialog.cpp \
+../src/dialogs/MaterialConfigurationDialog.cpp \
+../src/dialogs/MaterialEditor.cpp \
 ../src/dialogs/MenuBar.cpp \
 ../src/dialogs/MeshboxConfigurationDialog.cpp \
 ../src/dialogs/MeshpyrConfigurationDialog.cpp \
@@ -37,6 +39,8 @@ OBJS += \
 ./src/dialogs/Fl_Tweak.o \
 ./src/dialogs/InfoConfigurationDialog.o \
 ./src/dialogs/MasterConfigurationDialog.o \
+./src/dialogs/MaterialConfigurationDialog.o \
+./src/dialogs/MaterialEditor.o \
 ./src/dialogs/MenuBar.o \
 ./src/dialogs/MeshboxConfigurationDialog.o \
 ./src/dialogs/MeshpyrConfigurationDialog.o \
@@ -59,6 +63,8 @@ CPP_DEPS += \
 ./src/dialogs/Fl_Tweak.d \
 ./src/dialogs/InfoConfigurationDialog.d \
 ./src/dialogs/MasterConfigurationDialog.d \
+./src/dialogs/MaterialConfigurationDialog.d \
+./src/dialogs/MaterialEditor.d \
 ./src/dialogs/MenuBar.d \
 ./src/dialogs/MeshboxConfigurationDialog.d \
 ./src/dialogs/MeshpyrConfigurationDialog.d \

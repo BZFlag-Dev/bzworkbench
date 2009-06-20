@@ -11,6 +11,7 @@
  */
 
 #include "dialogs/MenuBar.h"
+#include "dialogs/MaterialEditor.h"
 #include "model/Model.h"
 #include "commonControls.h"
 
@@ -68,6 +69,8 @@ void MenuBar::buildMenu(void) {
 		add("Scene/Configure World...", 0, configureWorldCallback, this);
 		add("Scene/Configure Object...", FL_CTRL+'o', configureObjectCallback, this);
 		add("Scene/Configure Info...", 0, configureInfoCallback, this, FL_MENU_DIVIDER);
+
+		add("Scene/Material Editor...", 0, materialEditorCallback, this, FL_MENU_DIVIDER);
 
 		add("Scene/Define World Weapon...", FL_CTRL+'w', worldWeaponCallback, this);
 		add("Scene/Link Teleporters", 0, linkCallback, this);
@@ -386,6 +389,16 @@ void MenuBar::configureWorldCallback_real(Fl_Widget* w) {
 	// reset the world
 	ObserverMessage obs(ObserverMessage::UPDATE_WORLD, parent->getModel()->_getWorldData() );
 	parent->getModel()->notifyObservers( &obs );
+	value(0);
+}
+
+void MenuBar::materialEditorCallback_real(Fl_Widget* w) {
+	MaterialEditor* ed = new MaterialEditor( parent->getModel() );
+
+	ed->show();
+
+	while( ed->shown() ) { Fl::wait(); }
+
 	value(0);
 }
 

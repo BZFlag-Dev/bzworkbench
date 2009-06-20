@@ -237,6 +237,11 @@ public:
 		m->configureInfoCallback_real(w);
 	}
 
+	static void materialEditorCallback(Fl_Widget* w, void* data) {
+		MenuBar* m = (MenuBar*)data;
+		m->materialEditorCallback_real(w);
+	}
+
 	static void linkCallback(Fl_Widget* w, void* data) {
 		MenuBar* m = (MenuBar*)data;
 		m->linkCallback_real(w);
@@ -289,6 +294,7 @@ private:
 	void worldWeaponCallback_real(Fl_Widget* w);
 	void configureObjectCallback_real(Fl_Widget* w);
 	void configureInfoCallback_real(Fl_Widget* w);
+	void materialEditorCallback_real(Fl_Widget* w);
 	void linkCallback_real(Fl_Widget* w);
 
 	// reference to the MainWindow parent
