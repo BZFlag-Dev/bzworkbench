@@ -222,6 +222,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\BaseConfigurationDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\BoxConfigurationDialog.cpp"
 					>
 				</File>
@@ -246,7 +250,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\InfoConfigurationDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\MasterConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\MaterialConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\MaterialEditor.cpp"
 					>
 				</File>
 				<File
@@ -274,7 +290,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\WeaponConfigurationDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\WorldOptionsDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\ZoneConfigurationDialog.cpp"
 					>
 				</File>
 			</Filter>
@@ -363,6 +387,10 @@
 				</File>
 				<File
 					RelativePath="..\src\objects\group.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\objects\info.cpp"
 					>
 				</File>
 				<File
@@ -588,6 +616,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\objects\info.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\objects\link.h"
 					>
 				</File>
@@ -716,6 +748,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\dialogs\BaseConfigurationDialog.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dialogs\BoxConfigurationDialog.h"
 					>
 				</File>
@@ -744,7 +780,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\dialogs\InfoConfigurationDialog.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dialogs\MasterConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\MaterialConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\MaterialEditor.h"
 					>
 				</File>
 				<File
@@ -772,7 +820,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\dialogs\WeaponConfigurationDialog.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dialogs\WorldOptionsDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\ZoneConfigurationDialog.h"
 					>
 				</File>
 			</Filter>
