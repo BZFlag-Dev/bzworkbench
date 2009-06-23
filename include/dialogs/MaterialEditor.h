@@ -42,9 +42,49 @@ public:
 		ccd->CancelCallback_real( w );
 	}
 
+	static void MaterialAddCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->MaterialAddCallback_real( w );
+	}
+
+	static void MaterialRemoveCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->MaterialRemoveCallback_real( w );
+	}
+
 	static void MaterialEditCallback( Fl_Widget* w, void* data ) {
 		MaterialEditor* ccd = (MaterialEditor*)(data);
 		ccd->MaterialEditCallback_real( w );
+	}
+
+	static void TexmatAddCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->TexmatAddCallback_real( w );
+	}
+
+	static void TexmatRemoveCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->TexmatRemoveCallback_real( w );
+	}
+
+	static void TexmatEditCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->TexmatEditCallback_real( w );
+	}
+
+	static void DyncolAddCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->DyncolAddCallback_real( w );
+	}
+
+	static void DyncolRemoveCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->DyncolRemoveCallback_real( w );
+	}
+
+	static void DyncolEditCallback( Fl_Widget* w, void* data ) {
+		MaterialEditor* ccd = (MaterialEditor*)(data);
+		ccd->DyncolEditCallback_real( w );
 	}
 
 protected:
@@ -84,10 +124,25 @@ protected:
 	Fl_Button* dyncolEditButton;
 
 private:
+	void refreshMaterialList();
+	void refreshTexmatList();
+	void refreshDyncolList();
+
 	// real callbacks
 	void OKCallback_real( Fl_Widget* w );
 	void CancelCallback_real( Fl_Widget* w );
+
+	void MaterialAddCallback_real( Fl_Widget* w );
+	void MaterialRemoveCallback_real( Fl_Widget* w );
 	void MaterialEditCallback_real( Fl_Widget* w );
+
+	void TexmatAddCallback_real( Fl_Widget* w );
+	void TexmatRemoveCallback_real( Fl_Widget* w );
+	void TexmatEditCallback_real( Fl_Widget* w );
+
+	void DyncolAddCallback_real( Fl_Widget* w );
+	void DyncolRemoveCallback_real( Fl_Widget* w );
+	void DyncolEditCallback_real( Fl_Widget* w );
 };
 
 #endif /* MATERIALEDITOR_H_ */

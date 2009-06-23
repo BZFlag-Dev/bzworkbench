@@ -13,6 +13,8 @@
 #include "dialogs/MaterialEditor.h"
 
 #include "dialogs/MaterialConfigurationDialog.h"
+#include "objects/material.h"
+#include "model/SceneBuilder.h"
 
 #include "defines.h"
 
@@ -28,10 +30,13 @@ MaterialEditor::MaterialEditor( Model* model ) :
 
 	// material browser
 	materialBrowser = new Fl_Multi_Browser( 5, 30, 225, 90 );
+	refreshMaterialList();
 
 	// material buttons
 	materialAddButton = new Fl_Button( 235, 30, 70, DEFAULT_TEXTSIZE + 6, "Add" );
+	materialAddButton->callback( MaterialAddCallback, this );
 	materialRemoveButton = new Fl_Button( 235, 55, 70, DEFAULT_TEXTSIZE + 6, "Remove" );
+	materialRemoveButton->callback( MaterialRemoveCallback, this );
 	materialEditButton = new Fl_Button( 235, 80, 70, DEFAULT_TEXTSIZE + 6, "Edit" );
 	materialEditButton->callback( MaterialEditCallback, this );
 
@@ -40,6 +45,7 @@ MaterialEditor::MaterialEditor( Model* model ) :
 
 	// texture matrix browser
 	textureMatrixBrowser = new Fl_Multi_Browser( 5, 150, 225, 90 );
+	refreshTexmatList();
 
 	// texture matrix buttons
 	textureMatrixAddButton = new Fl_Button( 235, 150, 70, DEFAULT_TEXTSIZE + 6, "Add" );
@@ -64,6 +70,39 @@ MaterialEditor::MaterialEditor( Model* model ) :
 	setCancelEventHandler( CancelCallback, this );
 }
 
+void MaterialEditor::refreshMaterialList() {
+	materialBrowser->clear();
+
+	std::map<string, material*> materials = model->_getMaterials();
+	
+	std::map<string, material*>::const_iterator i;
+	for ( i = materials.begin(); i != materials.end(); i++ ) {
+		materialBrowser->add( i->first.c_str() );
+	}
+}
+
+void MaterialEditor::refreshTexmatList() {
+	textureMatrixBrowser->clear();
+
+	std::map<string, texturematrix*> texmats = model->_getTextureMatrices();
+
+	std::map<string, texturematrix*>::const_iterator i;
+	for ( i = texmats.begin(); i != texmats.end(); i++ ) {
+		textureMatrixBrowser->add( i->first.c_str() );
+	}
+}
+
+void MaterialEditor::refreshDyncolList() {
+	dyncolBrowser->clear();
+
+	std::map<string, dynamicColor*> dyncols = model->_getDynamicColors();
+
+	std::map<string, dynamicColor*>::const_iterator i;
+	for ( i = dyncols.begin(); i != dyncols.end(); i++ ) {
+		dyncolBrowser->add( i->first.c_str() );
+	}
+}
+
 // OK callback
 void MaterialEditor::OKCallback_real( Fl_Widget* w ) {
 	// don't delete this dialog box just yet...just hide it
@@ -76,14 +115,75 @@ void MaterialEditor::CancelCallback_real( Fl_Widget* w ) {
 	hide();
 }
 
-void MaterialEditor::MaterialEditCallback_real( Fl_Widget* w ) {
-	// just temporary code allowing the dialog to be accessed
-	MaterialConfigurationDialog* mcd = new MaterialConfigurationDialog( 0 );
+void MaterialEditor::MaterialAddCallback_real( Fl_Widget* w ) {
+	// make a new material object
+	material* newObj = dynamic_cast< material* >( model->_buildObject( "material" ) );
 
-	mcd->show();
+	if(!newObj)
+		return;
 
-	while ( mcd->shown() ) { Fl::wait(); }
+	model->_getMaterials()[ newObj->getName() ] = newObj;
 
-	delete mcd;
+	// make sure the materail shows up
+	refreshMaterialList();
 }
 
+void MaterialEditor::MaterialRemoveCallback_real( Fl_Widget* w ) {
+	// FIXME: implement
+}
+
+void MaterialEditor::MaterialEditCallback_real( Fl_Widget* w ) {
+	// find the first selected item
+	const char* name = NULL;
+	for (int i = 1; i <= materialBrowser->size(); i++) {
+		if ( materialBrowser->selected( i ) ) {
+			name = materialBrowser->text( i );
+			break;
+		}
+	}
+
+	// make sure something was actually selected
+	if ( name == NULL )
+		return;
+
+	// get the material
+	material* mat = dynamic_cast< material* >( model->_command( MODEL_GET, "material", string( name ) ) );
+
+	if ( mat != NULL ) {
+		// open a material config dialog
+		MaterialConfigurationDialog* mcd = new MaterialConfigurationDialog( mat );
+
+		mcd->show();
+
+		while ( mcd->shown() ) { Fl::wait(); }
+
+		// clean up
+		delete mcd;
+	}
+
+	refreshMaterialList();
+}
+
+void MaterialEditor::TexmatAddCallback_real( Fl_Widget* w ) {
+
+}
+
+void MaterialEditor::TexmatRemoveCallback_real( Fl_Widget* w ) {
+
+}
+
+void MaterialEditor::TexmatEditCallback_real( Fl_Widget* w ) {
+
+}
+
+void MaterialEditor::DyncolAddCallback_real( Fl_Widget* w ) {
+
+}
+
+void MaterialEditor::DyncolRemoveCallback_real( Fl_Widget* w ) {
+
+}
+
+void MaterialEditor::DyncolEditCallback_real( Fl_Widget* w ) {
+
+}
