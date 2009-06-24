@@ -557,3 +557,27 @@ osg::Material* material::getCurrentMaterial() {
 osg::Texture2D* material::getCurrentTexture() {
 	return (osg::Texture2D*)getTextureAttribute( 0, osg::StateAttribute::TEXTURE );
 }
+
+vector< string > material::getMaterials() {
+	vector< string > ret;
+	vector< material* >::const_iterator i;
+	for ( i = materials.begin(); i != materials.end(); i++ ) {
+		ret.push_back( (*i)->getName() );
+	}
+
+	return ret;
+}
+
+void material::setMaterials( vector< string > value ) {
+	materials.clear();
+
+	vector< string >::const_iterator i;
+	for ( i = value.begin(); i != value.end(); i++ ) {
+		material* mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", *i ) );
+
+		if ( mat != NULL )
+			materials.push_back( mat );
+		else
+			printf( "material::setMaterials(): Error! Could not find material %s\n", (*i).c_str() );
+	}
+}

@@ -75,6 +75,9 @@ public:
 	bool getGroupAlpha() { return groupAlpha; }
 	bool getOccluder() { return occluder; }
 
+	std::vector< std::string > getMaterials();
+	void setMaterials( std::vector< std::string > value );
+
 	void setName( const string& _name ) { this->name = _name; }
 	void setDynamicColor( dynamicColor* _dynCol ) { dynCol = _dynCol; }
 

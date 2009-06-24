@@ -26,13 +26,33 @@ MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
 	// FIXME: add matref functionality
 	matrefLabel = new QuickLabel( "Material References:", 5, 30 );
 	matrefBrowser = new Fl_Multi_Browser( 5, 55, 185, 90 );
+	vector<string> matrefs = theMat->getMaterials();
+	for ( vector<string>::const_iterator i = matrefs.begin(); i != matrefs.end(); i++ ) {
+		matrefBrowser->add( (*i).c_str() );
+	}
 	matrefChoice = new Fl_Choice( 195, 55, 100, DEFAULT_TEXTSIZE + 6 );
+	map<string, material*> materials = Model::getMaterials();
+	for ( map<string, material*>::const_iterator i = materials.begin(); i != materials.end(); i++ ) {
+		if ( i->second != theMat ) {
+			matrefChoice->add( i->first.c_str() );
+		}
+	}
 	matrefAddButton = new Fl_Button( 195, 80, 100, DEFAULT_TEXTSIZE + 6, "Add" );
+	matrefAddButton->callback( MatrefAddCallback, this );
 	matrefRemoveButton = new Fl_Button( 195, 105, 100, DEFAULT_TEXTSIZE + 6, "Remove" );
+	matrefRemoveButton->callback( MatrefRemoveCallback, this );
 
 	// FIXME: add dynamic color functionality
 	dyncolLabel = new QuickLabel( "Dynamic Color:", 5, 150 );
 	dyncolChoice = new Fl_Choice( 150, 150, 120, DEFAULT_TEXTSIZE + 6 );
+	map<string, dynamicColor*> dyncols = Model::getDynamicColors();
+	dyncolChoice->add( "NONE" );
+	for ( map<string, dynamicColor*>::const_iterator i = dyncols.begin(); i != dyncols.end(); i++ ) {
+		int index = dyncolChoice->add( i->first.c_str() );
+
+		if ( i->second == theMat->getDynamicColor() )
+			dyncolChoice->value( index );
+	}
 
 	noTexturesButton = new Fl_Check_Button( 5, 175, 200, DEFAULT_TEXTSIZE + 6, "No Textures" );
 	noTexturesButton->value( theMat->getNoTextures() ? true : false );
@@ -51,18 +71,46 @@ MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
 	occluderButton = new Fl_Check_Button( 5, 350, 200, DEFAULT_TEXTSIZE + 6, "Occluder" );
 	occluderButton->value( theMat->getOccluder() ? true : false );
 
-	alphaThresholdLabel = new QuickLabel( "Alpha Threshold:", 5, 375 );
-	alphaThresholdInput = new Fl_Value_Input( 150, 375, 120, DEFAULT_TEXTSIZE + 6 );
+	ambientLabel = new QuickLabel( "Ambient:", 5, 375 );
+	ambientInput = new RGBAWidget( 80, 375 );
+	ambientInput->setRGBA( theMat->getAmbient() );
+
+	diffuseLabel = new QuickLabel( "Diffuse:", 5, 400 );
+	diffuseInput = new RGBAWidget( 80, 400 );
+	diffuseInput->setRGBA( theMat->getDiffuse() );
+
+	specularLabel = new QuickLabel( "Specular:", 5, 425 );
+	specularInput = new RGBAWidget( 80, 425 );
+	specularInput->setRGBA( theMat->getSpecular() );
+
+	emissiveLabel = new QuickLabel( "Emissive:", 5, 450 );
+	emissiveInput = new RGBAWidget( 80, 450 );
+	emissiveInput->setRGBA( theMat->getEmissive() );
+
+	shininessLabel = new QuickLabel( "Shininess:", 5, 475 );
+	shininessInput = new Fl_Value_Input( 150, 475, 120, DEFAULT_TEXTSIZE + 6 );
+	shininessInput->value( theMat->getShininess() );
+
+	alphaThresholdLabel = new QuickLabel( "Alpha Threshold:", 5, 500 );
+	alphaThresholdInput = new Fl_Value_Input( 150, 500, 120, DEFAULT_TEXTSIZE + 6 );
 	alphaThresholdInput->value( theMat->getAlphaThreshold() );
 
 
-	textureLabel = new QuickLabel( "Texture:", 5, 400 );
-	textureInput = new Fl_Input( 150, 400, 120, DEFAULT_TEXTSIZE + 6 );
-	textureMatrixLabel = new QuickLabel( "Texture Matrix:", 5, 425 );
-	textureMatrixChoice = new Fl_Choice( 150, 425, 120, DEFAULT_TEXTSIZE + 6 );
-	noAlphaButton = new Fl_Check_Button( 5, 450, 200, DEFAULT_TEXTSIZE + 6, "No Alpha" );
-	noColorButton = new Fl_Check_Button( 5, 475, 200, DEFAULT_TEXTSIZE + 6, "No Color" );
-	sphereMapButton = new Fl_Check_Button( 5, 500, 200, DEFAULT_TEXTSIZE + 6, "Sphere Map" );
+	textureLabel = new QuickLabel( "Texture:", 5, 525 );
+	textureInput = new Fl_Input( 150, 525, 120, DEFAULT_TEXTSIZE + 6 );
+	textureMatrixLabel = new QuickLabel( "Texture Matrix:", 5, 550 );
+	textureMatrixChoice = new Fl_Choice( 150, 550, 120, DEFAULT_TEXTSIZE + 6 );
+	map<string, texturematrix*> texmats = Model::getTextureMatrices();
+	textureMatrixChoice->add( "NONE" );
+	for (map<string, texturematrix*>::const_iterator i = texmats.begin(); i != texmats.end(); i++ ) {
+		int index = textureMatrixChoice->add( i->first.c_str() );
+
+		if ( theMat->getTextureCount() > 0 && i->second == theMat->getTextureMatrix( 0 ) )
+			textureMatrixChoice->value( index );
+	}
+	noAlphaButton = new Fl_Check_Button( 5, 575, 200, DEFAULT_TEXTSIZE + 6, "No Alpha" );
+	noColorButton = new Fl_Check_Button( 5, 600, 200, DEFAULT_TEXTSIZE + 6, "No Color" );
+	sphereMapButton = new Fl_Check_Button( 5, 625, 200, DEFAULT_TEXTSIZE + 6, "Sphere Map" );
 
 	// only assign values if there is a texture
 	if ( theMat->getTextureCount() > 0 ) {
@@ -92,11 +140,32 @@ void MaterialConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 	theMat->setNoLighting( noLightingButton->value() == 1 ? true : false );
 	theMat->setGroupAlpha( groupAlphaButton->value() == 1 ? true : false );
 	theMat->setOccluder( occluderButton->value() == 1 ? true : false );
+	theMat->setAmbient( ambientInput->getRGBA() );
+	theMat->setDiffuse( diffuseInput->getRGBA() );
+	theMat->setSpecular( specularInput->getRGBA() );
+	theMat->setEmissive( emissiveInput->getRGBA() );
+	theMat->setShininess( shininessInput->value() );
 	theMat->setAlphaThreshold( alphaThresholdInput->value() );
 	theMat->setTexture( string( textureInput->value() ) );
 	theMat->setNoTexAlpha( noAlphaButton->value() == 1 ? true : false );
 	theMat->setNoTexColor( noColorButton->value() == 1 ? true : false );
 	theMat->setSphereMap( sphereMapButton->value() == 1 ? true : false );
+
+	if ( dyncolChoice->text() != NULL && string( dyncolChoice->text() ) != "NONE" )
+		theMat->setDynamicColor( Model::getDynamicColors()[ string( dyncolChoice->text() ) ] );
+	else
+		theMat->setDynamicColor( NULL );
+
+	if (textureMatrixChoice->text() != NULL && string( textureMatrixChoice->text() ) != "NONE" ) 
+		theMat->setTextureMatrix( Model::getTextureMatrices()[ string( textureMatrixChoice->text() ) ] );
+	else
+		theMat->setTextureMatrix( NULL );
+
+	vector<string> matrefs;
+	for ( int i = 1; i <= matrefBrowser->size(); i++ ) {
+		matrefs.push_back( matrefBrowser->text( i ) );
+	}
+	theMat->setMaterials( matrefs );
 
 	// don't delete this dialog box just yet...just hide it
 	hide();
@@ -106,4 +175,18 @@ void MaterialConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 void MaterialConfigurationDialog::CancelCallback_real( Fl_Widget* w ) {
 	// don't delete this dialog box just yet...just hide it
 	hide();
+}
+
+void MaterialConfigurationDialog::MatrefAddCallback_real( Fl_Widget* w ) {
+	if ( matrefChoice->text() != NULL ) {
+		matrefBrowser->add( matrefChoice->text() );
+	}
+}
+
+void MaterialConfigurationDialog::MatrefRemoveCallback_real( Fl_Widget* w ) {
+	for ( int i = 1; i <= matrefBrowser->size(); i++ ) {
+		if ( matrefBrowser->selected( i ) ) {
+			matrefBrowser->remove( i );
+		}
+	}
 }

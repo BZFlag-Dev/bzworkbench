@@ -85,6 +85,7 @@ public:
 	static objRefList& getObjects();
 	static std::map< std::string, material* >& getMaterials();
 	static std::map< std::string, texturematrix* >& getTextureMatrices();
+	static std::map< std::string, dynamicColor* >& getDynamicColors();
 	static std::map< std::string, physics* >& getPhysicsDrivers();
 	static std::map< std::string, Tlink* >& getTeleporterLinks();
 	static std::map< std::string, define* >& getGroups();

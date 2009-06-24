@@ -24,6 +24,8 @@
 
 #include "ConfigurationDialog.h"
 #include "widgets/QuickLabel.h"
+#include "widgets/RGBAWidget.h"
+#include "widgets/MaterialWidget.h"
 #include "defines.h"
 
 #include "objects/material.h"
@@ -33,8 +35,8 @@ class MaterialConfigurationDialog : public ConfigurationDialog {
 public:
 
 	// dimensions
-	static const int DEFAULT_WIDTH = 300;
-	static const int DEFAULT_HEIGHT = 550;
+	static const int DEFAULT_WIDTH = 400;
+	static const int DEFAULT_HEIGHT = 675;
 
 	// constructor
 	MaterialConfigurationDialog( material* theMat );
@@ -63,11 +65,22 @@ public:
 		ccd->CancelCallback_real( w );
 	}
 
+	static void MatrefAddCallback( Fl_Widget* w, void* data ) {
+		MaterialConfigurationDialog* ccd = (MaterialConfigurationDialog*)(data);
+		ccd->MatrefAddCallback_real( w );
+	}
+
+	static void MatrefRemoveCallback( Fl_Widget* w, void* data ) {
+		MaterialConfigurationDialog* ccd = (MaterialConfigurationDialog*)(data);
+		ccd->MatrefRemoveCallback_real( w );
+	}
 private:
 
 	// real callbacks
 	void OKCallback_real( Fl_Widget* w );
 	void CancelCallback_real( Fl_Widget* w );
+	void MatrefAddCallback_real( Fl_Widget* w );
+	void MatrefRemoveCallback_real( Fl_Widget* w );
 
 	// the cone
 	material* theMat;
@@ -96,6 +109,22 @@ private:
 
 	// dynamic color choice
 	Fl_Choice* dyncolChoice;
+
+	// material settings
+	QuickLabel* ambientLabel;
+	RGBAWidget* ambientInput;
+
+	QuickLabel* diffuseLabel;
+	RGBAWidget* diffuseInput;
+
+	QuickLabel* specularLabel;
+	RGBAWidget* specularInput;
+
+	QuickLabel* emissiveLabel;
+	RGBAWidget* emissiveInput;
+
+	QuickLabel* shininessLabel;
+	Fl_Value_Input* shininessInput;
 
 	// option buttons
 	Fl_Check_Button* noTexturesButton;
@@ -129,6 +158,8 @@ private:
 	Fl_Check_Button* noAlphaButton;
 	Fl_Check_Button* noColorButton;
 	Fl_Check_Button* sphereMapButton;
+
+
 
 };
 

@@ -716,6 +716,7 @@ string& Model::_toString() {
 Model::objRefList& 				Model::getObjects() 		{ return modRef->_getObjects(); }
 map< string, material* >& 		Model::getMaterials() 		{ return modRef->_getMaterials(); }
 map< string, texturematrix* >&	Model::getTextureMatrices() { return modRef->_getTextureMatrices(); }
+std::map< std::string, dynamicColor* >& Model::getDynamicColors() { return modRef->_getDynamicColors(); }
 map< string, physics* >& 		Model::getPhysicsDrivers() 	{ return modRef->_getPhysicsDrivers(); }
 map< string, Tlink* >&		 	Model::getTeleporterLinks() { return modRef->_getTeleporterLinks(); }
 map< string, define* >&			Model::getGroups() 			{ return modRef->_getGroups(); }

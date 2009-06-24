@@ -14,6 +14,8 @@
 
 #include "dialogs/MaterialConfigurationDialog.h"
 #include "objects/material.h"
+#include "objects/texturematrix.h"
+#include "objects/dynamicColor.h"
 #include "model/SceneBuilder.h"
 
 #include "defines.h"
@@ -49,19 +51,26 @@ MaterialEditor::MaterialEditor( Model* model ) :
 
 	// texture matrix buttons
 	textureMatrixAddButton = new Fl_Button( 235, 150, 70, DEFAULT_TEXTSIZE + 6, "Add" );
+	textureMatrixAddButton->callback( TexmatAddCallback, this );
 	textureMatrixRemoveButton = new Fl_Button( 235, 175, 70, DEFAULT_TEXTSIZE + 6, "Remove" );
+	textureMatrixRemoveButton->callback( TexmatRemoveCallback, this );
 	textureMatrixEditButton = new Fl_Button( 235, 200, 70, DEFAULT_TEXTSIZE + 6, "Edit" );
+	textureMatrixEditButton->callback( TexmatEditCallback, this );
 
 	// dynamic color label
 	dyncolLabel = new QuickLabel( "Dynamic Colors: ", 5, 245 );
 
 	// dynamic color browser
 	dyncolBrowser = new Fl_Multi_Browser( 5, 270, 225, 90 );
+	refreshDyncolList();
 
 	// dynamic color buttons
 	dyncolAddButton = new Fl_Button( 235, 270, 70, DEFAULT_TEXTSIZE + 6, "Add" );
+	dyncolAddButton->callback( DyncolAddCallback, this );
 	dyncolRemoveButton = new Fl_Button( 235, 295, 70, DEFAULT_TEXTSIZE + 6, "Remove" );
+	dyncolRemoveButton->callback( DyncolRemoveCallback, this );
 	dyncolEditButton = new Fl_Button( 235, 320, 70, DEFAULT_TEXTSIZE + 6, "Edit" );
+	dyncolEditButton->callback( DyncolEditCallback, this );
 
 	end();
 
@@ -124,7 +133,7 @@ void MaterialEditor::MaterialAddCallback_real( Fl_Widget* w ) {
 
 	model->_getMaterials()[ newObj->getName() ] = newObj;
 
-	// make sure the materail shows up
+	// make sure the material shows up
 	refreshMaterialList();
 }
 
@@ -165,7 +174,18 @@ void MaterialEditor::MaterialEditCallback_real( Fl_Widget* w ) {
 }
 
 void MaterialEditor::TexmatAddCallback_real( Fl_Widget* w ) {
+	// make a new material object
+	texturematrix* newObj = dynamic_cast< texturematrix* >( model->_buildObject( "texturematrix" ) );
 
+	if(!newObj)
+		return;
+
+	newObj->setName( SceneBuilder::makeUniqueName( "texturematrix" ) );
+
+	model->_getTextureMatrices()[ newObj->getName() ] = newObj;
+
+	// make sure the texture matrix shows up
+	refreshTexmatList();
 }
 
 void MaterialEditor::TexmatRemoveCallback_real( Fl_Widget* w ) {
@@ -177,7 +197,18 @@ void MaterialEditor::TexmatEditCallback_real( Fl_Widget* w ) {
 }
 
 void MaterialEditor::DyncolAddCallback_real( Fl_Widget* w ) {
+	// make a new material object
+	dynamicColor* newObj = dynamic_cast< dynamicColor* >( model->_buildObject( "dynamicColor" ) );
 
+	if(!newObj)
+		return;
+
+	newObj->setName( SceneBuilder::makeUniqueName( "dynamicColor" ) );
+
+	model->_getDynamicColors()[ newObj->getName() ] = newObj;
+
+	// make sure the dynamic color shows up
+	refreshDyncolList();
 }
 
 void MaterialEditor::DyncolRemoveCallback_real( Fl_Widget* w ) {

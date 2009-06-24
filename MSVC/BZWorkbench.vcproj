@@ -478,6 +478,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\widgets\RGBAWidget.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\widgets\TransformWidget.cpp"
 					>
 				</File>
@@ -873,6 +877,10 @@
 				</File>
 				<File
 					RelativePath="..\include\widgets\QuickLabel.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\widgets\RGBAWidget.h"
 					>
 				</File>
 				<File
