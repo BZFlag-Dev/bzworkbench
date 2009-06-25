@@ -47,6 +47,8 @@ int info::update(string& data) {
 	for ( vector<string>::iterator i = ++lines.begin(); i != lines.end(); i++ ) {
 		infoLines.push_back( *i );
 	}
+
+	return 1;
 }
 
 // toString

@@ -751,7 +751,36 @@ void Model::_removeObject( bz2object* obj ) {
 			ObserverMessage obs( ObserverMessage::REMOVE_OBJECT, obj );
 			this->notifyObservers( &obs );
 			objects.erase( itr );
+			obj->unref();
 
+			break;
+		}
+	}
+}
+
+void Model::_removeMaterial( material* mat ) {
+	if (materials.size() <= 0)
+		return;
+
+	map< string, material* >::iterator i;
+	for ( i = materials.begin(); i != materials.end(); i++ ) {
+		if ( i->second == mat ) {
+			
+			UpdateMessage msg( UpdateMessage::REMOVE_MATERIAL, mat );
+			// make sure all the objects are informed of the material being removed.
+			for ( objRefList::iterator j = objects.begin(); j != objects.end(); j++ ) {
+				(*j)->update( msg );
+			}
+			
+			// make sure the material is removed from other materials too
+			for ( map< string, material* >::iterator j = materials.begin(); j != materials.end(); j++ ) {
+				if ( j->second != mat ) {
+					j->second->removeMaterial( mat );
+				}
+			}
+
+			materials.erase( i );
+			mat->unref();
 			break;
 		}
 	}
@@ -1046,6 +1075,222 @@ ConfigurationDialog* Model::_configureObject( DataEntry* d ) {
 		return NULL;
 
 	return this->configMap[ d->getHeader() ](d);
+}
+
+bool Model::renameMaterial( std::string oldName, std::string newName ) { return modRef->_renameMaterial( oldName, newName ); }
+bool Model::_renameMaterial( std::string oldName, std::string newName ) {
+	// first check for conflicts and find the material
+	map< string, material* >::iterator matIter;
+	material* mat = NULL;
+	for ( map< string, material* >::iterator i = materials.begin(); i != materials.end(); i++ ) {
+		if ( i->first == newName ) {
+			printf( "Model::_renameMaterial(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
+			return false;
+		}
+		else if ( i->first == oldName ) {
+			matIter = i;
+			mat = i->second;
+		}
+	}
+
+	if ( mat == NULL ) {
+		printf( "Model::_renameMaterial(): Error! Could not find material to rename\n" );
+		return false;
+	}
+
+	// check new name for validity
+	for ( int i = 0; i < newName.size(); i++ ) {
+		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
+			printf( "Model::_renameMaterial(): Error! Invalid name.\n" );
+			return false;
+		}
+	}
+
+	// remove old entry and make new entry
+	materials.erase( matIter );
+	materials[ newName ] = mat;
+
+	return true;
+}
+
+bool Model::renameDynamicColor( std::string oldName, std::string newName ) { return modRef->_renameDynamicColor( oldName, newName ); }
+bool Model::_renameDynamicColor( std::string oldName, std::string newName ) {
+	// first check for conflicts and find the material
+	map< string, dynamicColor* >::iterator matIter;
+	dynamicColor* mat = NULL;
+	for ( map< string, dynamicColor* >::iterator i = dynamicColors.begin(); i != dynamicColors.end(); i++ ) {
+		if ( i->first == newName ) {
+			printf( "Model::_renameMaterial(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
+			return false;
+		}
+		else if ( i->first == oldName ) {
+			matIter = i;
+			mat = i->second;
+		}
+	}
+
+	if ( mat == NULL ) {
+		printf( "Model::_renameMaterial(): Error! Could not find dynamic color to rename\n" );
+		return false;
+	}
+
+	// check new name for validity
+	for ( int i = 0; i < newName.size(); i++ ) {
+		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
+			printf( "Model::_renameMaterial(): Error! Invalid name.\n" );
+			return false;
+		}
+	}
+
+	// remove old entry and make new entry
+	dynamicColors.erase( matIter );
+	dynamicColors[ newName ] = mat;
+
+	return true;
+}
+
+bool Model::renameTextureMatrix( std::string oldName, std::string newName ) { return modRef->_renameTextureMatrix( oldName, newName ); }
+bool Model::_renameTextureMatrix( std::string oldName, std::string newName ) {
+	// first check for conflicts and find the material
+	map< string, texturematrix* >::iterator matIter;
+	texturematrix* mat = NULL;
+	for ( map< string, texturematrix* >::iterator i = textureMatrices.begin(); i != textureMatrices.end(); i++ ) {
+		if ( i->first == newName ) {
+			printf( "Model::_renameTextureMatrix(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
+			return false;
+		}
+		else if ( i->first == oldName ) {
+			matIter = i;
+			mat = i->second;
+		}
+	}
+
+	if ( mat == NULL ) {
+		printf( "Model::_renameTextureMatrix(): Error! Could not find texture matrix to rename\n" );
+		return false;
+	}
+
+	// check new name for validity
+	for ( int i = 0; i < newName.size(); i++ ) {
+		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
+			printf( "Model::_renameTextureMatrix(): Error! Invalid name.\n" );
+			return false;
+		}
+	}
+
+	// remove old entry and make new entry
+	textureMatrices.erase( matIter );
+	textureMatrices[ newName ] = mat;
+
+	return true;
+}
+
+bool Model::renamePhysicsDriver( std::string oldName, std::string newName ) { return modRef->_renamePhysicsDriver( oldName, newName ); }
+bool Model::_renamePhysicsDriver( std::string oldName, std::string newName ) {
+	// first check for conflicts and find the material
+	map< string, physics* >::iterator matIter;
+	physics* mat = NULL;
+	for ( map< string, physics* >::iterator i = phys.begin(); i != phys.end(); i++ ) {
+		if ( i->first == newName ) {
+			printf( "Model::_renamePhysicsDriver(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
+			return false;
+		}
+		else if ( i->first == oldName ) {
+			matIter = i;
+			mat = i->second;
+		}
+	}
+
+	if ( mat == NULL ) {
+		printf( "Model::_renamePhysicsDriver(): Error! Could not find physics driver to rename\n" );
+		return false;
+	}
+
+	// check new name for validity
+	for ( int i = 0; i < newName.size(); i++ ) {
+		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
+			printf( "Model::_renamePhysicsDriver(): Error! Invalid name.\n" );
+			return false;
+		}
+	}
+
+	// remove old entry and make new entry
+	phys.erase( matIter );
+	phys[ newName ] = mat;
+
+	return true;
+}
+
+bool Model::renameTeleporterLink( std::string oldName, std::string newName ) { return modRef->_renameTeleporterLink( oldName, newName ); }
+bool Model::_renameTeleporterLink( std::string oldName, std::string newName ) {
+	// first check for conflicts and find the material
+	map< string, Tlink* >::iterator matIter;
+	Tlink* mat = NULL;
+	for ( map< string, Tlink* >::iterator i = links.begin(); i != links.end(); i++ ) {
+		if ( i->first == newName ) {
+			printf( "Model::_renameTeleporterLink(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
+			return false;
+		}
+		else if ( i->first == oldName ) {
+			matIter = i;
+			mat = i->second;
+		}
+	}
+
+	if ( mat == NULL ) {
+		printf( "Model::_renameTeleporterLink(): Error! Could not find teleporter link to rename\n" );
+		return false;
+	}
+
+	// check new name for validity
+	for ( int i = 0; i < newName.size(); i++ ) {
+		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
+			printf( "Model::_renameTeleporterLink(): Error! Invalid name.\n" );
+			return false;
+		}
+	}
+
+	// remove old entry and make new entry
+	links.erase( matIter );
+	links[ newName ] = mat;
+
+	return true;
+}
+
+bool Model::renameGroup( std::string oldName, std::string newName ) { return modRef->_renameGroup( oldName, newName ); }
+bool Model::_renameGroup( std::string oldName, std::string newName ) {
+	// first check for conflicts and find the material
+	map< string, define* >::iterator matIter;
+	define* mat = NULL;
+	for ( map< string, define* >::iterator i = groups.begin(); i != groups.end(); i++ ) {
+		if ( i->first == newName ) {
+			printf( "Model::_renameGroup(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
+			return false;
+		}
+		else if ( i->first == oldName ) {
+			matIter = i;
+			mat = i->second;
+		}
+	}
+
+	if ( mat == NULL ) {
+		printf( "Model::_renameGroup(): Error! Could not find define to rename\n" );
+		return false;
+	}
+
+	// check new name for validity
+	for ( int i = 0; i < newName.size(); i++ ) {
+		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
+			printf( "Model::_renameGroup(): Error! Invalid name.\n" );
+			return false;
+		}
+	}
+
+	// remove old entry and make new entry
+	groups.erase( matIter );
+	groups[ newName ] = mat;
+
+	return true;
 }
 
 // group objects together

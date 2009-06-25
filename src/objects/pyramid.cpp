@@ -22,12 +22,12 @@ const char* pyramid::faceNames[FaceCount] = {
   "bottom"
 };
 
-pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin>") {
+pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin><matref><phydrv>") {
 	setDefaults();
 }
 
 // constructor with string
-pyramid::pyramid(string& data) : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin>") {
+pyramid::pyramid(string& data) : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin><matref><phydrv>") {
 	setDefaults();
 
 	this->update(data);
@@ -239,6 +239,14 @@ int pyramid::update(UpdateMessage& message) {
 		case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
 			setSize( getSize() + *(message.getAsScaleFactor()) );
 			break;
+
+		case UpdateMessage::REMOVE_MATERIAL: {
+			material* mat = message.getAsMaterial();
+			for ( int i = 0; i < FaceCount; i++ ) 
+				if ( ((osg::Group*)getThisNode())->getChild( i )->getStateSet() == mat )
+					((osg::Group*)getThisNode())->getChild( i )->setStateSet( NULL );
+			break;
+		}
 
 		default:	// unknown event; don't handle
 			return result;

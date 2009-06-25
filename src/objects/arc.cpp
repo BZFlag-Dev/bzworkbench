@@ -188,7 +188,13 @@ int arc::update(UpdateMessage& message) {
 		case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
 			setSize( getSize() + *(message.getAsScaleFactor()) );
 			break;
-
+		case UpdateMessage::REMOVE_MATERIAL: {
+			material* mat = message.getAsMaterial();
+			for ( int i = 0; i < MaterialCount; i++ ) 
+				if ( ((osg::Group*)getThisNode())->getStateSet() == mat )
+					((osg::Group*)getThisNode())->setStateSet( NULL );
+			break;
+		}
 		default:	// unknown event; don't handle
 			return result;
 	}

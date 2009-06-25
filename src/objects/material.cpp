@@ -260,7 +260,7 @@ string material::toString(void) {
 
 	string matString = string("");
 	if( materials.size() > 0 ) {
-		for(vector< material* >::iterator i = materials.begin(); i != materials.end(); i++) {
+		for(list< material* >::iterator i = materials.begin(); i != materials.end(); i++) {
 			matString += "  matref " + (*i)->getName() + "\n";
 		}
 	}
@@ -356,6 +356,12 @@ void material::setSphereMap( bool value ) {
 	textures[ textures.size() - 1 ].sphereMap = value;
 }
 
+void material::setName( const string& _name ) {
+	if ( Model::renameMaterial( getName(), _name ) ) {
+		name = _name;
+	}
+}
+
 void material::reset() {
 	dynCol = NULL;
 
@@ -387,7 +393,7 @@ material& material::operator=(material const &rhs) {
 	}
 
 	materials.clear();
-	for (vector<material*>::const_iterator itr = rhs.materials.begin(); itr != rhs.materials.end(); itr++) {
+	for (list<material*>::const_iterator itr = rhs.materials.begin(); itr != rhs.materials.end(); itr++) {
 		materials.push_back( *itr );
 	}
 
@@ -494,7 +500,7 @@ void material::computeFinalMaterial() {
 
 	if( materials.size() > 0 ) {
 
-		for( vector< material* >::iterator i = materials.begin(); i != materials.end(); i++ ) {
+		for( list< material* >::iterator i = materials.begin(); i != materials.end(); i++ ) {
 
 			material* mat = *i;
 
@@ -560,12 +566,26 @@ osg::Texture2D* material::getCurrentTexture() {
 
 vector< string > material::getMaterials() {
 	vector< string > ret;
-	vector< material* >::const_iterator i;
+	list< material* >::const_iterator i;
 	for ( i = materials.begin(); i != materials.end(); i++ ) {
 		ret.push_back( (*i)->getName() );
 	}
 
 	return ret;
+}
+
+void material::removeMaterial( material* mat ) {
+	list< material* >::iterator i;
+	list< list< material* >::iterator > iters;
+	for ( i = materials.begin(); i != materials.end(); i++ ) {
+		if ( *i == mat ) {
+			iters.push_back( i );
+		}
+	}
+
+	for ( list< list< material* >::iterator >::iterator it = iters.begin(); it != iters.end(); it++ ) {
+		materials.erase( *it );
+	}
 }
 
 void material::setMaterials( vector< string > value ) {

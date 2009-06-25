@@ -102,6 +102,13 @@ public:
 	static void assignMaterial( material* matref, bz2object* obj );
 	static ConfigurationDialog* configureObject( DataEntry* obj );
 
+	static bool renameMaterial( std::string oldName, std::string newName );
+	static bool renameDynamicColor( std::string oldName, std::string newName );
+	static bool renameTextureMatrix( std::string oldName, std::string newName );
+	static bool renamePhysicsDriver( std::string oldName, std::string newName );
+	static bool renameTeleporterLink( std::string oldName, std::string newName );
+	static bool renameGroup( std::string oldName, std::string newName );
+
 	// editor-like methods (BZWB-specific)
 	static bool cutSelection();
 	static bool copySelection();
@@ -128,6 +135,7 @@ public:
 	void _addObject( bz2object* obj );
 	DataEntry* _buildObject( const char* header );
 	void _removeObject( bz2object* obj );
+	void _removeMaterial( material* mat );
 	void _setSelected( bz2object* obj );
 	void _setUnselected( bz2object* obj );
 	void _unselectAll();
@@ -136,6 +144,13 @@ public:
 	void _assignMaterial( const std::string& matref, bz2object* obj );
 	void _assignMaterial( material* matref, bz2object* obj );
 	ConfigurationDialog* _configureObject( DataEntry* obj );
+
+	bool _renameMaterial( std::string oldName, std::string newName );
+	bool _renameDynamicColor( std::string oldName, std::string newName );
+	bool _renameTextureMatrix( std::string oldName, std::string newName );
+	bool _renamePhysicsDriver( std::string oldName, std::string newName );
+	bool _renameTeleporterLink( std::string oldName, std::string newName );
+	bool _renameGroup( std::string oldName, std::string newName );
 
 	// editor-like methods (BZWB-specific)--instantiated
 	bool _cutSelection();
@@ -193,6 +208,7 @@ public:
 	const std::string _getSupportedTerminators();
 	bool _hasInitializer( DataEntry* d ) { return ( cmap.count( d->getHeader() ) == 0 || cmap[ std::string(d->getHeader()) ] == NULL ) ? false : true; }
 	bool _hasConfigurationDialog( DataEntry* d ) { return ( configMap.count( d->getHeader() ) == 0 || configMap[ std::string(d->getHeader()) ] == NULL ) ? false : true; }
+
 
 private:
 
@@ -256,37 +272,5 @@ private:
 
 	static Model* modRef;
 };
-
-/*#include "BZWParser.h"
-
-#include "../DataEntry.h"
-
-#include "../objects/arc.h"
-#include "../objects/base.h"
-#include "../objects/box.h"
-#include "../objects/cone.h"
-#include "../objects/define.h"
-#include "../objects/dynamicColor.h"
-#include "../objects/group.h"
-#include "../objects/link.h"
-#include "../objects/material.h"
-#include "../objects/mesh.h"
-#include "../objects/meshbox.h"
-#include "../objects/meshpyr.h"
-#include "../objects/options.h"
-#include "../objects/physics.h"
-#include "../objects/pyramid.h"
-#include "../objects/sphere.h"
-#include "../objects/teleporter.h"
-#include "../objects/tetra.h"
-#include "../objects/texturematrix.h"
-#include "../objects/waterLevel.h"
-#include "../objects/weapon.h"
-#include "../objects/world.h"
-#include "../objects/zone.h"
-
-#include "../objects/bz2object.h"*/
-
-// #include "../windows/View.h"
 
 #endif /*MODEL_H_*/

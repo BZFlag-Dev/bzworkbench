@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 #include <osg/Material>
 #include <osg/Texture2D>
@@ -76,9 +77,10 @@ public:
 	bool getOccluder() { return occluder; }
 
 	std::vector< std::string > getMaterials();
+	void removeMaterial( material* mat );
 	void setMaterials( std::vector< std::string > value );
 
-	void setName( const string& _name ) { this->name = _name; }
+	void setName( const string& _name );
 	void setDynamicColor( dynamicColor* _dynCol ) { dynCol = _dynCol; }
 
 	void setAmbient( const osg::Vec4& value ) { getCurrentMaterial()->setAmbient( osg::Material::FRONT, value ); }
@@ -141,7 +143,7 @@ private:
 
 	std::vector< std::string > shaders;
 
-	std::vector< material* > materials;
+	std::list< material* > materials;
 
 	dynamicColor* dynCol;
 	bool noTextures;

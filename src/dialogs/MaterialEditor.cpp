@@ -138,7 +138,26 @@ void MaterialEditor::MaterialAddCallback_real( Fl_Widget* w ) {
 }
 
 void MaterialEditor::MaterialRemoveCallback_real( Fl_Widget* w ) {
-	// FIXME: implement
+	const char* name = NULL;
+	for (int i = 1; i <= materialBrowser->size(); i++) {
+		if ( materialBrowser->selected( i ) ) {
+			name = materialBrowser->text( i );
+			break;
+		}
+	}
+
+	if ( name == NULL )
+		return;
+
+	map< string, material* > materials = model->_getMaterials();
+
+	if ( materials.count( string( name ) ) ) {
+		material* mat = materials[ string( name ) ];
+
+		model->_removeMaterial( mat );
+	}
+
+	refreshMaterialList();
 }
 
 void MaterialEditor::MaterialEditCallback_real( Fl_Widget* w ) {

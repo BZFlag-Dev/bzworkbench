@@ -239,6 +239,14 @@ int box::update(UpdateMessage& message) {
 			setSize( getSize() + *(message.getAsScaleFactor()) );
 			break;
 		}
+
+		case UpdateMessage::REMOVE_MATERIAL: {
+			material* mat = message.getAsMaterial();
+			for ( int i = 0; i < FaceCount; i++ ) 
+				if ( ((osg::Group*)getThisNode())->getChild( i )->getStateSet() == mat )
+					((osg::Group*)getThisNode())->getChild( i )->setStateSet( NULL );
+			break;
+		}
 		default:	// unknown event; don't handle
 			return result;
 	}
