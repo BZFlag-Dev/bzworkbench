@@ -4,24 +4,30 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/widgets/ColorCommandWidget.cpp \
 ../src/widgets/Console.cpp \
 ../src/widgets/Fl_ImageButton.cpp \
 ../src/widgets/MaterialWidget.cpp \
 ../src/widgets/QuickLabel.cpp \
+../src/widgets/RGBAWidget.cpp \
 ../src/widgets/TransformWidget.cpp 
 
 OBJS += \
+./src/widgets/ColorCommandWidget.o \
 ./src/widgets/Console.o \
 ./src/widgets/Fl_ImageButton.o \
 ./src/widgets/MaterialWidget.o \
 ./src/widgets/QuickLabel.o \
+./src/widgets/RGBAWidget.o \
 ./src/widgets/TransformWidget.o 
 
 CPP_DEPS += \
+./src/widgets/ColorCommandWidget.d \
 ./src/widgets/Console.d \
 ./src/widgets/Fl_ImageButton.d \
 ./src/widgets/MaterialWidget.d \
 ./src/widgets/QuickLabel.d \
+./src/widgets/RGBAWidget.d \
 ./src/widgets/TransformWidget.d 
 
 

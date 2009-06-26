@@ -10,6 +10,7 @@ CPP_SRCS += \
 ../src/dialogs/BoxConfigurationDialog.cpp \
 ../src/dialogs/ConeConfigurationDialog.cpp \
 ../src/dialogs/ConfigurationMenu.cpp \
+../src/dialogs/DynamicColorConfigurationDialog.cpp \
 ../src/dialogs/Fl_Dialog.cpp \
 ../src/dialogs/Fl_Error.cpp \
 ../src/dialogs/Fl_Tweak.cpp \
@@ -34,6 +35,7 @@ OBJS += \
 ./src/dialogs/BoxConfigurationDialog.o \
 ./src/dialogs/ConeConfigurationDialog.o \
 ./src/dialogs/ConfigurationMenu.o \
+./src/dialogs/DynamicColorConfigurationDialog.o \
 ./src/dialogs/Fl_Dialog.o \
 ./src/dialogs/Fl_Error.o \
 ./src/dialogs/Fl_Tweak.o \
@@ -58,6 +60,7 @@ CPP_DEPS += \
 ./src/dialogs/BoxConfigurationDialog.d \
 ./src/dialogs/ConeConfigurationDialog.d \
 ./src/dialogs/ConfigurationMenu.d \
+./src/dialogs/DynamicColorConfigurationDialog.d \
 ./src/dialogs/Fl_Dialog.d \
 ./src/dialogs/Fl_Error.d \
 ./src/dialogs/Fl_Tweak.d \

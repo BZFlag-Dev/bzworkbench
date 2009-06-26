@@ -23,7 +23,6 @@ MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
 	nameInput = new Fl_Input( 60, 5, 230, DEFAULT_TEXTSIZE + 6);
 	nameInput->value( theMat->getName().c_str() );
 
-	// FIXME: add matref functionality
 	matrefLabel = new QuickLabel( "Material References:", 5, 30 );
 	matrefBrowser = new Fl_Multi_Browser( 5, 55, 185, 90 );
 	vector<string> matrefs = theMat->getMaterials();
@@ -42,7 +41,6 @@ MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
 	matrefRemoveButton = new Fl_Button( 195, 105, 100, DEFAULT_TEXTSIZE + 6, "Remove" );
 	matrefRemoveButton->callback( MatrefRemoveCallback, this );
 
-	// FIXME: add dynamic color functionality
 	dyncolLabel = new QuickLabel( "Dynamic Color:", 5, 150 );
 	dyncolChoice = new Fl_Choice( 150, 150, 120, DEFAULT_TEXTSIZE + 6 );
 	map<string, dynamicColor*> dyncols = Model::getDynamicColors();
@@ -156,7 +154,7 @@ void MaterialConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 	else
 		theMat->setDynamicColor( NULL );
 
-	if (textureMatrixChoice->text() != NULL && string( textureMatrixChoice->text() ) != "NONE" ) 
+	if (textureMatrixChoice->text() != NULL && string( textureMatrixChoice->text() ) != "NONE" )
 		theMat->setTextureMatrix( Model::getTextureMatrices()[ string( textureMatrixChoice->text() ) ] );
 	else
 		theMat->setTextureMatrix( NULL );

@@ -765,13 +765,13 @@ void Model::_removeMaterial( material* mat ) {
 	map< string, material* >::iterator i;
 	for ( i = materials.begin(); i != materials.end(); i++ ) {
 		if ( i->second == mat ) {
-			
+
 			UpdateMessage msg( UpdateMessage::REMOVE_MATERIAL, mat );
 			// make sure all the objects are informed of the material being removed.
 			for ( objRefList::iterator j = objects.begin(); j != objects.end(); j++ ) {
 				(*j)->update( msg );
 			}
-			
+
 			// make sure the material is removed from other materials too
 			for ( map< string, material* >::iterator j = materials.begin(); j != materials.end(); j++ ) {
 				if ( j->second != mat ) {
@@ -781,6 +781,28 @@ void Model::_removeMaterial( material* mat ) {
 
 			materials.erase( i );
 			mat->unref();
+			break;
+		}
+	}
+}
+
+void Model::_removeDynamicColor( dynamicColor* dyncol ) {
+	if (dynamicColors.size() <= 0)
+		return;
+
+	map< string, dynamicColor* >::iterator i;
+	for ( i = dynamicColors.begin(); i != dynamicColors.end(); i++ ) {
+		if ( i->second == dyncol ) {
+
+			// make sure the dynamic color is removed from any materials
+			for ( map< string, material* >::iterator j = materials.begin(); j != materials.end(); j++ ) {
+				if (j->second->getDynamicColor() == dyncol) {
+					j->second->setDynamicColor( NULL );
+				}
+			}
+
+			dynamicColors.erase( i );
+			delete dyncol;
 			break;
 		}
 	}
@@ -1120,7 +1142,7 @@ bool Model::_renameDynamicColor( std::string oldName, std::string newName ) {
 	dynamicColor* mat = NULL;
 	for ( map< string, dynamicColor* >::iterator i = dynamicColors.begin(); i != dynamicColors.end(); i++ ) {
 		if ( i->first == newName ) {
-			printf( "Model::_renameMaterial(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
+			printf( "Model::_renameDynamicColor(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
 			return false;
 		}
 		else if ( i->first == oldName ) {
@@ -1130,14 +1152,14 @@ bool Model::_renameDynamicColor( std::string oldName, std::string newName ) {
 	}
 
 	if ( mat == NULL ) {
-		printf( "Model::_renameMaterial(): Error! Could not find dynamic color to rename\n" );
+		printf( "Model::_renameDynamicColor(): Error! Could not find dynamic color to rename\n" );
 		return false;
 	}
 
 	// check new name for validity
 	for ( int i = 0; i < newName.size(); i++ ) {
 		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
-			printf( "Model::_renameMaterial(): Error! Invalid name.\n" );
+			printf( "Model::_renameDynamicColor(): Error! Invalid name.\n" );
 			return false;
 		}
 	}

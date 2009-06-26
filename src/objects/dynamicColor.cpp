@@ -12,11 +12,14 @@
 
 #include "objects/dynamicColor.h"
 
+#include "model/Model.h"
+#include "model/SceneBuilder.h"
+
 // default constructor
 dynamicColor::dynamicColor() :
 	DataEntry("dynamicColor", "<red><green><blue><alpha><name>") {
-		
-	name = string("");
+
+	name = SceneBuilder::makeUniqueName( "dynamicColor" );
 	redCommands = vector<ColorCommand>();
 	greenCommands = vector<ColorCommand>();
 	blueCommands = vector<ColorCommand>();
@@ -26,13 +29,13 @@ dynamicColor::dynamicColor() :
 // constructor with data
 dynamicColor::dynamicColor(string& data) :
 	DataEntry("dynamicColor", "<red><green><blue><alpha><name>", data.c_str()) {
-	
-	name = string("");
+
+	name = SceneBuilder::makeUniqueName( "dynamicColor" );
 	redCommands = vector<ColorCommand>();
 	greenCommands = vector<ColorCommand>();
 	blueCommands = vector<ColorCommand>();
 	alphaCommands = vector<ColorCommand>();
-	
+
 	update(data);
 }
 
@@ -42,39 +45,39 @@ string dynamicColor::get(void) { return toString(); }
 /**
  * Helper method:  check and see if the commands given are valid ColorCommands
  */
- 
+
 bool areValidCommands(vector<string>& commandList) {
 	// an empty list is valid
 	if(commandList.size() == 0)
 		return true;
-	
-	// iterate through and use ColorCommand::isValid() to check each command	
+
+	// iterate through and use ColorCommand::isValid() to check each command
 	for(vector<string>::iterator i = commandList.begin(); i != commandList.end(); i++) {
 		if(! ColorCommand::isValid( *i ) ) {
 			printf("dynamicColor::update(): Error! Invalid color command \"%s\"\n", i->c_str());
-			return false;	
+			return false;
 		}
 	}
-	
+
 	return true;
 }
 
 /**
  * Helper method: convert a vector of string-ified color commands into a vector of ColorCommand objects
  */
- 
+
 vector<ColorCommand> parseCommands(vector<string> commandList) {
 	vector<ColorCommand> ret = vector<ColorCommand>();
-	
+
 	// return an empty list if there are no commands in commandList
 	if(commandList.size() == 0)
 		return ret;
-	
+
 	// iterate through the commandList and build ColorCommand objects from them
 	for(vector<string>::iterator i = commandList.begin(); i != commandList.end(); i++) {
-		ret.push_back( ColorCommand( *i ) );	
+		ret.push_back( ColorCommand( *i ) );
 	}
-	
+
 	return ret;
 }
 
@@ -83,69 +86,70 @@ vector<ColorCommand> parseCommands(vector<string> commandList) {
  */
 string stringifyCommands(vector<ColorCommand>& commands, const char* color) {
 	string ret = string("");
-	
+
 	// break if there are no commands
 	if(commands.size() == 0)
 		return ret;
-		
+
 	// iterate through the commands and concat their toString() output to ret
 	for(vector<ColorCommand>::iterator i = commands.begin(); i != commands.end(); i++) {
-		ret += string("  ") + color + " " + i->toString();	
+		ret += string("  ") + color + " " + i->toString();
 	}
-	
+
 	return ret;
 }
 
 // setter
 int dynamicColor::update(string& data) {
 	const char* header = getHeader().c_str();
-	
+
 	// get the section
 	vector<string> lines = BZWParser::getSectionsByHeader( header, data.c_str() );
-	
+
 	// break of there isn't only one
 	if(!hasOnlyOne(lines, "header"))
 		return 0;
-		
+
 	// get the data
 	const char* dynamicColorData = lines[0].c_str();
-	
+
 	// get the name
 	vector<string> names = BZWParser::getValuesByKey( "name", header, dynamicColorData );
 	if(!hasOnlyOne(names, "name"))
 		return 0;
-		
+
 	// get and validate the "red" commands
 	vector<string> redCommandVals = BZWParser::getValuesByKey( "red", header, dynamicColorData );
 	if(! areValidCommands(redCommandVals) )
 		return 0;
-	
+
 	// get and validate the "green" commands
 	vector<string> greenCommandVals = BZWParser::getValuesByKey( "green", header, dynamicColorData );
 	if(! areValidCommands(greenCommandVals) )
 		return 0;
-	
+
 	// get and validate the "blue" commands
 	vector<string> blueCommandVals = BZWParser::getValuesByKey( "blue", header, dynamicColorData );
 	if(! areValidCommands(blueCommandVals) )
 		return 0;
-	
+
 	// get validate the "alpha" commands
 	vector<string> alphaCommandVals = BZWParser::getValuesByKey( "alpha", header, dynamicColorData );
 	if(! areValidCommands(alphaCommandVals) )
 		return 0;
-		
+
 	// update superclass
 	if(! DataEntry::update(data) )
 		return 0;
-		
+
 	// commit the data
 	redCommands = parseCommands( redCommandVals );
 	greenCommands = parseCommands( greenCommandVals );
 	blueCommands = parseCommands( blueCommandVals );
 	alphaCommands = parseCommands( alphaCommandVals );
-	name = names[0];
-	
+	if ( names.size() > 0 )
+		name = names[0];
+
 	return 1;
 }
 
@@ -156,7 +160,7 @@ string dynamicColor::toString(void) {
 	string blueString = stringifyCommands( blueCommands, "blue" );
 	string greenString = stringifyCommands( greenCommands, "green" );
 	string alphaString = stringifyCommands( alphaCommands, "alpha" );
-	
+
 	return string("dynamicColor\n") +
 				  (name.length() != 0 ? "  name " + name : string("# name")) + "\n" +
 				  redString +
@@ -168,5 +172,11 @@ string dynamicColor::toString(void) {
 
 // render
 int dynamicColor::render(void) {
-	return 0;	
+	return 0;
+}
+
+void dynamicColor::setName( const string& _name ) {
+	if ( Model::renameDynamicColor( getName(), _name ) ) {
+		this->name = _name;
+	}
 }

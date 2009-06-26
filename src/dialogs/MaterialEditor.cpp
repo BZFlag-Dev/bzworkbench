@@ -13,6 +13,7 @@
 #include "dialogs/MaterialEditor.h"
 
 #include "dialogs/MaterialConfigurationDialog.h"
+#include "dialogs/DynamicColorConfigurationDialog.h"
 #include "objects/material.h"
 #include "objects/texturematrix.h"
 #include "objects/dynamicColor.h"
@@ -83,7 +84,7 @@ void MaterialEditor::refreshMaterialList() {
 	materialBrowser->clear();
 
 	std::map<string, material*> materials = model->_getMaterials();
-	
+
 	std::map<string, material*>::const_iterator i;
 	for ( i = materials.begin(); i != materials.end(); i++ ) {
 		materialBrowser->add( i->first.c_str() );
@@ -199,8 +200,6 @@ void MaterialEditor::TexmatAddCallback_real( Fl_Widget* w ) {
 	if(!newObj)
 		return;
 
-	newObj->setName( SceneBuilder::makeUniqueName( "texturematrix" ) );
-
 	model->_getTextureMatrices()[ newObj->getName() ] = newObj;
 
 	// make sure the texture matrix shows up
@@ -222,8 +221,6 @@ void MaterialEditor::DyncolAddCallback_real( Fl_Widget* w ) {
 	if(!newObj)
 		return;
 
-	newObj->setName( SceneBuilder::makeUniqueName( "dynamicColor" ) );
-
 	model->_getDynamicColors()[ newObj->getName() ] = newObj;
 
 	// make sure the dynamic color shows up
@@ -231,9 +228,56 @@ void MaterialEditor::DyncolAddCallback_real( Fl_Widget* w ) {
 }
 
 void MaterialEditor::DyncolRemoveCallback_real( Fl_Widget* w ) {
+	const char* name = NULL;
+	for (int i = 1; i <= dyncolBrowser->size(); i++) {
+		if ( dyncolBrowser->selected( i ) ) {
+			name = dyncolBrowser->text( i );
+			break;
+		}
+	}
 
+	if ( name == NULL )
+		return;
+
+	map< string, dynamicColor* > dyncols = model->_getDynamicColors();
+
+	if ( dyncols.count( string( name ) ) ) {
+		dynamicColor* dyncol = dyncols[ string( name ) ];
+
+		model->_removeDynamicColor( dyncol );
+	}
+
+	refreshDyncolList();
 }
 
 void MaterialEditor::DyncolEditCallback_real( Fl_Widget* w ) {
+	// find the first selected item
+	const char* name = NULL;
+	for (int i = 1; i <= dyncolBrowser->size(); i++) {
+		if ( dyncolBrowser->selected( i ) ) {
+			name = dyncolBrowser->text( i );
+			break;
+		}
+	}
 
+	// make sure something was actually selected
+	if ( name == NULL )
+		return;
+
+	// get the material
+	dynamicColor* dyncol = dynamic_cast< dynamicColor* >( model->_command( MODEL_GET, "dynamicColor", string( name ) ) );
+
+	if ( dyncol != NULL ) {
+		// open a material config dialog
+		DynamicColorConfigurationDialog* dccd = new DynamicColorConfigurationDialog( dyncol );
+
+		dccd->show();
+
+		while ( dccd->shown() ) { Fl::wait(); }
+
+		// clean up
+		delete dccd;
+	}
+
+	refreshDyncolList();
 }
