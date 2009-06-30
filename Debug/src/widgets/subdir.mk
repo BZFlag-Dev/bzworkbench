@@ -10,6 +10,7 @@ CPP_SRCS += \
 ../src/widgets/MaterialWidget.cpp \
 ../src/widgets/QuickLabel.cpp \
 ../src/widgets/RGBAWidget.cpp \
+../src/widgets/TexcoordWidget.cpp \
 ../src/widgets/TransformWidget.cpp 
 
 OBJS += \
@@ -19,6 +20,7 @@ OBJS += \
 ./src/widgets/MaterialWidget.o \
 ./src/widgets/QuickLabel.o \
 ./src/widgets/RGBAWidget.o \
+./src/widgets/TexcoordWidget.o \
 ./src/widgets/TransformWidget.o 
 
 CPP_DEPS += \
@@ -28,6 +30,7 @@ CPP_DEPS += \
 ./src/widgets/MaterialWidget.d \
 ./src/widgets/QuickLabel.d \
 ./src/widgets/RGBAWidget.d \
+./src/widgets/TexcoordWidget.d \
 ./src/widgets/TransformWidget.d 
 
 

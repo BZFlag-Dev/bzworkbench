@@ -136,6 +136,7 @@ public:
 	DataEntry* _buildObject( const char* header );
 	void _removeObject( bz2object* obj );
 	void _removeMaterial( material* mat );
+	void _removeTextureMatrix( texturematrix* texmat );
 	void _removeDynamicColor( dynamicColor* dyncol );
 	void _setSelected( bz2object* obj );
 	void _setUnselected( bz2object* obj );

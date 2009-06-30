@@ -14,6 +14,7 @@
 
 #include "dialogs/MaterialConfigurationDialog.h"
 #include "dialogs/DynamicColorConfigurationDialog.h"
+#include "dialogs/TextureMatrixConfigurationDialog.h"
 #include "objects/material.h"
 #include "objects/texturematrix.h"
 #include "objects/dynamicColor.h"
@@ -207,11 +208,58 @@ void MaterialEditor::TexmatAddCallback_real( Fl_Widget* w ) {
 }
 
 void MaterialEditor::TexmatRemoveCallback_real( Fl_Widget* w ) {
+	const char* name = NULL;
+	for (int i = 1; i <= textureMatrixBrowser->size(); i++) {
+		if ( textureMatrixBrowser->selected( i ) ) {
+			name = textureMatrixBrowser->text( i );
+			break;
+		}
+	}
 
+	if ( name == NULL )
+		return;
+
+	map< string, texturematrix* > texmats = model->_getTextureMatrices();
+
+	if ( texmats.count( string( name ) ) ) {
+		texturematrix* texmat = texmats[ string( name ) ];
+
+		model->_removeTextureMatrix( texmat );
+	}
+
+	refreshTexmatList();
 }
 
 void MaterialEditor::TexmatEditCallback_real( Fl_Widget* w ) {
+	// find the first selected item
+	const char* name = NULL;
+	for (int i = 1; i <= textureMatrixBrowser->size(); i++) {
+		if ( textureMatrixBrowser->selected( i ) ) {
+			name = textureMatrixBrowser->text( i );
+			break;
+		}
+	}
 
+	// make sure something was actually selected
+	if ( name == NULL )
+		return;
+
+	// get the texture matrix
+	texturematrix* texmat = dynamic_cast< texturematrix* >( model->_command( MODEL_GET, "texturematrix", string( name ) ) );
+
+	if ( texmat != NULL ) {
+		// open a texture matrix config dialog
+		TextureMatrixConfigurationDialog* tcd = new TextureMatrixConfigurationDialog( texmat );
+
+		tcd->show();
+
+		while ( tcd->shown() ) { Fl::wait(); }
+
+		// clean up
+		delete tcd;
+	}
+
+	refreshTexmatList();
 }
 
 void MaterialEditor::DyncolAddCallback_real( Fl_Widget* w ) {

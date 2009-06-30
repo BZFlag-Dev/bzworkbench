@@ -24,6 +24,7 @@ CPP_SRCS += \
 ../src/dialogs/PyramidConfigurationDialog.cpp \
 ../src/dialogs/SphereConfigurationDialog.cpp \
 ../src/dialogs/TeleporterConfigurationDialog.cpp \
+../src/dialogs/TextureMatrixConfigurationDialog.cpp \
 ../src/dialogs/WeaponConfigurationDialog.cpp \
 ../src/dialogs/WorldOptionsDialog.cpp \
 ../src/dialogs/ZoneConfigurationDialog.cpp 
@@ -49,6 +50,7 @@ OBJS += \
 ./src/dialogs/PyramidConfigurationDialog.o \
 ./src/dialogs/SphereConfigurationDialog.o \
 ./src/dialogs/TeleporterConfigurationDialog.o \
+./src/dialogs/TextureMatrixConfigurationDialog.o \
 ./src/dialogs/WeaponConfigurationDialog.o \
 ./src/dialogs/WorldOptionsDialog.o \
 ./src/dialogs/ZoneConfigurationDialog.o 
@@ -74,6 +76,7 @@ CPP_DEPS += \
 ./src/dialogs/PyramidConfigurationDialog.d \
 ./src/dialogs/SphereConfigurationDialog.d \
 ./src/dialogs/TeleporterConfigurationDialog.d \
+./src/dialogs/TextureMatrixConfigurationDialog.d \
 ./src/dialogs/WeaponConfigurationDialog.d \
 ./src/dialogs/WorldOptionsDialog.d \
 ./src/dialogs/ZoneConfigurationDialog.d 

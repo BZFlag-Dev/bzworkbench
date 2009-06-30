@@ -20,40 +20,60 @@
 class texturematrix : public DataEntry {
 
 public:
-	
+
 	// default constructor
 	texturematrix();
-	
+
 	// constructor with data
 	texturematrix(string& data);
-	
+
 	static DataEntry* init() { return new texturematrix(); }
 	static DataEntry* init(string& data) { return new texturematrix(data); }
-	
+
 	// getter
 	string get(void);
-	
+
 	// setter
 	int update(string& data);
-	
+
 	// toString
 	string toString(void);
-	
+
 	// render
 	int render(void);
-	
+
 	// getters
 	string& getName() { return this->name; }
-	
+
 	// setters
-	void setName( const string& _name ) { this->name = _name; }
-	
+	void setName( const string& _name );
+
+	TexCoord2D getScale() { return texScale; }
+	TexCoord2D getScaleFreq() { return texFreq; }
+	TexCoord2D getShift() { return texShift; }
+	TexCoord2D getCenter() { return texCenter; }
+	TexCoord2D getFixedScale() { return texFixedScale; }
+	TexCoord2D getFixedShift() { return texFixedShift; }
+	TexCoord2D getFixedCenter() { return texFixedCenter; }
+	float getSpin() { return spin; }
+	float getFixedSpin() { return fixedSpin; }
+
+	void setScale( TexCoord2D value ) { texScale = value; }
+	void setScaleFreq( TexCoord2D value ) { texFreq = value; }
+	void setShift( TexCoord2D value ) { texShift = value; }
+	void setCenter( TexCoord2D value ) { texCenter = value; }
+	void setFixedScale( TexCoord2D value ) { texFixedScale = value; }
+	void setFixedShift( TexCoord2D value ) { texFixedShift = value; }
+	void setFixedCenter( TexCoord2D value ) { texFixedCenter = value; }
+	void setSpin( float value ) { spin = value; }
+	void setFixedSpin( float value ) { fixedSpin = value; }
+
 private:
 
 	string name;
-	TexCoord2D texFreq, texScale, texShift, texCenter, texFixedScale, texFixedShift;
+	TexCoord2D texFreq, texScale, texShift, texCenter, texFixedScale, texFixedShift, texFixedCenter;
 	float spin, fixedSpin;
-	
+
 };
 
 

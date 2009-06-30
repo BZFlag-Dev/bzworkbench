@@ -786,6 +786,30 @@ void Model::_removeMaterial( material* mat ) {
 	}
 }
 
+void Model::_removeTextureMatrix( texturematrix* texmat ) {
+	if (textureMatrices.size() <= 0)
+		return;
+
+	map< string, texturematrix* >::iterator i;
+	for ( i = textureMatrices.begin(); i != textureMatrices.end(); i++ ) {
+		if ( i->second == texmat ) {
+
+			// make sure the texture matrix is removed from any materials
+			for ( map< string, material* >::iterator j = materials.begin(); j != materials.end(); j++ ) {
+				for (int k = 0; k < j->second->getTextureCount(); k++ ) {
+					if (j->second->getTextureMatrix( k ) == texmat) {
+						j->second->setTextureMatrix( NULL );
+					}
+				}
+			}
+
+			textureMatrices.erase( i );
+			delete texmat;
+			break;
+		}
+	}
+}
+
 void Model::_removeDynamicColor( dynamicColor* dyncol ) {
 	if (dynamicColors.size() <= 0)
 		return;
