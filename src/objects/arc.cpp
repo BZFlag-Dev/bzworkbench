@@ -138,7 +138,7 @@ int arc::update(string& data) {
 
 	// get smoothbounce
 	vector<string> smoothBounces =  BZWParser::getValuesByKey("smoothbounce", header, arcData);
-	
+
 	// do base class update
 	if(!bz2object::update(data))
 		return 0;
@@ -190,7 +190,7 @@ int arc::update(UpdateMessage& message) {
 			break;
 		case UpdateMessage::REMOVE_MATERIAL: {
 			material* mat = message.getAsMaterial();
-			for ( int i = 0; i < MaterialCount; i++ ) 
+			for ( int i = 0; i < MaterialCount; i++ )
 				if ( ((osg::Group*)getThisNode())->getStateSet() == mat )
 					((osg::Group*)getThisNode())->setStateSet( NULL );
 			break;
@@ -387,7 +387,7 @@ void arc::updateGeometry() {
 		makeRing(sides, isCircle, a, 0, sz.z(), inrad, outrad, squish, texsz);
 	}
 
-	
+
 }
 
 
@@ -497,8 +497,6 @@ void arc::makePie(osg::Geometry** sides, bool isCircle, float a, float r,
 	sides[3]->addPrimitiveSet( outsideIdx );
 	sides[4]->addPrimitiveSet( startIdx );
 	sides[5]->addPrimitiveSet( endIdx );
-	
-	int arrayPlace = 0;
 
 	for (i = 0; i < divisions; i++) {
 
@@ -646,9 +644,6 @@ void arc::makeRing(osg::Geometry** sides, bool isCircle, float a, float r,
 		sides[j]->setTexCoordArray( 0, realTexcoords[j] );
 		sides[j]->addPrimitiveSet( indices[j] );
 	}
-	
-
-	int arrayPlace = 0;
 
 	for (i = 0; i < divisions; i++) {
 

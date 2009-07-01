@@ -1166,7 +1166,7 @@ bool Model::_renameMaterial( std::string oldName, std::string newName ) {
 	}
 
 	// check new name for validity
-	for ( int i = 0; i < newName.size(); i++ ) {
+	for ( unsigned int i = 0; i < newName.size(); i++ ) {
 		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
 			printf( "Model::_renameMaterial(): Error! Invalid name.\n" );
 			return false;
@@ -1202,7 +1202,7 @@ bool Model::_renameDynamicColor( std::string oldName, std::string newName ) {
 	}
 
 	// check new name for validity
-	for ( int i = 0; i < newName.size(); i++ ) {
+	for ( unsigned int i = 0; i < newName.size(); i++ ) {
 		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
 			printf( "Model::_renameDynamicColor(): Error! Invalid name.\n" );
 			return false;
@@ -1238,7 +1238,7 @@ bool Model::_renameTextureMatrix( std::string oldName, std::string newName ) {
 	}
 
 	// check new name for validity
-	for ( int i = 0; i < newName.size(); i++ ) {
+	for ( unsigned int i = 0; i < newName.size(); i++ ) {
 		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
 			printf( "Model::_renameTextureMatrix(): Error! Invalid name.\n" );
 			return false;
@@ -1274,7 +1274,7 @@ bool Model::_renamePhysicsDriver( std::string oldName, std::string newName ) {
 	}
 
 	// check new name for validity
-	for ( int i = 0; i < newName.size(); i++ ) {
+	for ( unsigned int i = 0; i < newName.size(); i++ ) {
 		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
 			printf( "Model::_renamePhysicsDriver(): Error! Invalid name.\n" );
 			return false;
@@ -1310,7 +1310,7 @@ bool Model::_renameTeleporterLink( std::string oldName, std::string newName ) {
 	}
 
 	// check new name for validity
-	for ( int i = 0; i < newName.size(); i++ ) {
+	for ( unsigned int i = 0; i < newName.size(); i++ ) {
 		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
 			printf( "Model::_renameTeleporterLink(): Error! Invalid name.\n" );
 			return false;
@@ -1346,7 +1346,7 @@ bool Model::_renameGroup( std::string oldName, std::string newName ) {
 	}
 
 	// check new name for validity
-	for ( int i = 0; i < newName.size(); i++ ) {
+	for ( unsigned int i = 0; i < newName.size(); i++ ) {
 		if ( !TextUtils::isAlphanumeric( newName[i] ) && !TextUtils::isPunctuation( newName[i] ) ) {
 			printf( "Model::_renameGroup(): Error! Invalid name.\n" );
 			return false;
