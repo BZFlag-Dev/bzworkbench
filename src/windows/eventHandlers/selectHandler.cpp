@@ -106,8 +106,7 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
        	}
     	// catch double click events and do a pick
         case osgGA::GUIEventAdapter::DOUBLECLICK :
-        	
-
+			// don't do anything
        		return false;
 
         default:
@@ -153,11 +152,11 @@ bool selectHandler::pickObject(View* viewer, const osgGA::GUIEventAdapter& ea) {
             		return true;
             	}
             }
-
         }
     }
 
-
+	// if nothing was under the mouse, unselect everything
+	viewer->unselectAll();
 
     lastSelected = NULL;
     lastSelectedData = NULL;
