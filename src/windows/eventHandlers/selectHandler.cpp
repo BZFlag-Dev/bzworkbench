@@ -85,7 +85,13 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
        			viewer = dynamic_cast<View*>(&aa);
        			if( viewer ) {
        				prevEvent = osgGA::GUIEventAdapter::PUSH;
-       				return pickSelector( viewer, ea );
+					if ( pickSelector( viewer, ea ) ) {
+       					return true;
+					}
+					// only pick an object if a selector couldn't be picked
+					else if ( pickObject( viewer, ea ) ) {
+						return true;
+					}
        			}
        		}
        		else if( button == FL_RIGHT_MOUSE ) {
@@ -100,15 +106,7 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
        	}
     	// catch double click events and do a pick
         case osgGA::GUIEventAdapter::DOUBLECLICK :
-        	if( ea.getButton() == FL_LEFT_MOUSE ) {
-	            viewer = dynamic_cast<View*>(&aa);
-	            if (viewer) {
-	            	prevEvent = osgGA::GUIEventAdapter::DOUBLECLICK;
-
-	            	return pickObject(viewer,ea);
-
-	            }
-        	}
+        	
 
        		return false;
 
@@ -158,6 +156,8 @@ bool selectHandler::pickObject(View* viewer, const osgGA::GUIEventAdapter& ea) {
 
         }
     }
+
+
 
     lastSelected = NULL;
     lastSelectedData = NULL;

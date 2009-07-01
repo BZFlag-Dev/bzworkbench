@@ -238,6 +238,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\DynamicColorConfigurationDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\Fl_Dialog.cpp"
 					>
 				</File>
@@ -278,6 +282,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\PhysicsConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\PhysicsEditor.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\PyramidConfigurationDialog.cpp"
 					>
 				</File>
@@ -287,6 +299,10 @@
 				</File>
 				<File
 					RelativePath="..\src\dialogs\TeleporterConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\TextureMatrixConfigurationDialog.cpp"
 					>
 				</File>
 				<File
@@ -462,6 +478,10 @@
 				Name="Widgets"
 				>
 				<File
+					RelativePath="..\src\widgets\ColorCommandWidget.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\widgets\Console.cpp"
 					>
 				</File>
@@ -474,11 +494,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\widgets\Point3DWidget.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\widgets\QuickLabel.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\widgets\RGBAWidget.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\widgets\TexcoordWidget.cpp"
 					>
 				</File>
 				<File
@@ -772,6 +800,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\dialogs\DynamicColorConfigurationDialog.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dialogs\Fl_Dialog.h"
 					>
 				</File>
@@ -812,6 +844,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\dialogs\PhysicsConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\PhysicsEditor.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dialogs\PyramidConfigurationDialog.h"
 					>
 				</File>
@@ -821,6 +861,10 @@
 				</File>
 				<File
 					RelativePath="..\include\dialogs\TeleporterConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\TextureMatrixConfigurationDialog.h"
 					>
 				</File>
 				<File
@@ -864,6 +908,10 @@
 				Name="widgets"
 				>
 				<File
+					RelativePath="..\include\widgets\ColorCommandWidget.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\widgets\Console.h"
 					>
 				</File>
@@ -876,11 +924,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\widgets\Point3DWidget.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\widgets\QuickLabel.h"
 					>
 				</File>
 				<File
 					RelativePath="..\include\widgets\RGBAWidget.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\widgets\TexcoordWidget.h"
 					>
 				</File>
 				<File
