@@ -8,6 +8,7 @@ CPP_SRCS += \
 ../src/widgets/Console.cpp \
 ../src/widgets/Fl_ImageButton.cpp \
 ../src/widgets/MaterialWidget.cpp \
+../src/widgets/Point3DWidget.cpp \
 ../src/widgets/QuickLabel.cpp \
 ../src/widgets/RGBAWidget.cpp \
 ../src/widgets/TexcoordWidget.cpp \
@@ -18,6 +19,7 @@ OBJS += \
 ./src/widgets/Console.o \
 ./src/widgets/Fl_ImageButton.o \
 ./src/widgets/MaterialWidget.o \
+./src/widgets/Point3DWidget.o \
 ./src/widgets/QuickLabel.o \
 ./src/widgets/RGBAWidget.o \
 ./src/widgets/TexcoordWidget.o \
@@ -28,6 +30,7 @@ CPP_DEPS += \
 ./src/widgets/Console.d \
 ./src/widgets/Fl_ImageButton.d \
 ./src/widgets/MaterialWidget.d \
+./src/widgets/Point3DWidget.d \
 ./src/widgets/QuickLabel.d \
 ./src/widgets/RGBAWidget.d \
 ./src/widgets/TexcoordWidget.d \

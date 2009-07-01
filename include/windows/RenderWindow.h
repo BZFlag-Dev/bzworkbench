@@ -22,34 +22,32 @@
 #include <osgGA/TrackballManipulator>
 #include <osgDB/ReadFile>
 
-#include "../model/Model.h"
-
 class RenderWindow : public Fl_Gl_Window {
-	
+
 public:
-	
+
 	static const int DEFAULT_WIDTH = 980;
 	static const int DEFAULT_HEIGHT = 680;
-	
+
 	// constructors
 	// (needs a reference to the Model so it can render stuff)
 	RenderWindow();
 	RenderWindow(int x, int y, int width, int height);
-	
+
 	// OSG-specific methods
 	osgViewer::GraphicsWindow* getGraphicsWindow() { return _gw.get(); }
     const osgViewer::GraphicsWindow* getGraphicsWindow() const { return _gw.get(); }
-	
+
 	// FLTK-specific methods
 	virtual int handle(int);
 	void resize(int x, int y, int w, int h);
-	
+
 	// get the embedded view
 	osgViewer::GraphicsWindowEmbedded* getOSGGraphicsWindow() { return _gw.get(); }
-	
+
 	// set the embedded view
 	void setOSGGraphicsWindow( osgViewer::GraphicsWindowEmbedded* gw ) { _gw = gw; }
-	
+
 protected:
 
 	// reference to an embedded OSG render window

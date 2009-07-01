@@ -36,10 +36,10 @@ class group;
 // supported query commands.
 #define MODEL_GET "get"
 
-#include "../Observable.h"
+#include "Observable.h"
 #include "ObserverMessage.h"
 
-#include "../dialogs/ConfigurationDialog.h"
+#include "dialogs/ConfigurationDialog.h"
 
 #include <osg/ref_ptr>
 #include <osg/Vec3>
@@ -136,6 +136,7 @@ public:
 	DataEntry* _buildObject( const char* header );
 	void _removeObject( bz2object* obj );
 	void _removeMaterial( material* mat );
+	void _removePhysicsDriver( physics* phydrv );
 	void _removeTextureMatrix( texturematrix* texmat );
 	void _removeDynamicColor( dynamicColor* dyncol );
 	void _setSelected( bz2object* obj );

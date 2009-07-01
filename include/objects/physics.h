@@ -13,12 +13,12 @@
 #ifndef PHYSICS_H_
 #define PHYSICS_H_
 
-#include "DataEntry.h"
 #include "render/Point3D.h"
-#include "ftoa.h"
-#include "model/BZWParser.h"
+#include "DataEntry.h"
 
 #include <osg/Referenced>
+
+#include <string>
 
 class physics : public DataEntry, public osg::Referenced {
 
@@ -26,40 +26,50 @@ public:
 
 	// default constructor
 	physics();
-	
+
 	// constructors for osg::Referenced
 	physics( bool threadSafe );
 	physics( const osg::Referenced& ref );
-	
+
 	// constructor with data
-	physics(string& data);
-	
+	physics(std::string& data);
+
 	static DataEntry* init() { return new physics(); }
-	static DataEntry* init(string& data) { return new physics(data); }
-	
+	static DataEntry* init(std::string& data) { return new physics(data); }
+
 	// getter
-	string get(void);
-	
+	std::string get(void);
+
 	// setter
-	int update(string& data);
-	
+	int update(std::string& data);
+
 	// toString
-	string toString(void);
-	
+	std::string toString(void);
+
 	// render
 	int render(void);
-	
+
 	// getters
-	string& getName() { return name; }
-	
+	std::string& getName() { return name; }
+
 	// setters
-	void setName( const string& _name ) { name = _name; }
-	
+	void setName( const std::string& _name );
+
+	Point3D getLinear() { return linear; }
+	Point3D getAngular() { return angular; }
+	float getSlide() { return slide; }
+	std::string getDeathMessage() { return deathMessage; }
+
+	void setLinear( Point3D value ) { linear = value; }
+	void setAngular( Point3D value ) { angular = value; }
+	void setSlide( float value ) { slide = value; }
+	void setDeathMessage( std::string value ) { deathMessage = value; }
+
 private:
-	
+
 	Point3D linear, angular;
 	float slide;
-	string name, deathMessage;
+	std::string name, deathMessage;
 };
 
 #endif /*PHYSICS_H_*/

@@ -786,6 +786,27 @@ void Model::_removeMaterial( material* mat ) {
 	}
 }
 
+void Model::_removePhysicsDriver( physics* phydrv ) {
+	if (phys.size() <= 0)
+		return;
+
+	map< string, physics* >::iterator i;
+	for ( i = phys.begin(); i != phys.end(); i++ ) {
+		if ( i->second == phydrv ) {
+
+			UpdateMessage msg( UpdateMessage::REMOVE_PHYDRV, phydrv );
+			// make sure all the objects are informed of the phydrv being removed.
+			for ( objRefList::iterator j = objects.begin(); j != objects.end(); j++ ) {
+				(*j)->update( msg );
+			}
+
+			phys.erase( i );
+			phydrv->unref();
+			break;
+		}
+	}
+}
+
 void Model::_removeTextureMatrix( texturematrix* texmat ) {
 	if (textureMatrices.size() <= 0)
 		return;

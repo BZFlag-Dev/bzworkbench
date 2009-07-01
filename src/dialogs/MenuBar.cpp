@@ -12,6 +12,7 @@
 
 #include "dialogs/MenuBar.h"
 #include "dialogs/MaterialEditor.h"
+#include "dialogs/PhysicsEditor.h"
 #include "model/Model.h"
 #include "commonControls.h"
 
@@ -70,7 +71,8 @@ void MenuBar::buildMenu(void) {
 		add("Scene/Configure Object...", FL_CTRL+'o', configureObjectCallback, this);
 		add("Scene/Configure Info...", 0, configureInfoCallback, this, FL_MENU_DIVIDER);
 
-		add("Scene/Material Editor...", 0, materialEditorCallback, this, FL_MENU_DIVIDER);
+		add("Scene/Material Editor...", 0, materialEditorCallback, this);
+		add("Scene/Physics Editor...", 0, physicsEditorCallback, this, FL_MENU_DIVIDER);
 
 		add("Scene/Define World Weapon...", FL_CTRL+'w', worldWeaponCallback, this);
 		add("Scene/Link Teleporters", 0, linkCallback, this);
@@ -398,6 +400,20 @@ void MenuBar::materialEditorCallback_real(Fl_Widget* w) {
 	ed->show();
 
 	while( ed->shown() ) { Fl::wait(); }
+
+	delete ed;
+
+	value(0);
+}
+
+void MenuBar::physicsEditorCallback_real(Fl_Widget* w) {
+	PhysicsEditor* ed = new PhysicsEditor( parent->getModel() );
+
+	ed->show();
+
+	while( ed->shown() ) { Fl::wait(); }
+
+	delete ed;
 
 	value(0);
 }

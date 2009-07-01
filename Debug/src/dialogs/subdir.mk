@@ -21,6 +21,8 @@ CPP_SRCS += \
 ../src/dialogs/MenuBar.cpp \
 ../src/dialogs/MeshboxConfigurationDialog.cpp \
 ../src/dialogs/MeshpyrConfigurationDialog.cpp \
+../src/dialogs/PhysicsConfigurationDialog.cpp \
+../src/dialogs/PhysicsEditor.cpp \
 ../src/dialogs/PyramidConfigurationDialog.cpp \
 ../src/dialogs/SphereConfigurationDialog.cpp \
 ../src/dialogs/TeleporterConfigurationDialog.cpp \
@@ -47,6 +49,8 @@ OBJS += \
 ./src/dialogs/MenuBar.o \
 ./src/dialogs/MeshboxConfigurationDialog.o \
 ./src/dialogs/MeshpyrConfigurationDialog.o \
+./src/dialogs/PhysicsConfigurationDialog.o \
+./src/dialogs/PhysicsEditor.o \
 ./src/dialogs/PyramidConfigurationDialog.o \
 ./src/dialogs/SphereConfigurationDialog.o \
 ./src/dialogs/TeleporterConfigurationDialog.o \
@@ -73,6 +77,8 @@ CPP_DEPS += \
 ./src/dialogs/MenuBar.d \
 ./src/dialogs/MeshboxConfigurationDialog.d \
 ./src/dialogs/MeshpyrConfigurationDialog.d \
+./src/dialogs/PhysicsConfigurationDialog.d \
+./src/dialogs/PhysicsEditor.d \
 ./src/dialogs/PyramidConfigurationDialog.d \
 ./src/dialogs/SphereConfigurationDialog.d \
 ./src/dialogs/TeleporterConfigurationDialog.d \

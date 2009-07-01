@@ -23,7 +23,7 @@
 #include "defines.h"
 
 MaterialEditor::MaterialEditor( Model* model ) :
-		Fl_Dialog( "Material Editor", 310, 400, Fl_Dialog::Fl_OK | Fl_Dialog::Fl_CANCEL )
+		Fl_Dialog( "Material Editor", 310, 400, Fl_Dialog::Fl_OK )
 {
 	this->model = model;
 
@@ -78,7 +78,6 @@ MaterialEditor::MaterialEditor( Model* model ) :
 
 	// add the callbacks
 	setOKEventHandler( OKCallback, this );
-	setCancelEventHandler( CancelCallback, this );
 }
 
 void MaterialEditor::refreshMaterialList() {
@@ -116,12 +115,6 @@ void MaterialEditor::refreshDyncolList() {
 
 // OK callback
 void MaterialEditor::OKCallback_real( Fl_Widget* w ) {
-	// don't delete this dialog box just yet...just hide it
-	hide();
-}
-
-// Cancel callback
-void MaterialEditor::CancelCallback_real( Fl_Widget* w ) {
 	// don't delete this dialog box just yet...just hide it
 	hide();
 }

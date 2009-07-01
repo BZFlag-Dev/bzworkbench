@@ -13,13 +13,13 @@
 #ifndef BZ2OBJECT_H_
 #define BZ2OBJECT_H_
 
+#include "DataEntry.h"
 #include "render/Renderable.h"
 #include "render/Point3D.h"
-#include "DataEntry.h"
 #include "Transform.h"
 
-class physics;
-class material;
+#include "objects/material.h"
+#include "objects/physics.h"
 
 #include <vector>
 #include <cstring>

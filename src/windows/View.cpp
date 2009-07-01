@@ -12,51 +12,53 @@
 
 #include "windows/View.h"
 
+#include "objects/waterLevel.h"
+
 const double View::DEFAULT_ZOOM = 75.0;
 
 // view constructor
 View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char *_label) :
 	RenderWindow(_x,_y,_w,_h) {
-	
+
 	// set OSG viewport
     this->getCamera()->setViewport(new osg::Viewport(0,0,_w,_h));
-    
+
     // get the graphics context
     this->getCamera()->setGraphicsContext(getGraphicsWindow());
-    
+
     // do single-threaded view
   this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
-   
+
    // set the model
    this->model = m;
-   
+
    // initialize the root node
    this->root = new osg::Group();
-   
+
    // configure the stateset of the root node
    osg::StateSet* stateSet = root->getOrCreateStateSet();
-   
+
    // disable OSG's shading by making full white ambient light
    osg::LightModel* lighting = new osg::LightModel();
    lighting->setAmbientIntensity( osg::Vec4( 1, 1, 1, 1 ) );
-   
+
    stateSet->setAttribute( lighting, osg::StateAttribute::OVERRIDE );
-   
+
    stateSet->setTextureMode( 0, GL_TEXTURE_2D, osg::StateAttribute::ON );
-   
+
    // initialize the ground
    this->ground = new Ground( 400.0f );
-   
+
    // add the ground to the root node
    this->root->addChild( ground );
-	
+
 	// set the key modifiers to false
    this->modifiers = map< int, bool >();
    this->modifiers[ FL_SHIFT ] = false;
    this->modifiers[ FL_CTRL ] = false;
    this->modifiers[ FL_ALT ] = false;
    this->modifiers[ FL_META ] = false;
-   
+
 	// build the scene from the model
 	Model::objRefList objects = model->getObjects();
 	if(objects.size() > 0) {
@@ -64,39 +66,39 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 			root->addChild( _i->get() );
 		}
 	}
-	
-	
+
+
    // make a new selection object
    this->selection = new Selection();
-   
+
    // add the selection
    // NOTE: this has to be the LAST child on the list, because it doesn't have Z-bufferring enabled!
    this->root->addChild( selection );
-   
+
 	// add the root node to the scene
    this->setSceneData( root );
-   
+
    // give the View a trackball manipulator
    osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
-   
+
    // make sure that the center of the trackball doesn't move if we zoom in too close
    cameraManipulator->setMinimumZoomScale( 0.0 );
-   
+
    this->setCameraManipulator(cameraManipulator);
    this->cameraManipulatorRef = cameraManipulator;
-   
+
    // make an event handler collection
    this->eventHandlers = new EventHandlerCollection( this );
-   
+
    // add the selectHandler
    this->eventHandlers->addEventHandler( selectHandler::getName().c_str(), new selectHandler( this, cameraManipulator ) );
-   
+
    // add the scene picker event handler
    this->addEventHandler(eventHandlers);
-   
+
    // assign the parent reference
    this->mw = _mw;
-   
+
    // build the mouse button map
    this->buildMouseButtonMap();
 }
@@ -104,11 +106,11 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 // build the mouse button map
 void View::buildMouseButtonMap() {
 	mouseButtonMap = map< unsigned int, unsigned int > ();
-	
+
 	// default mapppings
-	
+
 	mouseButtonMap[ FL_MIDDLE_MOUSE ] = FL_LEFT_MOUSE;		// middle mouse drags in FLTK should translate to left mouse drags in OSG
-	
+
 }
 
 // destructor
@@ -136,13 +138,13 @@ int View::handle(int event) {
 	modifiers[ FL_CTRL ] = (( shiftState & FL_CTRL ) != 0);
 	modifiers[ FL_META ] = (( shiftState & FL_META ) != 0);
 	modifiers[ FL_ALT ] = (( shiftState & FL_ALT ) != 0);
-	
+
 	keydown = Fl::event_key();
 	buttondown = Fl::event_button();
-    
+
     // set up the 3D cursor by the key
     selection->setStateByKey( keydown );
-    
+
 	// forward FLTK events to OSG
 	switch(event){
         case FL_PUSH:
@@ -155,10 +157,10 @@ int View::handle(int event) {
             	_gw->getEventQueue()->mouseDoubleButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
             	Fl::event_is_click(0);
             }
-            
+
             redraw();
             return 1;
-          
+
         case FL_DRAG: {
         	_gw->getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
         	// get the distance from the eyepoint to the center of the trackball
@@ -170,16 +172,16 @@ int View::handle(int event) {
         }
         case FL_RELEASE:
             _gw->getEventQueue()->mouseButtonRelease(Fl::event_x(), Fl::event_y(), Fl::event_button() );
-        	redraw();    
+        	redraw();
 			return 1;
         case FL_KEYDOWN:
-        
+
         	_gw->getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             redraw();
             return 1;
         case FL_KEYUP:
         	selection->setState( Selection::TRANSLATE);
-        	
+
             _gw->getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             redraw();
             return 1;
@@ -191,45 +193,45 @@ int View::handle(int event) {
 
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
-	
+
 	// refresh the selection
 	selection->update( obs, data );
-	
+
 	// process data
 	if( data != NULL ) {
 		// get the message
 		ObserverMessage* obs_msg = (ObserverMessage*)(data);
-		
+
 		// process the message
 		switch( obs_msg->type ) {
 			// add an object to the scene
 			case ObserverMessage::ADD_OBJECT : {
 				bz2object* obj = (bz2object*)(obs_msg->data);
-				
+
 				if( getRootNode()->getNumChildren() > 0 )
 					getRootNode()->insertChild( 1, obj );	// insert the child directly after the Ground object
 				else
 					getRootNode()->addChild( obj );
-					
-					
+
+
 				break;
 			}
 			// remove an object from the scene
 			case ObserverMessage::REMOVE_OBJECT : {
 				bz2object* obj = (bz2object*)(obs_msg->data);
 				getRootNode()->removeChild( obj );
-				
+
 				break;
 			}
 			// update the world size
 			case ObserverMessage::UPDATE_WORLD : {
 				// in this case, the data will contain a pointer to the modified world object
 				world* bzworld = (world*)(obs_msg->data);
-				
+
 				root->removeChild( ground );
 				ground = new Ground( bzworld->getSize(), model->getWaterLevelData()->getHeight() );
 				root->insertChild(0, ground);
-				
+
 				break;
 			}
 			// update an object (i.e. it's selection value changed, etc.)
@@ -239,14 +241,14 @@ void View::update( Observable* obs, void* data ) {
 					SceneBuilder::markSelectedAndPreserveStateSet( obj );
 				else
 					SceneBuilder::markUnselectedAndRestoreStateSet( obj );
-					
-				break;	
+
+				break;
 			}
 			default:
 				break;
 		}
 	}
-	
+
 	// refresh the scene
 	redraw();
 }
@@ -261,7 +263,7 @@ bool View::isSelected( bz2object* obj ) { return this->model->isSelected( obj );
  * Tell the model to select an object
  */
 void View::setSelected( bz2object* object ) {
-	
+
 	this->model->_setSelected( object );
 }
 
@@ -269,7 +271,7 @@ void View::setSelected( bz2object* object ) {
  * Tell the model to unselect an object
  */
 void View::setUnselected( bz2object* object ) {
-	
+
 	this->model->_setUnselected( object );
 }
 
@@ -278,7 +280,7 @@ void View::setUnselected( bz2object* object ) {
  * Tell the model to unselect all selected objects
  */
 void View::unselectAll() {
-	
+
 	this->model->_unselectAll();
 }
 

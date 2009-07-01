@@ -36,12 +36,6 @@ public:
 		ccd->OKCallback_real( w );
 	}
 
-	// CANCEL callback
-	static void CancelCallback( Fl_Widget* w, void* data ) {
-		MaterialEditor* ccd = (MaterialEditor*)(data);
-		ccd->CancelCallback_real( w );
-	}
-
 	static void MaterialAddCallback( Fl_Widget* w, void* data ) {
 		MaterialEditor* ccd = (MaterialEditor*)(data);
 		ccd->MaterialAddCallback_real( w );
@@ -130,7 +124,6 @@ private:
 
 	// real callbacks
 	void OKCallback_real( Fl_Widget* w );
-	void CancelCallback_real( Fl_Widget* w );
 
 	void MaterialAddCallback_real( Fl_Widget* w );
 	void MaterialRemoveCallback_real( Fl_Widget* w );

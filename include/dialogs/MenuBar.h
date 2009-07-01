@@ -242,6 +242,11 @@ public:
 		m->materialEditorCallback_real(w);
 	}
 
+	static void physicsEditorCallback(Fl_Widget* w, void* data) {
+		MenuBar* m = (MenuBar*)data;
+		m->physicsEditorCallback_real(w);
+	}
+
 	static void linkCallback(Fl_Widget* w, void* data) {
 		MenuBar* m = (MenuBar*)data;
 		m->linkCallback_real(w);
@@ -295,6 +300,7 @@ private:
 	void configureObjectCallback_real(Fl_Widget* w);
 	void configureInfoCallback_real(Fl_Widget* w);
 	void materialEditorCallback_real(Fl_Widget* w);
+	void physicsEditorCallback_real(Fl_Widget* w);
 	void linkCallback_real(Fl_Widget* w);
 
 	// reference to the MainWindow parent
