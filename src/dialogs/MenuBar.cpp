@@ -216,11 +216,16 @@ void MenuBar::paste_saved_selection_real( Fl_Widget* w ) {
 }
 
 void MenuBar::select_all_real( Fl_Widget* w ) {
+	this->parent->getView()->unselectAll();
 
+	Model::objRefList objs = Model::getObjects();
+	for ( Model::objRefList::iterator i = objs.begin(); i != objs.end(); i++ ) {
+		this->parent->getView()->setSelected( *i );
+	}
 }
 
 void MenuBar::unselect_all_real( Fl_Widget* w ) {
-
+	this->parent->getView()->unselectAll();
 }
 
 // add a box
