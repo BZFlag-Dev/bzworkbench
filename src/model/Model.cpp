@@ -724,6 +724,7 @@ void					Model::addObject( bz2object* obj ) { modRef->_addObject( obj ); }
 void					Model::removeObject( bz2object* obj ) { modRef->_removeObject( obj ); }
 void					Model::setSelected( bz2object* obj ) { modRef->_setSelected( obj ); }
 void					Model::setUnselected( bz2object* obj ) { modRef->_setUnselected( obj ); }
+void					Model::selectAll() { modRef->_selectAll(); }
 void					Model::unselectAll() { modRef->_unselectAll(); }
 bool					Model::isSelected( bz2object* obj ) { return modRef->_isSelected( obj ); }
 
@@ -751,7 +752,6 @@ void Model::_removeObject( bz2object* obj ) {
 			ObserverMessage obs( ObserverMessage::REMOVE_OBJECT, obj );
 			this->notifyObservers( &obs );
 			objects.erase( itr );
-			obj->unref();
 
 			break;
 		}
@@ -910,6 +910,16 @@ bool Model::_isSelected( bz2object* obj ) {
 	}
 
 	return false;
+}
+
+// select all objects
+void Model::_selectAll() {
+	unselectAll();
+
+	Model::objRefList objs = Model::getObjects();
+	for ( Model::objRefList::iterator i = objs.begin(); i != objs.end(); i++ ) {
+		setSelected( *i );
+	}
 }
 
 // unselect all objects
@@ -1421,14 +1431,14 @@ void Model::_ungroupObjects( group* g ) {
 
 	// see if we need to remove the associated define
 	bool noRefs = true;	// set to false if other groups are referencing this group's "define"
-	string defName = g->getDefine()->getName();
+	define* def = g->getDefine();
 	for( vector< osg::ref_ptr< bz2object > >::iterator i = this->objects.begin(); i != this->objects.end(); i++ ) {
 		group* grp = dynamic_cast< group* > ( i->get() );
-		if( !grp )
+		if( !grp || grp == g)
 			continue;
 
 		// if the associated "define" has the same name as the define from this group, then we don't erase it
-		if( grp->getDefine()->getName() == defName ) {
+		if( grp->getDefine() == def ) {
 			noRefs = false;
 			break;
 		}
@@ -1439,7 +1449,7 @@ void Model::_ungroupObjects( group* g ) {
 
 	// if no references to the define were found, then remove this define
 	if( noRefs ) {
-		this->groups.erase( defName );
+		this->groups.erase( g->getDefine()->getName() );
 	}
 
 }

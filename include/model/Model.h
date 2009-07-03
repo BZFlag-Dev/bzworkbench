@@ -95,6 +95,7 @@ public:
 	static void removeObject( bz2object* obj );
 	static void setSelected( bz2object* obj );
 	static void setUnselected( bz2object* obj );
+	static void selectAll();
 	static void unselectAll();
 	static bool isSelected( bz2object* obj );
 	static objRefList& getSelection();
@@ -141,6 +142,7 @@ public:
 	void _removeDynamicColor( dynamicColor* dyncol );
 	void _setSelected( bz2object* obj );
 	void _setUnselected( bz2object* obj );
+	void _selectAll();
 	void _unselectAll();
 	bool _isSelected( bz2object* obj );
 	objRefList& _getSelection() { return this->selectedObjects; }

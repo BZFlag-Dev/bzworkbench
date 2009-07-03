@@ -216,16 +216,11 @@ void MenuBar::paste_saved_selection_real( Fl_Widget* w ) {
 }
 
 void MenuBar::select_all_real( Fl_Widget* w ) {
-	this->parent->getView()->unselectAll();
-
-	Model::objRefList objs = Model::getObjects();
-	for ( Model::objRefList::iterator i = objs.begin(); i != objs.end(); i++ ) {
-		this->parent->getView()->setSelected( *i );
-	}
+	parent->getModel()->selectAll();
 }
 
 void MenuBar::unselect_all_real( Fl_Widget* w ) {
-	this->parent->getView()->unselectAll();
+	parent->getModel()->unselectAll();
 }
 
 // add a box
@@ -361,8 +356,9 @@ void MenuBar::groupCallback_real(Fl_Widget* w) {
 		return;
 
 	// only do an un-group if the only object selected is a group
-	if( objects.size() == 1 && objects[0]->getHeader() == "group" )
+	if( objects.size() == 1 && objects[0]->getHeader() == "group" ) {
 		parent->getModel()->_ungroupObjects( dynamic_cast< group* > (objects[0].get()) );
+	}
 	else {
 		parent->getModel()->_groupObjects( objects );
 	}
