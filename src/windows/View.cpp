@@ -69,7 +69,7 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 
 
    // make a new selection object
-   this->selection = new Selection();
+   this->selection = new Selection( this );
 
    // add the selection
    // NOTE: this has to be the LAST child on the list, because it doesn't have Z-bufferring enabled!
@@ -130,6 +130,14 @@ void View::updateSelection( float newDistance ) {
 	this->selection->setScale( osg::Vec3( 0.01 * newDistance, 0.01 * newDistance, 0.01 * newDistance ) );
 }
 
+void View::updateSelection() {
+	// get the distance from the eyepoint to the center of the trackball
+    float dist = this->cameraManipulatorRef->getDistance();
+    this->updateSelection( dist );
+    // refresh
+    redraw();
+}
+
 // handle events
 int View::handle(int event) {
 	// whatever the event was, we need to regenerate the modifier keys
@@ -163,11 +171,7 @@ int View::handle(int event) {
 
         case FL_DRAG: {
         	_gw->getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
-        	// get the distance from the eyepoint to the center of the trackball
-    		float dist = this->cameraManipulatorRef->getDistance();
-    		this->updateSelection( dist );
-    		// refresh
-        	redraw();
+        	updateSelection();
 			return 1;
         }
         case FL_RELEASE:
@@ -175,13 +179,10 @@ int View::handle(int event) {
         	redraw();
 			return 1;
         case FL_KEYDOWN:
-
         	_gw->getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             redraw();
             return 1;
         case FL_KEYUP:
-        	selection->setState( Selection::TRANSLATE);
-
             _gw->getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             redraw();
             return 1;

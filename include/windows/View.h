@@ -112,6 +112,9 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
         // get the MainWindow parent, if possible
         MainWindow* requestMainWindow() { return mw; }
 
+		// update the selection based on the camera distance and redraw
+		void updateSelection();
+
     protected:
 
     	// draw method

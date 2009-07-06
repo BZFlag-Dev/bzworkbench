@@ -24,12 +24,16 @@
 #include <string>
 
 #include "Point3D.h"
-#include "../objects/bz2object.h"
-#include "../model/SceneBuilder.h"
-#include "../model/Model.h"
-#include "../Observer.h"
-#include "../Observable.h"
-#include "../defines.h"
+#include "objects/bz2object.h"
+#include "model/SceneBuilder.h"
+#include "model/Model.h"
+#include "Observer.h"
+#include "Observable.h"
+#include "defines.h"
+
+
+// forward declaration
+class View;
 
 using namespace std;
 
@@ -63,7 +67,7 @@ public:
 	};
 
 	// constructer
-	Selection(SelectionState state = TRANSLATE);
+	Selection(View* view, SelectionState state = TRANSLATE);
 
 	// destructor
 	~Selection() {}
@@ -132,6 +136,7 @@ private:
 	// compute the local origin
 	osg::Vec3 computeLocalOrigin( Model::objRefList& objects );
 
+	View* view;
 };
 
 #endif /*SELECTION_H_*/
