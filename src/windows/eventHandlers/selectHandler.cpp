@@ -52,7 +52,8 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     			// log this event
     			prevEvent = osgGA::GUIEventAdapter::DRAG;
 
-    			// handle a selector, based on a pressed key
+    			/*// handle a selector, based on a pressed key
+				
     			switch( viewer->getKey() ) {
     				// 'r' is for "rotate" (i.e. "spin" in BZW)
     				case BZ_ROTATE_KEY:
@@ -72,7 +73,20 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
 
     				default:
     					return dragSelector( view, ea );
-    			}
+    			}*/
+
+				switch( viewer->getSelectionNode()->getState() ) {
+					case Selection::ROTATE:
+						return rotateSelector( view, ea );
+					case Selection::SCALE:
+						return scaleSelector( view, ea );
+					case Selection::SHIFT:
+						return shiftSelector( view, ea );
+					case Selection::SHEAR:
+						return shearSelector( view, ea );
+					default:
+						return dragSelector( view, ea );
+				}
 
     		}
     		return false;

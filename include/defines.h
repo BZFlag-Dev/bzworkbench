@@ -25,6 +25,7 @@
 #define	BZ_SCALE_KEY		's'
 #define BZ_SHEAR_KEY		'l'
 #define BZ_SHIFT_KEY		't'
+#define BZ_TRANSLATE_KEY	'm'
 
 // for windows users...
 #define _CRT_SECURE_NO_DEPRECATE

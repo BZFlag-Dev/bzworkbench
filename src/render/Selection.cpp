@@ -639,11 +639,11 @@ Selection::SelectionState Selection::setState( SelectionState newState ) {
 	bool addBack = removeChild( selectionNode.get() );
 	
 	switch( newState ) {
-		case BZ_ROTATE_KEY:
+		case ROTATE:
 			rotator->setPosition( selectionNode->getPosition() );
 			selectionNode = rotator;
 			break;
-		case BZ_SCALE_KEY:
+		case SCALE:
 			scaler->setPosition( selectionNode->getPosition() );
 			selectionNode = scaler;
 			break;
@@ -667,7 +667,7 @@ Selection::SelectionState Selection::setStateByKey( unsigned char key ) {
 	
 	bool addBack = removeChild( selectionNode.get() );
 	SelectionState newState;
-	
+
 	switch( key ) {
 		
 		case BZ_ROTATE_KEY:
@@ -680,11 +680,14 @@ Selection::SelectionState Selection::setStateByKey( unsigned char key ) {
 			selectionNode = scaler;
 			newState = SCALE;
 			break;
-			
-		default:
+		case BZ_TRANSLATE_KEY:
 			axes->setPosition( selectionNode->getPosition() );
 			selectionNode = axes;
 			newState = TRANSLATE;
+			break;
+		default:
+			// don't change the state if the key wasn't recognized
+			newState = state;
 			break;
 	}
 	

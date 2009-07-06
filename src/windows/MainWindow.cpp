@@ -68,6 +68,18 @@ void MainWindow::buildButtonPanel() {
 	configureButton = new Fl_Button( RENDER_WINDOW_X, RENDER_WINDOW_Y + RENDER_WINDOW_HEIGHT, 80, DEFAULT_TEXTSIZE + 6, "Configure" );
 	configureButton->callback( configureCallback, this );
 	add( configureButton );
+
+	// buttons for changing the selection state
+	translateStateButton = new Fl_Button( RENDER_WINDOW_X + 85, RENDER_WINDOW_Y + RENDER_WINDOW_HEIGHT, 80, DEFAULT_TEXTSIZE + 6, "Translate" );
+	translateStateButton->callback( translateStateCallback, this );
+	rotateStateButton = new Fl_Button( RENDER_WINDOW_X + 170, RENDER_WINDOW_Y + RENDER_WINDOW_HEIGHT, 80, DEFAULT_TEXTSIZE + 6, "Rotate" );
+	rotateStateButton->callback( rotateStateCallback, this );
+	scaleStateButton = new Fl_Button( RENDER_WINDOW_X + 255, RENDER_WINDOW_Y + RENDER_WINDOW_HEIGHT, 80, DEFAULT_TEXTSIZE + 6, "Scale" );
+	scaleStateButton->callback( scaleStateCallback, this );
+	add( translateStateButton );
+	add( rotateStateButton );
+    add( scaleStateButton );
+
 }
 
 // default constructor
@@ -183,4 +195,16 @@ void MainWindow::configure( bz2object* obj ) {
 void MainWindow::error(const char* errorText) {
 	Fl_Error* errorMessage = new Fl_Error( errorText );
 	errorMessage->show();
+}
+
+void MainWindow::translateStateCallback_real(Fl_Widget* w) {
+	view->getSelectionNode()->setState( Selection::TRANSLATE );
+}
+
+void MainWindow::scaleStateCallback_real(Fl_Widget* w) {
+	view->getSelectionNode()->setState( Selection::SCALE );
+}
+
+void MainWindow::rotateStateCallback_real(Fl_Widget* w) {
+	view->getSelectionNode()->setState( Selection::ROTATE );
 }

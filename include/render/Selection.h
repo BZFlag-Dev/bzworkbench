@@ -84,6 +84,9 @@ public:
 	// set the scale
 	void setScale( const osg::Vec3& scale ) { this->selectionNode->setScale( scale ); }
 
+	// get the state
+	SelectionState getState() { return state; }
+
 private:
 
 	// some constants defining the shape and color of the axes

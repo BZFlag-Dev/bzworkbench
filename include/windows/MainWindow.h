@@ -140,7 +140,26 @@ public:
 		mw->menuBar->configureObjectCallback_real( w );
 	}
 
+	static void translateStateCallback(Fl_Widget* w, void* data) {
+		MainWindow* mw = (MainWindow*)(data);
+		mw->translateStateCallback_real( w );
+	}
+
+	static void scaleStateCallback(Fl_Widget* w, void* data) {
+		MainWindow* mw = (MainWindow*)(data);
+		mw->scaleStateCallback_real( w );
+	}
+
+	static void rotateStateCallback(Fl_Widget* w, void* data) {
+		MainWindow* mw = (MainWindow*)(data);
+		mw->rotateStateCallback_real( w );
+	}
+
 private:
+	// real callbacks
+	void translateStateCallback_real(Fl_Widget* w);
+	void scaleStateCallback_real(Fl_Widget* w);
+	void rotateStateCallback_real(Fl_Widget* w);
 
 	// reference to the main menu
 	// MainMenu* mainMenu;
@@ -191,6 +210,11 @@ private:
 
 	// button to launch a MasterConfigurationDialog
 	Fl_Button* configureButton;
+
+	// buttons for changing the selection state
+	Fl_Button* translateStateButton;
+	Fl_Button* rotateStateButton;
+	Fl_Button* scaleStateButton;
 };
 
 #include "model/Model.h"
