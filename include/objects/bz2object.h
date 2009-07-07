@@ -177,6 +177,11 @@ class bz2object : public Renderable, public DataEntry
 		void removeMaterial( material* mat );
 		void removeMaterial( unsigned int index );
 
+		// snap to grid methods
+		void snapTranslate( float size, osg::Vec3 position );
+		void snapScale( float size, osg::Vec3 scale );
+		void snapRotate( float size, float rotation );
+
 
 	protected:
 		osg::ref_ptr< physics > physicsDriver;

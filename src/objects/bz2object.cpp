@@ -12,6 +12,8 @@
 
 #include "objects/bz2object.h"
 
+#include <cmath>
+
 // default constructor
 bz2object::bz2object(const char* name, const char* keys):
 	Renderable(),
@@ -779,4 +781,25 @@ void bz2object::removeTransformation( unsigned int index ) {
 
 	// remove the transformation at itr
 	this->transformations.erase( itr );
+}
+
+void bz2object::snapTranslate( float size, osg::Vec3 position ) {
+	osg::Vec3 tmp = position / size;
+	tmp = osg::Vec3( osg::round( tmp.x() ), osg::round( tmp.y() ), osg::round( tmp.z() ) );
+	tmp *= size;
+	setPosition( tmp );
+}
+
+void bz2object::snapScale( float size, osg::Vec3 scale ) {
+	osg::Vec3 tmp = scale / size;
+	tmp = osg::Vec3( osg::round( tmp.x() ), osg::round( tmp.y() ), osg::round( tmp.z() ) );
+	tmp *= size;
+	setSize( tmp );
+}
+
+void bz2object::snapRotate( float size, float rotation ) {
+	float tmp = rotation / size;
+	tmp = osg::round( tmp );
+	tmp *= size;
+	setRotationZ( tmp );
 }

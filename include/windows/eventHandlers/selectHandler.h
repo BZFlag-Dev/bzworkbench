@@ -84,6 +84,15 @@ private:
 
     // the base camera manipulator (needed for extracting camera orientation)
     osgGA::MatrixManipulator* cameraManipulator;
+
+	// variables for snapping
+	osg::Vec3 translateSnap;
+	osg::Vec3 scaleSnap;
+	float rotateSnap;
+	float translateSnapAmount;
+	float scaleSnapAmount;
+	float rotateSnapAmount;
+	bool snapping;
 };
 
 #endif /*SELECTHANDLER_H_*/

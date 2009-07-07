@@ -20,6 +20,14 @@ selectHandler::selectHandler( View* _view, osgGA::MatrixManipulator* manipulator
 	lastSelectedData = NULL;
 	dx = dy = prev_x = prev_y = 0.0;
 	cameraManipulator = manipulator;
+
+	translateSnap = osg::Vec3( 0, 0, 0 );
+	scaleSnap = osg::Vec3( 0, 0, 0 );
+	rotateSnap = 0;
+	translateSnapAmount = 1;
+	scaleSnapAmount = 1;
+	rotateSnapAmount = 15;
+	snapping = true;
 }
 
 // handle an event
@@ -52,29 +60,7 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     			// log this event
     			prevEvent = osgGA::GUIEventAdapter::DRAG;
 
-    			/*// handle a selector, based on a pressed key
-				
-    			switch( viewer->getKey() ) {
-    				// 'r' is for "rotate" (i.e. "spin" in BZW)
-    				case BZ_ROTATE_KEY:
-    					return rotateSelector( view, ea );
-
-    				// 's' is for "scale"
-    				case BZ_SCALE_KEY:
-    					return scaleSelector( view, ea );
-
-    				// 'l' is for "lean" (i.e. "shear" in BZW)
-    				case BZ_SHEAR_KEY:
-    					return shearSelector( view, ea );
-
-    				// 't' is for "translate" (i.e. "shift" in BZW)
-    				case BZ_SHIFT_KEY:
-    					return shiftSelector( view, ea );
-
-    				default:
-    					return dragSelector( view, ea );
-    			}*/
-
+				// handle a selector
 				switch( viewer->getSelectionNode()->getState() ) {
 					case Selection::ROTATE:
 						return rotateSelector( view, ea );
@@ -90,6 +76,12 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
 
     		}
     		return false;
+
+		case osgGA::GUIEventAdapter::RELEASE:
+			translateSnap = osg::Vec3( 0, 0, 0 );
+			scaleSnap = osg::Vec3( 0, 0, 0 );
+			rotateSnap = 0;
+			return true;
 
     	// catch single-click events (see if we picked the selector or an object)
        	case osgGA::GUIEventAdapter::PUSH : {
@@ -118,10 +110,6 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
         	}
        		return false;
        	}
-    	// catch double click events and do a pick
-        case osgGA::GUIEventAdapter::DOUBLECLICK :
-			// don't do anything
-       		return false;
 
         default:
         	// assume we handled everything
@@ -316,13 +304,39 @@ bool selectHandler::dragSelector( View* viewer, const osgGA::GUIEventAdapter& ea
 		// transform them
 		if(selected.size() > 0) {
 			osg::Vec3 _dPosition = position - selection->getPosition();
-			osg::Vec3 tmp;
-			for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
-				tmp = (*i)->getPos() + _dPosition;
 
-				// tell the object it got updated (i.e. so it can handle any changes specific to itself)
-				UpdateMessage msg = UpdateMessage( UpdateMessage::SET_POSITION, &tmp );
-				(*i)->update( msg );
+			// check if snapping is turned on
+			if ( snapping ) {
+				translateSnap += _dPosition;
+
+				// only move the objects if _dSnapPosition > 0
+				if ( fabsf( translateSnap.x() ) > translateSnapAmount/2 || 
+					fabsf( translateSnap.y() ) > translateSnapAmount/2 || 
+					fabsf( translateSnap.z() ) > translateSnapAmount/2 ) {
+					osg::Vec3 tmp;
+					for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
+						tmp = (*i)->getPos() + translateSnap;
+
+						// tell the object it got updated (i.e. so it can handle any changes specific to itself)
+						UpdateMessage msg = UpdateMessage( UpdateMessage::SET_POSITION, &tmp );
+						(*i)->update( msg );
+						
+						// finally make sure the object is aligned to the grid (incase snap size was changed)
+						(*i)->snapTranslate( translateSnapAmount, (*i)->getPos() );
+					}
+
+					translateSnap = osg::Vec3( 0, 0, 0 );
+				}
+			}
+			else {
+				osg::Vec3 tmp;
+				for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
+					tmp = (*i)->getPos() + _dPosition;
+
+					// tell the object it got updated (i.e. so it can handle any changes specific to itself)
+					UpdateMessage msg = UpdateMessage( UpdateMessage::SET_POSITION, &tmp );
+					(*i)->update( msg );
+				}
 			}
 
 			// finally, transform the selector itself
@@ -342,7 +356,7 @@ bool selectHandler::rotateSelector( View* viewer, const osgGA::GUIEventAdapter& 
 	osg::Vec3 position = lastSelected->getPosition();
 
 	// get the angular orientation
-	double a_x = 0.0, a_y = 0.0, a_z = 0.0;
+	double a_z = 0.0;
 
 	// transform the 2D mouse movement into a 3D vector by transforming it into camera space
 	// get the vectors (but keep in mind that the window uses the XY-plane, but "up" in the 3D scene is along Z)
@@ -357,15 +371,7 @@ bool selectHandler::rotateSelector( View* viewer, const osgGA::GUIEventAdapter& 
 	osg::Vec3 transformVector = sideVector + upVector;
 	transformVector.normalize();
 
-	if(node->getName() == Selection_X_AXIS_NODE_NAME) {
-		// rotate x
-		a_x += transformVector.x();
-	}
-	else if(node->getName() == Selection_Y_AXIS_NODE_NAME) {
-		// rotate y
-		a_y += transformVector.y();
-	}
-	else if(node->getName() == Selection_Z_AXIS_NODE_NAME) {
+	if(node->getName() == Selection_Z_AXIS_NODE_NAME) {
 		// rotate z
 		a_z += transformVector.z();
 	}
@@ -383,12 +389,33 @@ bool selectHandler::rotateSelector( View* viewer, const osgGA::GUIEventAdapter& 
 
 		// transform them
 		if(selected.size() > 0) {
-			osg::Vec3 dr = osg::Vec3( a_x, a_y, a_z );
-			for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
-				// tell the object it got updated (i.e. so it can handle any changes specific to itself)
-				UpdateMessage msg = UpdateMessage( UpdateMessage::SET_ROTATION_FACTOR, &dr );
 
-				(*i)->update( msg );
+			if ( snapping ) {
+				rotateSnap += a_z;
+
+				// only attempt to rotate the objects if we are at least half way between snaps
+				if ( fabsf( rotateSnap ) >= rotateSnapAmount/2 ) {
+					osg::Vec3 dr = osg::Vec3( 0, 0, rotateSnap );
+					for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
+						// tell the object it got updated (i.e. so it can handle any changes specific to itself)
+						UpdateMessage msg = UpdateMessage( UpdateMessage::SET_ROTATION_FACTOR, &dr );
+						(*i)->update( msg );
+						
+						// finally make sure the object is aligned with the snap size (incase snap size was changed)
+						(*i)->snapRotate( rotateSnapAmount, (*i)->getRotation().z() );
+					}
+
+					rotateSnap = 0;
+				}
+			}
+			else {
+				osg::Vec3 dr = osg::Vec3( 0, 0, a_z );
+				for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
+					// tell the object it got updated (i.e. so it can handle any changes specific to itself)
+					UpdateMessage msg = UpdateMessage( UpdateMessage::SET_ROTATION_FACTOR, &dr );
+
+					(*i)->update( msg );
+				}
 			}
 
 			// finally, transform the selector itself
@@ -444,21 +471,56 @@ bool selectHandler::scaleSelector( View* viewer, const osgGA::GUIEventAdapter& e
 	if(selection) {
 		Model::objRefList selected = view->getModelRef()->getSelection();
 		if( selected.size() > 0 ) {
-			osg::Vec3 tscale;
-			for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
-				tscale = (*i)->getSize() + scale;
-				// no negative scaling!
-				if( tscale.x() < 0 )
-					scale.set( 0, scale.y(), scale.z() );
-				if( tscale.y() < 0 )
-					scale.set( scale.x(), 0, scale.z() );
-				if( tscale.z() < 0 )
-					scale.set( scale.x(), scale.y(), 0 );
 
-				// tell the object it got updated (i.e. so it can handle any changes specific to itself)
-				// this needs to be done for BZW 1.x objects so their textures scale appropriately
-				UpdateMessage msg = UpdateMessage( UpdateMessage::SET_SCALE_FACTOR, &scale );
-				(*i)->update( msg );
+			// check if snapping is turned on
+			if ( snapping ) {
+				scaleSnap += scale;
+
+				// only move the objects if _dSnapPosition > 0
+				if ( fabsf( scaleSnap.x() ) > scaleSnapAmount / 2 || 
+					fabsf( scaleSnap.y() ) > scaleSnapAmount / 2 || 
+					fabsf( scaleSnap.z() ) > scaleSnapAmount / 2 ) {
+					osg::Vec3 tscale;
+					for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
+						tscale = (*i)->getSize() + scale;
+
+						// no negative scaling!
+						if( tscale.x() < 0 )
+							scale.set( 0, scale.y(), scale.z() );
+						if( tscale.y() < 0 )
+							scale.set( scale.x(), 0, scale.z() );
+						if( tscale.z() < 0 )
+							scale.set( scale.x(), scale.y(), 0 );
+
+						// tell the object it got updated (i.e. so it can handle any changes specific to itself)
+						// this needs to be done for BZW 1.x objects so their textures scale appropriately
+						UpdateMessage msg = UpdateMessage( UpdateMessage::SET_SCALE_FACTOR, &scale );
+						(*i)->update( msg );
+						
+						// finally make sure the object is aligned to the grid (incase snap size was changed)
+						(*i)->snapScale( scaleSnapAmount, (*i)->getSize() );
+					}
+
+					scaleSnap = osg::Vec3( 0, 0, 0 );
+				}
+			}
+			else {
+				osg::Vec3 tscale;
+				for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
+					tscale = (*i)->getSize() + scale;
+					// no negative scaling!
+					if( tscale.x() < 0 )
+						scale.set( 0, scale.y(), scale.z() );
+					if( tscale.y() < 0 )
+						scale.set( scale.x(), 0, scale.z() );
+					if( tscale.z() < 0 )
+						scale.set( scale.x(), scale.y(), 0 );
+
+					// tell the object it got updated (i.e. so it can handle any changes specific to itself)
+					// this needs to be done for BZW 1.x objects so their textures scale appropriately
+					UpdateMessage msg = UpdateMessage( UpdateMessage::SET_SCALE_FACTOR, &scale );
+					(*i)->update( msg );
+				}
 			}
 		}
 	}
