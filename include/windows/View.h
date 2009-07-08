@@ -115,6 +115,16 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
 		// update the selection based on the camera distance and redraw
 		void updateSelection();
 
+		// snapping getters/setters
+		bool getSnappingEnabled() { return snappingEnabled; }
+		float getTranslateSnapSize() { return translateSnapSize; }
+		float getScaleSnapSize() { return scaleSnapSize; }
+		float getRotateSnapSize() { return rotateSnapSize; }
+		void setSnappingEnabled( bool value ) { snappingEnabled = value; }
+		void setTranslateSnapSize( float value ) { translateSnapSize = value; }
+		void setScaleSnapSize( float value ) { scaleSnapSize = value; }
+		void setRotateSnapSize( float value ) { rotateSnapSize = value; }
+
     protected:
 
     	// draw method
@@ -161,6 +171,12 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
 
 		// update the selection's axes
 		void updateSelection( float distance );
+
+		// snap sizes
+		bool snappingEnabled;
+		float scaleSnapSize;
+		float translateSnapSize;
+		float rotateSnapSize;
 };
 
 

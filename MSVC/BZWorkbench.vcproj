@@ -294,6 +294,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\SnapSettings.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\SphereConfigurationDialog.cpp"
 					>
 				</File>
@@ -853,6 +857,10 @@
 				</File>
 				<File
 					RelativePath="..\include\dialogs\PyramidConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\SnapSettings.h"
 					>
 				</File>
 				<File

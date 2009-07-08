@@ -12,6 +12,8 @@
 
 #include "windows/MainWindow.h"
 
+#include "dialogs/SnapSettings.h"
+
 bool MainWindow::initialized = false;
 
 // build up the button panel
@@ -80,6 +82,13 @@ void MainWindow::buildButtonPanel() {
 	add( rotateStateButton );
     add( scaleStateButton );
 
+	// buttons for snapping
+	snappingEnabledButton = new Fl_Check_Button( RENDER_WINDOW_X + 340, RENDER_WINDOW_Y + RENDER_WINDOW_HEIGHT, 80, DEFAULT_TEXTSIZE + 6, "Snap" );
+	snappingEnabledButton->callback( snapEnabledCallback, this );
+	snapConfigButton = new Fl_Button( RENDER_WINDOW_X + 425, RENDER_WINDOW_Y + RENDER_WINDOW_HEIGHT, 80, DEFAULT_TEXTSIZE + 6, "Snap Config" );
+	snapConfigButton->callback( snapConfigCallback, this );
+	add( snappingEnabledButton );
+	add( snapConfigButton );
 }
 
 // default constructor
@@ -207,4 +216,18 @@ void MainWindow::scaleStateCallback_real(Fl_Widget* w) {
 
 void MainWindow::rotateStateCallback_real(Fl_Widget* w) {
 	view->getSelectionNode()->setState( Selection::ROTATE );
+}
+
+void MainWindow::snapConfigCallback_real(Fl_Widget* w) {
+	SnapSettings* ss = new SnapSettings( this );
+
+	ss->show();
+
+	while ( ss->shown() ) { Fl::wait(); }
+
+	delete ss;
+}
+
+void MainWindow::snapEnabledCallback_real(Fl_Widget* w) {
+	view->setSnappingEnabled( snappingEnabledButton->value() == 1 ? true : false );
 }

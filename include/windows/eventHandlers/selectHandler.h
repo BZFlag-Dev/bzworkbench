@@ -89,10 +89,6 @@ private:
 	osg::Vec3 translateSnap;
 	osg::Vec3 scaleSnap;
 	float rotateSnap;
-	float translateSnapAmount;
-	float scaleSnapAmount;
-	float rotateSnapAmount;
-	bool snapping;
 };
 
 #endif /*SELECTHANDLER_H_*/

@@ -155,11 +155,23 @@ public:
 		mw->rotateStateCallback_real( w );
 	}
 
+	static void snapEnabledCallback(Fl_Widget* w, void* data) {
+		MainWindow* mw = (MainWindow*)(data);
+		mw->snapEnabledCallback_real( w );
+	}
+
+	static void snapConfigCallback(Fl_Widget* w, void* data) {
+		MainWindow* mw = (MainWindow*)(data);
+		mw->snapConfigCallback_real( w );
+	}
+
 private:
 	// real callbacks
 	void translateStateCallback_real(Fl_Widget* w);
 	void scaleStateCallback_real(Fl_Widget* w);
 	void rotateStateCallback_real(Fl_Widget* w);
+	void snapConfigCallback_real(Fl_Widget* w);
+	void snapEnabledCallback_real(Fl_Widget* w);
 
 	// reference to the main menu
 	// MainMenu* mainMenu;
@@ -215,6 +227,10 @@ private:
 	Fl_Button* translateStateButton;
 	Fl_Button* rotateStateButton;
 	Fl_Button* scaleStateButton;
+
+	// buttons for snapping
+	Fl_Check_Button* snappingEnabledButton;
+	Fl_Button* snapConfigButton;
 };
 
 #include "model/Model.h"

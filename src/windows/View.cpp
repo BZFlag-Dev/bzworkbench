@@ -101,6 +101,12 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 
    // build the mouse button map
    this->buildMouseButtonMap();
+
+   snappingEnabled = false;
+
+   scaleSnapSize = 1;
+   translateSnapSize = 1;
+   rotateSnapSize = 15;
 }
 
 // build the mouse button map

@@ -24,10 +24,6 @@ selectHandler::selectHandler( View* _view, osgGA::MatrixManipulator* manipulator
 	translateSnap = osg::Vec3( 0, 0, 0 );
 	scaleSnap = osg::Vec3( 0, 0, 0 );
 	rotateSnap = 0;
-	translateSnapAmount = 1;
-	scaleSnapAmount = 1;
-	rotateSnapAmount = 15;
-	snapping = true;
 }
 
 // handle an event
@@ -306,7 +302,9 @@ bool selectHandler::dragSelector( View* viewer, const osgGA::GUIEventAdapter& ea
 			osg::Vec3 _dPosition = position - selection->getPosition();
 
 			// check if snapping is turned on
-			if ( snapping ) {
+			if ( view->getSnappingEnabled() ) {
+				float translateSnapAmount = view->getTranslateSnapSize();
+
 				translateSnap += _dPosition;
 
 				// only move the objects if _dSnapPosition > 0
@@ -390,7 +388,9 @@ bool selectHandler::rotateSelector( View* viewer, const osgGA::GUIEventAdapter& 
 		// transform them
 		if(selected.size() > 0) {
 
-			if ( snapping ) {
+			if ( view->getSnappingEnabled() ) {
+				float rotateSnapAmount = view->getRotateSnapSize();
+
 				rotateSnap += a_z;
 
 				// only attempt to rotate the objects if we are at least half way between snaps
@@ -473,28 +473,30 @@ bool selectHandler::scaleSelector( View* viewer, const osgGA::GUIEventAdapter& e
 		if( selected.size() > 0 ) {
 
 			// check if snapping is turned on
-			if ( snapping ) {
+			if ( view->getSnappingEnabled() ) {
+				float scaleSnapAmount = view->getScaleSnapSize();
+
 				scaleSnap += scale;
 
 				// only move the objects if _dSnapPosition > 0
-				if ( fabsf( scaleSnap.x() ) > scaleSnapAmount / 2 || 
-					fabsf( scaleSnap.y() ) > scaleSnapAmount / 2 || 
-					fabsf( scaleSnap.z() ) > scaleSnapAmount / 2 ) {
+				if ( fabsf( scaleSnap.x() ) >= scaleSnapAmount / 2 || 
+					fabsf( scaleSnap.y() ) >= scaleSnapAmount / 2 || 
+					fabsf( scaleSnap.z() ) >= scaleSnapAmount / 2 ) {
 					osg::Vec3 tscale;
 					for(Model::objRefList::iterator i = selected.begin(); i != selected.end(); i++) {
-						tscale = (*i)->getSize() + scale;
+						tscale = (*i)->getSize() + scaleSnap;
 
 						// no negative scaling!
 						if( tscale.x() < 0 )
-							scale.set( 0, scale.y(), scale.z() );
+							scaleSnap.set( 0, scaleSnap.y(), scaleSnap.z() );
 						if( tscale.y() < 0 )
-							scale.set( scale.x(), 0, scale.z() );
+							scaleSnap.set( scaleSnap.x(), 0, scaleSnap.z() );
 						if( tscale.z() < 0 )
-							scale.set( scale.x(), scale.y(), 0 );
+							scaleSnap.set( scaleSnap.x(), scaleSnap.y(), 0 );
 
 						// tell the object it got updated (i.e. so it can handle any changes specific to itself)
 						// this needs to be done for BZW 1.x objects so their textures scale appropriately
-						UpdateMessage msg = UpdateMessage( UpdateMessage::SET_SCALE_FACTOR, &scale );
+						UpdateMessage msg = UpdateMessage( UpdateMessage::SET_SCALE_FACTOR, &scaleSnap );
 						(*i)->update( msg );
 						
 						// finally make sure the object is aligned to the grid (incase snap size was changed)
