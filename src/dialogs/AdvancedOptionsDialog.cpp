@@ -87,12 +87,15 @@ void AdvancedOptionsDialog::AdvancedOptionsPage::addMaterial( MaterialWidget* mw
 		mw->position( x, y );
 		materialList->add( mw );
 		materialWidgets.push_back( mw );
+
+		redraw();
 	}
 }
 
 
-AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, std::string name, std::vector<material*> mats, physics *phys, bool usephydrv ) : Fl_Group( x, y, 380, 270 ) {
+AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, std::string name, std::vector<material*> mats, physics *phys, bool usephydrv ) : Fl_Group( x, y, 380, 300 ) {
 	this->name = name;
+	this->usephydrv = usephydrv;
 	label ( this->name.c_str() );
 
 	begin();
@@ -130,26 +133,47 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 	
 	if (usephydrv) {
 		phydrvLabel = new QuickLabel("Physics Driver", 5 + x, 190 + y );
-		phydrvMenu = new Fl_Menu_Button( 5 + x, 215 + y, DEFAULT_WIDTH - 40, DEFAULT_TEXTSIZE + 6, "(coming soon)" );
+		phydrvMenu = new Fl_Choice( 5 + x, 215 + y, DEFAULT_WIDTH - 40, DEFAULT_TEXTSIZE + 6 );
+		phydrvMenu->add( "(none)" );
+		phydrvMenu->value( 0 );
+		map< string, physics*> phydrvs = Model::getPhysicsDrivers();
+		for (map< string, physics*>::iterator i = phydrvs.begin(); i != phydrvs.end(); i++ ) {
+			int idx = phydrvMenu->add( i->first.c_str() );
+			if ( phys == i->second ) {
+				phydrvMenu->value( idx );
+			}
+		}
 	}
 
 	end();
 }
 
 void AdvancedOptionsDialog::AdvancedOptionsPage::commitChanges( bz2object* obj ) {
-	if ( name != "All" )
-		obj->getMaterials( name ).clear();
+	std::string slot;
+	if ( name == "All" )
+		slot = "";
 	else
-		obj->getMaterials( "" ).clear();
+		slot = name;
+
+	obj->getMaterials( slot ).clear();
 
 	for ( vector< MaterialWidget* >::iterator i = materialWidgets.begin(); i != materialWidgets.end(); i++ ) {
 		material* mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", (*i)->getSelectedMaterial().c_str() ) );
 
 		if ( mat != NULL ) {
-			if ( name != "All" )
-				obj->addMaterial( mat, name );
-			else
-				obj->addMaterial( mat, "" );
+			obj->addMaterial( mat, slot );
+		}
+	}
+
+	if ( usephydrv ) {
+		string physname( phydrvMenu->text() );
+		if ( physname == "(none)" )
+			obj->setPhyDrv( NULL, slot );
+		else {
+			physics* phys = dynamic_cast< physics* >( Model::command( MODEL_GET, "phydrv", physname.c_str() ) );
+
+			if ( phys != NULL )
+				obj->setPhyDrv( phys, slot );
 		}
 	}
 }

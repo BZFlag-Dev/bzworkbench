@@ -768,7 +768,7 @@ void bz2object::refreshMaterial()
 		}
 
 		if ( i->first == "" )
-			SceneBuilder::assignBZMaterial( mat, this );
+			SceneBuilder::assignBZMaterial( mat, getThisNode() );
 		else
 			SceneBuilder::assignBZMaterial( mat, i->second.node );
 	}

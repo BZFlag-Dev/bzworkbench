@@ -26,7 +26,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Menu_Button.H>
+#include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Tabs.H>
@@ -77,10 +77,11 @@ public:
 	
 		// physics driver widgets
 		QuickLabel* phydrvLabel;
-		Fl_Menu_Button* phydrvMenu;
+		Fl_Choice* phydrvMenu;
 
 		vector<string> materialRefs;
 		std::string name;
+		bool usephydrv;
 	};
 
 
