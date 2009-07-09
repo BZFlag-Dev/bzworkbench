@@ -25,6 +25,8 @@ MaterialWidget::MaterialWidget( int x, int y, int width, int height, vector< str
 	materialMenu = new Fl_Menu_Button(x + 30, y, width - 50, DEFAULT_TEXTSIZE + 12);
 	
 	setMaterials( materialChoices );
+
+	setSelectedMaterial( "(none)" );
 	
 	add( activeButton );
 	add( materialMenu );

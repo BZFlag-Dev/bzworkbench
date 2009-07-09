@@ -16,19 +16,20 @@
 #include "Fl_Dialog.h"
 #include "ConfigurationDialog.h"
 
-#include "../widgets/QuickLabel.h"
-#include "../widgets/MaterialWidget.h"
-#include "../defines.h"
+#include "widgets/QuickLabel.h"
+#include "widgets/MaterialWidget.h"
+#include "defines.h"
 
-#include "../model/Model.h"
+#include "model/Model.h"
 
-#include "../objects/material.h"
+#include "objects/material.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Menu_Button.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Tabs.H>
 
 #include <vector>
 #include <string>
@@ -43,9 +44,48 @@ using namespace std;
 class AdvancedOptionsDialog : public ConfigurationDialog {
 
 public:
+	class AdvancedOptionsPage : public Fl_Group {
+	
+	public:
+		AdvancedOptionsPage( int x, int y, std::string name, std::vector<material*> mats, physics* phys, bool usephydrv );
+
+		// add material callback
+		static void addMaterialCallback( Fl_Widget* w, void* data ) {
+			AdvancedOptionsPage* ccd = (AdvancedOptionsPage*)data;
+			ccd->addMaterialCallback_real( w );
+		}
+
+		static void removeMaterialCallback( Fl_Widget* w, void* data ) {
+			AdvancedOptionsPage* obj = (AdvancedOptionsPage*)data;
+			obj->removeMaterialCallback_real( w );
+		}
+
+		void commitChanges( bz2object* obj );
+
+	private:
+		void addMaterialCallback_real( Fl_Widget* w );
+		void removeMaterialCallback_real( Fl_Widget* w );
+
+		void addMaterial( MaterialWidget* mw );
+
+		// material widgets
+		QuickLabel* materialLabel;
+		Fl_Button* materialAdd;
+		Fl_Button* materialRemove;
+		Fl_Scroll* materialList;
+		vector< MaterialWidget* > materialWidgets;
+	
+		// physics driver widgets
+		QuickLabel* phydrvLabel;
+		Fl_Menu_Button* phydrvMenu;
+
+		vector<string> materialRefs;
+		std::string name;
+	};
+
 
 	static const int DEFAULT_WIDTH = 400;
-	static const int DEFAULT_HEIGHT = 250;
+	static const int DEFAULT_HEIGHT = 350;
 	
 	// constructor
 	AdvancedOptionsDialog( bz2object* obj );
@@ -65,11 +105,7 @@ public:
 		ccd->CancelCallback_real( w );
 	}
 	
-	// add material callback
-	static void addMaterialCallback( Fl_Widget* w, void* data ) {
-		AdvancedOptionsDialog* ccd = (AdvancedOptionsDialog*)data;
-		ccd->addMaterialCallback_real( w );
-	}
+	
 	
 private:
 
@@ -77,26 +113,13 @@ private:
 	void OKCallback_real( Fl_Widget* w );
 	void CancelCallback_real( Fl_Widget* w );
 	
-	void addMaterialCallback_real( Fl_Widget* w, MaterialWidget* newMaterial = NULL );
-	
-	// material widgets
-	QuickLabel* materialLabel;
-	Fl_Button* materialNew;
-	Fl_Button* materialEdit;
-	Fl_Button* materialDelete;
-	Fl_Scroll* materialList;
-	vector< MaterialWidget* > materialWidgets;
-	
-	// physics driver widgets
-	QuickLabel* phydrvLabel;
-	Fl_Menu_Button* phydrvMenu;
-	Fl_Button* phydrvNew;
-	Fl_Button* phydrvEdit;
-	Fl_Button* phydrvDelete;
-	
 	// bz2object reference
 	// (duplicated from ConfigurationDialog::object for type safety)
 	bz2object* obj;
+
+	Fl_Tabs* tabs;
+
+	vector< AdvancedOptionsPage* > tabPages;
 	
 };
 

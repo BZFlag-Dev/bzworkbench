@@ -22,7 +22,6 @@ mesh::mesh(void) :
 	insidePoints = vector<Point3D>();
 	outsidePoints = vector<Point3D>();
 	decorative = false;
-	materials = vector< material* >();
 	faces = vector<MeshFace*>();
 	drawInfo = NULL;
 	materialMap = map<string, string>();
@@ -38,7 +37,6 @@ mesh::mesh(string& data) :
 	insidePoints = vector<Point3D>();
 	outsidePoints = vector<Point3D>();
 	decorative = false;
-	materials = vector< material* >();
 	faces = vector<MeshFace*>();
 	drawInfo = NULL;
 	materialMap = map<string, string>();

@@ -34,7 +34,6 @@ void meshpyr::setDefaults() {
 
 	// define some basic values
 	divisions = 4;
-	physicsDriver = NULL;
 	flatShading = false;
 	smoothbounce = true;
 	flipz = false;

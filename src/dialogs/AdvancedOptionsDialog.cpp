@@ -22,18 +22,93 @@ AdvancedOptionsDialog::AdvancedOptionsDialog( bz2object* _obj ) :
 	
 	begin();
 	
-	materialLabel = new QuickLabel("Materials (order matters)", 5, 5);
-	materialNew = new Fl_Button(DEFAULT_WIDTH - 180, 5, 55, DEFAULT_TEXTSIZE + 6, "New" );
-	materialEdit = new Fl_Button(DEFAULT_WIDTH - 120, 5, 55, DEFAULT_TEXTSIZE + 6, "Edit" );
-	materialDelete = new Fl_Button( DEFAULT_WIDTH - 60, 5, 55, DEFAULT_TEXTSIZE + 6, "Delete");
-	materialList = new Fl_Scroll( 5, 30, DEFAULT_WIDTH - 10, 120 );
+	tabs = new Fl_Tabs( 5, 5, DEFAULT_WIDTH - 10, 300 );
+	
+
+	vector<string> materialSlots = _obj->materialSlotNames();
+	vector<string> physicsSlots = _obj->physicsSlotNames();
+
+	for ( vector<string>::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+		vector<material*> materials = _obj->getMaterials( *i );
+		physics* phys = NULL;
+		bool usephys = false;
+		for ( vector<string>::iterator j = physicsSlots.begin(); j != physicsSlots.end(); j++ ) {
+			if ( *j == *i ) {
+				phys = _obj->getPhyDrv( *j );
+				usephys = true;
+			}
+		}
+
+		AdvancedOptionsPage* page;
+		if ( *i == "" )
+			page = new AdvancedOptionsPage( 10, 35, "All", materials, phys, usephys );
+		else
+			page = new AdvancedOptionsPage( 10, 35, *i, materials, phys, usephys );
+
+		tabs->add( page );
+		tabPages.push_back( page );
+	}
+	
+	end();
+
+	setOKEventHandler( OKCallback, this );
+	setCancelEventHandler( CancelCallback, this );
+}
+
+// OK callback
+void AdvancedOptionsDialog::OKCallback_real( Fl_Widget* w ) {
+	for ( vector< AdvancedOptionsPage* >::iterator i = tabPages.begin(); i != tabPages.end(); i++ ) {
+		(*i)->commitChanges( obj );
+	}
+
+	Fl::delete_widget( this );
+}
+
+// Cancel Callback
+void AdvancedOptionsDialog::CancelCallback_real( Fl_Widget* w ) {
+	Fl::delete_widget( this );
+}
+
+// add material callback
+void AdvancedOptionsDialog::AdvancedOptionsPage::addMaterialCallback_real( Fl_Widget* w ) {
+	// add material
+	MaterialWidget* mw = new MaterialWidget( materialList->x() + 5, 0, materialList->w() - 10, 2 * DEFAULT_TEXTSIZE, materialRefs );
+	addMaterial( mw );
+}
+
+void AdvancedOptionsDialog::AdvancedOptionsPage::removeMaterialCallback_real( Fl_Widget* w ) {
+	materialList->remove( materialList->child( materialList->children() ) );
+}
+
+void AdvancedOptionsDialog::AdvancedOptionsPage::addMaterial( MaterialWidget* mw ) {
+	if( mw != NULL ) {
+		int x = materialList->x() + 5;
+		int y = materialList->y() + 5 + 2 * DEFAULT_TEXTSIZE * ( materialList->children() - 1 );
+		mw->position( x, y );
+		materialList->add( mw );
+		materialWidgets.push_back( mw );
+	}
+}
+
+
+AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, std::string name, std::vector<material*> mats, physics *phys, bool usephydrv ) : Fl_Group( x, y, 380, 270 ) {
+	this->name = name;
+	label ( this->name.c_str() );
+
+	begin();
+
+	materialLabel = new QuickLabel("Materials (order matters)", 5 + x, 5 + y);
+	materialAdd = new Fl_Button(DEFAULT_WIDTH - 180 + x, 5 + y, 55, DEFAULT_TEXTSIZE + 6, "Add" );
+	materialAdd->callback( addMaterialCallback, this );
+	materialRemove = new Fl_Button(DEFAULT_WIDTH - 120 + x, 5 + y, 65, DEFAULT_TEXTSIZE + 6, "Remove" );
+	materialList = new Fl_Scroll( 5 + x, 30 + y, DEFAULT_WIDTH - 40, 120 );
 	materialList->end();
 	materialList->box(FL_UP_BOX);
 	materialList->type(Fl_Scroll::VERTICAL_ALWAYS);
 	
 	// add materials
 	// first, query the model for them
-	vector<string> materialRefs = vector<string>();
+	materialRefs = vector<string>();
 	materialRefs.push_back( MaterialWidget_NONE );
 	
 	map< string, material* > materialMap = Model::getMaterials();
@@ -45,47 +120,36 @@ AdvancedOptionsDialog::AdvancedOptionsDialog( bz2object* _obj ) :
 	
 	// second, add the widgets
 	materialWidgets = vector< MaterialWidget* >();
-	vector< material* > objMaterials = obj->getMaterials();
-	if( objMaterials.size() > 0 ) {
-		for( vector< material* >::iterator i = objMaterials.begin(); i != objMaterials.end(); i++ ) {
+	if( mats.size() > 0 ) {
+		for( vector< material* >::iterator i = mats.begin(); i != mats.end(); i++ ) {
 			MaterialWidget* mw = new MaterialWidget( materialList->x() + 5, 0, materialList->w() - 10, 2 * DEFAULT_TEXTSIZE, materialRefs );
 			mw->setSelectedMaterial( (*i)->getName() );
-			addMaterialCallback_real( materialList, mw );
+			addMaterial( mw );
 		}
 	}
 	
-	phydrvLabel = new QuickLabel("Physics Driver", 5, 190 );
-	phydrvNew = new Fl_Button( DEFAULT_WIDTH - 180, 190, 55, DEFAULT_TEXTSIZE + 6, "New" );
-	phydrvEdit = new Fl_Button( DEFAULT_WIDTH - 120, 190, 55, DEFAULT_TEXTSIZE + 6, "Edit" );
-	phydrvDelete = new Fl_Button( DEFAULT_WIDTH - 60, 190, 55, DEFAULT_TEXTSIZE + 6, "Delete" );
-	phydrvMenu = new Fl_Menu_Button( 5, 215, DEFAULT_WIDTH - 10, DEFAULT_TEXTSIZE + 6, "(coming soon)" );
-	
-	setOKEventHandler( OKCallback, this );
-	setCancelEventHandler( CancelCallback, this );
-	
+	if (usephydrv) {
+		phydrvLabel = new QuickLabel("Physics Driver", 5 + x, 190 + y );
+		phydrvMenu = new Fl_Menu_Button( 5 + x, 215 + y, DEFAULT_WIDTH - 40, DEFAULT_TEXTSIZE + 6, "(coming soon)" );
+	}
+
 	end();
 }
 
-// OK callback
-void AdvancedOptionsDialog::OKCallback_real( Fl_Widget* w ) {
-	
-}
+void AdvancedOptionsDialog::AdvancedOptionsPage::commitChanges( bz2object* obj ) {
+	if ( name != "All" )
+		obj->getMaterials( name ).clear();
+	else
+		obj->getMaterials( "" ).clear();
 
-// Cancel Callback
-void AdvancedOptionsDialog::CancelCallback_real( Fl_Widget* w ) {
-	Fl::delete_widget( this );
-}
+	for ( vector< MaterialWidget* >::iterator i = materialWidgets.begin(); i != materialWidgets.end(); i++ ) {
+		material* mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", (*i)->getSelectedMaterial().c_str() ) );
 
-// add material callback
-void AdvancedOptionsDialog::addMaterialCallback_real( Fl_Widget* w, MaterialWidget* mw ) {
-	// add an existing material widget if one is passed
-	if( mw != NULL ) {
-		int x = materialList->x() + 5;
-		int y = materialList->y() + 5 + 2 * DEFAULT_TEXTSIZE * ( materialList->children() - 1 );
-		mw->position( x, y );
-		materialList->add( mw );
-	}
-	else {		// open up the material configuration dialog and get a new material
-		
+		if ( mat != NULL ) {
+			if ( name != "All" )
+				obj->addMaterial( mat, name );
+			else
+				obj->addMaterial( mat, "" );
+		}
 	}
 }

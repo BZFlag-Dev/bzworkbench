@@ -44,14 +44,36 @@ void box::setDefaults() {
 		const float defScale = (i >= ZP) ? -2.0f : -8.0f;
 		texSizes[i] = Point2D(defScale, defScale);
 		texOffsets[i] = Point2D(0.0f, 0.0f);
-		physDrvs[i] = NULL;
 		driveThroughs[i] = false;
 		shootThroughs[i] = false;
 		ricochets[i] = false;
 
 		// set default textures
-		SceneBuilder::assignTexture((i >= ZP) ? "roof" : "boxwall", group->getChild(i),
-				osg::StateAttribute::ON);
+		SceneBuilder::assignTexture((i >= ZP) ? "roof" : "boxwall", group->getChild(i) );
+
+		// add material/physics slot
+		MaterialSlot mslot;
+		PhysicsSlot pslot;
+		if (i <= YN) {
+			mslot.alias.push_back("sides");
+			pslot.alias.push_back("sides");
+			mslot.alias.push_back("outside");
+			pslot.alias.push_back("outside");
+		}
+		else if (i == ZP) {
+			mslot.alias.push_back("top");
+			pslot.alias.push_back("top");
+		}
+		else if (i == ZN) {
+			mslot.alias.push_back("bottom");
+			pslot.alias.push_back("bottom");
+		}
+		mslot.defaultMaterial = group->getChild(i)->getStateSet();
+		mslot.node = group->getChild(i);
+		pslot.phydrv = NULL;
+
+		materialSlots[ string( faceNames[i] ) ] = mslot;
+		physicsSlots[ string( faceNames[i] ) ] = pslot;	
 	}
 
 	setPos( osg::Vec3(0.0, 0.0, 0.0) );
@@ -99,13 +121,6 @@ int box::update(string& data) {
 			faces.push_back("bottom");
 		}
 
-
-		vector<string> physdrvs = BZWParser::getValuesByKeyAndFaces("phydrv", faces, header, boxData);
-		if(physdrvs.size() > 1) {
-			printf("box::update(): Error! Defined \"%s phydrv\" %d times!\n", faceName.c_str(), (int)physdrvs.size());
-			return 0;
-		}
-
 		vector<string> texsizes = BZWParser::getValuesByKeyAndFaces("texsize", faces, header, boxData);
 		if(texsizes.size() > 1) {
 			printf("box::update(): Error! Defined \"%s texsize\" %d times!\n", faceName.c_str(), (int)texsizes.size());
@@ -142,16 +157,6 @@ int box::update(string& data) {
 			return 0;
 		}
 
-		vector<string> matrefs = BZWParser::getValuesByKeyAndFaces("matref", faces, header, boxData);
-
-		if (physdrvs.size() > 0) {
-			physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", physdrvs[0] );
-			if (phys != NULL)
-				physDrvs[i] = phys;
-			else
-				printf("box::update(): Error! Couldn't find physics driver %s\n", physdrvs[0].c_str());
-		}
-
 		if (texsizes.size() > 0) {
 			texSizes[i] = Point2D( texsizes[0].c_str() );
 		}
@@ -176,20 +181,6 @@ int box::update(string& data) {
 		if (ricochets.size() > 0) {
 			this->ricochets[i] = true;
 		}
-
-		vector< material* > materials;
-		for (vector<string>::iterator itr = matrefs.begin(); itr != matrefs.end(); itr++) {
-			material* mat = (material*)Model::command( MODEL_GET, "material", *itr );
-			if (mat != NULL)
-				materials.push_back( mat );
-			else
-				printf("box::update(): Error! Couldn't find material %s\n", (*itr).c_str());
-		}
-
-		material* finalMat = material::computeFinalMaterial(materials);
-
-		osg::Group* group = (osg::Group*)getThisNode();
-		group->getChild(i)->setStateSet(finalMat);
 	}
 
 
@@ -259,8 +250,6 @@ string box::toString(void) {
 	string faceLines;
 
 	for (int i = 0; i < FaceCount; i++) {
-		if (physDrvs[i] != NULL)
-			faceLines += string(faceNames[i]) + " phydrv " + physDrvs[i]->getName() + "\n";
 		faceLines += string(faceNames[i]) + " texsize " + texSizes[i].toString() + "\n";
 		faceLines += string(faceNames[i]) + " texoffset " + texOffsets[i].toString() + "\n";
 		if (driveThroughs[i])

@@ -44,22 +44,33 @@ void arc::setDefaults() {
 	ratio = 1.0f;
 	divisions = 16;
 	angle = 360.0f;
-	physicsDriver = NULL;
 	flatShading = false;
 	smoothbounce = false;
 	texsize.set( -8.0f, -8.0f, -8.0f, -8.0f  );
 	boxStyle = false;
 
 	osg::Group* group = new osg::Group();
-	for (int i = 0; i < MaterialCount; i++)
+	for (int i = 0; i < MaterialCount; i++) {
 		group->addChild( new osg::Geode() );
 
-	SceneBuilder::assignTexture( "roof", group->getChild( 0 ), osg::StateAttribute::ON);
-	SceneBuilder::assignTexture( "roof", group->getChild( 1 ), osg::StateAttribute::ON);
-	SceneBuilder::assignTexture( "boxwall", group->getChild( 2 ), osg::StateAttribute::ON);
-	SceneBuilder::assignTexture( "boxwall", group->getChild( 3 ), osg::StateAttribute::ON);
-	SceneBuilder::assignTexture( "wall", group->getChild( 4 ), osg::StateAttribute::ON);
-	SceneBuilder::assignTexture( "wall", group->getChild( 5 ), osg::StateAttribute::ON);
+		string texture;
+		if ( i <= Bottom ) {
+			texture = "roof";
+		}
+		else if ( i <= Outside ) {
+			texture = "boxwall";
+		}
+		else if ( i <= EndFace ) {
+			texture = "wall";
+		}
+
+		SceneBuilder::assignTexture( texture.c_str(), group->getChild( i ) );
+
+		MaterialSlot mslot;
+		mslot.defaultMaterial = group->getChild( i )->getStateSet();
+		mslot.node = group->getChild( i );
+		materialSlots[ string( sideNames[i] ) ] = mslot;
+	}
 
 	setThisNode( group );
 
@@ -86,30 +97,6 @@ int arc::update(string& data) {
 		return 0;
 
 	const char* arcData = lines[0].c_str();
-
-	// get the matrefs
-	osg::Group* group = (osg::Group*)getThisNode();
-	for (int i = 0; i < MaterialCount; i++) {
-		vector<string> faces;
-		faces.push_back(sideNames[i]);
-
-		vector<string> matrefs = BZWParser::getValuesByKeyAndFaces("matref", faces, header, arcData);
-
-		if (matrefs.size() > 0) {
-			vector< material* > materials;
-			for (vector<string>::iterator itr = matrefs.begin(); itr != matrefs.end(); itr++) {
-				material* mat = (material*)Model::command( MODEL_GET, "material", *itr );
-				if (mat != NULL)
-					materials.push_back( mat );
-				else
-					printf("arc::update(): Error! Couldn't find material %s\n", (*itr).c_str());
-			}
-
-			material* finalMat = material::computeFinalMaterial(materials);
-
-			group->getChild(i)->setStateSet(finalMat);
-		}
-	}
 
 	// get the texsize
 	vector<string> texsizes = BZWParser::getValuesByKey("texsize", header, arcData);

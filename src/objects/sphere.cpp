@@ -42,11 +42,20 @@ void sphere::setDefaults() {
 	SceneBuilder::assignTexture( "boxwall", group->getChild( 0 ) );
 	SceneBuilder::assignTexture( "roof", group->getChild( 1 ) );
 
+	MaterialSlot mslotEdge;
+	mslotEdge.defaultMaterial = group->getChild( 0 )->getStateSet();
+	mslotEdge.node = group->getChild( 0 );
+	MaterialSlot mslotBottom;
+	mslotBottom.defaultMaterial = group->getChild( 1 )->getStateSet();
+	mslotBottom.node = group->getChild( 1 );
+
+	materialSlots[ string( sideNames[ 0 ] ) ] = mslotEdge;
+	materialSlots[ string( sideNames[ 1 ] ) ] = mslotBottom;
+
 	// define some basic values
 	realSize = osg::Vec3( 10, 10, 10 );
 	texsize.set( -4.0f, -4.0f );
 	divisions = 16;
-	physicsDriver = NULL;
 	flatShading = false;
 	smoothbounce = false;
 	hemisphere = false;
@@ -71,30 +80,6 @@ int sphere::update(string& data) {
 	if(!hasOnlyOne(lines, "sphere"))
 		return 0;
 	const char* sphereData = lines[0].c_str();
-
-	// get the matrefs
-	osg::Group* group = (osg::Group*)getThisNode();
-	for (int i = 0; i < MaterialCount; i++) {
-		vector<string> faces;
-		faces.push_back(sideNames[i]);
-
-		vector<string> matrefs = BZWParser::getValuesByKeyAndFaces("matref", faces, header, sphereData);
-
-		if (matrefs.size() > 0) {
-			vector< material* > materials;
-			for (vector<string>::iterator itr = matrefs.begin(); itr != matrefs.end(); itr++) {
-				material* mat = (material*)Model::command( MODEL_GET, "material", *itr );
-				if (mat != NULL)
-					materials.push_back( mat );
-				else
-					printf("cone::update(): Error! Couldn't find material %s\n", (*itr).c_str());
-			}
-
-			material* finalMat = material::computeFinalMaterial(materials);
-
-			group->getChild(i)->setStateSet(finalMat);
-		}
-	}
 
 	// get the name
 	vector<string> names = BZWParser::getValuesByKey("name", header, sphereData);

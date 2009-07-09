@@ -83,7 +83,6 @@ public:
 	void setRicochet( int face, bool value );
 
 private:
-	osg::ref_ptr< physics > physDrvs[FaceCount];
 	Point2D texSizes[FaceCount];
 	Point2D texOffsets[FaceCount];
 	bool driveThroughs[FaceCount];

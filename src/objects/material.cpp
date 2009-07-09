@@ -215,7 +215,7 @@ int material::update(string& data) {
 	if(!DataEntry::update(data))
 		return 0;
 
-	if ( names.size() > 0 ) setName( names[0] );
+	if ( names.size() > 0 ) name = names[0];
 	dynCol = (dyncols.size() != 0 ? (dynamicColor*)Model::command( MODEL_GET, "dynamicColor", dyncols[0] ) : NULL);
 	(emissives.size() != 0 ? setEmissive(RGBA( emissives[emissives.size() - 1].c_str() )) : setEmissive(RGBA(-1, -1, -1, -1)));
 	(speculars.size() != 0 ? setSpecular(RGBA( speculars[speculars.size() - 1].c_str() )) : setSpecular(RGBA(-1, -1, -1, -1)));

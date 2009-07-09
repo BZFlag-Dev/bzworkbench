@@ -38,7 +38,6 @@ void meshbox::setDefaults() {
 	ratio = 1.0f;
 	divisions = 4;
 	angle = 360.0f;
-	physicsDriver = NULL;
 	flatShading = true;
 	smoothbounce = false;
 	texsize.set( -8.0f, -8.0f, -8.0f, -8.0f  );

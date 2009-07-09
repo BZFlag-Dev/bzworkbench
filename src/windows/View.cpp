@@ -102,8 +102,8 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
    // build the mouse button map
    this->buildMouseButtonMap();
 
+   // initialize snap to grid variables
    snappingEnabled = false;
-
    scaleSnapSize = 1;
    translateSnapSize = 1;
    rotateSnapSize = 15;

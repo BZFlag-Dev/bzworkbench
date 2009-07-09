@@ -82,7 +82,6 @@ public:
 private:
 	bool flipz;
 
-	osg::ref_ptr< physics > physDrvs[FaceCount];
 	Point2D texSizes[FaceCount];
 	Point2D texOffsets[FaceCount];
 	bool driveThroughs[FaceCount];

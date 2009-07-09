@@ -22,7 +22,12 @@ bz2object::bz2object(const char* name, const char* keys):
 	thisNode = NULL;
 
 	transformations = vector< osg::ref_ptr<BZTransform> >();
-	materials = vector< material* >();
+	MaterialSlot mslot;
+	mslot.defaultMaterial = NULL;
+	materialSlots[""] = mslot;
+	PhysicsSlot pslot;
+	pslot.phydrv = NULL;
+	physicsSlots[""] = pslot;
 	setSelected( false );
 	setName( "(unknown bz2object)" );
 
@@ -64,7 +69,12 @@ bz2object::bz2object(const char* name, const char* keys, const char* data):
 	thisNode = NULL;
 
 	transformations = vector< osg::ref_ptr<BZTransform> >();
-	materials = vector< material* >();
+	MaterialSlot mslot;
+	mslot.defaultMaterial = NULL;
+	materialSlots[""] = mslot;
+	PhysicsSlot pslot;
+	pslot.phydrv = NULL;
+	physicsSlots[""] = pslot;
 	setSelected( false );
 
 	vector<float> sdata;
@@ -108,7 +118,12 @@ bz2object::bz2object(const char* name, const char* keys, osg::Node* node ):
 	thisNode = node;
 
 	transformations = vector< osg::ref_ptr<BZTransform> >();
-	materials = vector< material* >();
+	MaterialSlot mslot;
+	mslot.defaultMaterial = NULL;
+	materialSlots[""] = mslot;
+	PhysicsSlot pslot;
+	pslot.phydrv = NULL;
+	physicsSlots[""] = pslot;
 	setSelected( false );
 	setName( "(unknown bz2object)" );
 
@@ -150,7 +165,12 @@ bz2object::bz2object( const char* name, const char* keys, const char* data, osg:
 	thisNode = node;
 
 	transformations = vector< osg::ref_ptr<BZTransform> >();
-	materials = vector< material* >();
+	MaterialSlot mslot;
+	mslot.defaultMaterial = NULL;
+	materialSlots[""] = mslot;
+	PhysicsSlot pslot;
+	pslot.phydrv = NULL;
+	physicsSlots[""] = pslot;
 	setSelected( false );
 
 	vector<float> sdata;
@@ -215,7 +235,7 @@ int bz2object::update(string& data)
 	const char* objData = lines[0].c_str();
 
 	// data
-	vector<string> names, positions, rotations, sizes, physicsDrivers, matrefs;
+	vector<string> names, positions, rotations, sizes, matrefs;
 
 	// get the name (break if there are more than one)
 	if(isKey("name")) {
@@ -272,20 +292,6 @@ int bz2object::update(string& data)
 
 	}
 
-	// get the physics driver
-	if(isKey("phydrv")) {
-		physicsDrivers = BZWParser::getValuesByKey("phydrv", header, objData);
-		if(physicsDrivers.size() > 1) {
-			printf("%s::update(): Error! Defined \"phydrv\" %d times!\n", header, (int)physicsDrivers.size());
-			return 0;
-		}
-	}
-
-	// get materials
-	if(isKey("matref")) {
-		matrefs = BZWParser::getValuesByKey("matref", header, objData);
-	}
-
 	// load in the simpler data
 	if(isKey("name") && names.size() > 0)
 		this->setName( names[0] );
@@ -297,25 +303,71 @@ int bz2object::update(string& data)
 		this->setSize( Point3D( sizes[0].c_str() ) );
 
 	// query the model for a physics driver
-	if(isKey("phydrv") && physicsDrivers.size() > 0) {
-		physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", physicsDrivers[0] );
-		this->physicsDriver = phys;
+	if( isKey( "phydrv" ) ) {
+		for ( map< string, PhysicsSlot >::iterator i = physicsSlots.begin(); i != physicsSlots.end(); i++ ) {
+			vector<string> physicsDrivers;
+			
+			if ( i->first != "" ) {
+				vector<string> faces;
+				faces.push_back( i->first );
+				for ( vector<string>::iterator j = i->second.alias.begin(); j != i->second.alias.end(); j++ )
+					faces.push_back( *j );
+
+				physicsDrivers = BZWParser::getValuesByKeyAndFaces( "phydrv", faces, header, objData );
+			}
+			else {
+				physicsDrivers = BZWParser::getValuesByKey( "phydrv", header, objData );
+			}
+
+			if(physicsDrivers.size() > 1) {
+				printf("%s::update(): Error! Defined \"phydrv\" %d times!\n", header, (int)physicsDrivers.size());
+				return 0;
+			}
+
+			if ( physicsDrivers.size() > 0 ) {
+				physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", physicsDrivers[0] );
+				i->second.phydrv = phys;
+			}
+		}
 	}
 
-	if(isKey("matref") && matrefs.size() > 0) {
-		// erase previous materials
-		this->materials.clear();
-		// use the model to resolve the references into material pointers
-		for( vector<string>::iterator i = matrefs.begin(); i != matrefs.end(); i++ ) {
-			material* mat = (material*)Model::command( MODEL_GET, "material", *i );
-			if( mat )
-				this->materials.push_back( mat );
-			else
-				printf("bz2object::update(): Error! Couldn't find material %s\n", (*i).c_str());
-		}
+	if( isKey( "matref" ) ) {
+		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+			// erase previous materials
+			i->second.materials.clear();
+			
+			// get materials
+			vector<string> matrefs;
+			
+			if ( i->first != "" ) {
+				vector<string> faces;
+				faces.push_back( i->first );
+				for ( vector<string>::iterator j = i->second.alias.begin(); j != i->second.alias.end(); j++ )
+					faces.push_back( *j );
 
-		// assign the material
-		getThisNode()->setStateSet( material::computeFinalMaterial(materials) );
+				matrefs = BZWParser::getValuesByKeyAndFaces( "matref", faces, header, data.c_str() );
+			}
+			else {
+				matrefs = BZWParser::getValuesByKey( "matref", header, data.c_str() );
+			}
+
+			// use the model to resolve the references into material pointers
+			for( vector<string>::iterator j = matrefs.begin(); j != matrefs.end(); j++ ) {
+				material* mat = (material*)Model::command( MODEL_GET, "material", *j );
+				if( mat )
+					i->second.materials.push_back( mat );
+				else
+					printf("bz2object::update(): Error! Couldn't find material %s\n", (*j).c_str());
+			}
+
+			// assign the material
+			if ( matrefs.size() > 0 ) {
+				if ( i->first != "" )
+					i->second.node->setStateSet( material::computeFinalMaterial(i->second.materials) );
+				else
+					getThisNode()->setStateSet( material::computeFinalMaterial(i->second.materials) );
+			}
+		}
 	}
 
 
@@ -482,13 +534,28 @@ string bz2object::BZWLines( bz2object* obj )
 		ret += "  shift " + Point3D( obj->getPos() ).toString();
 
 	// add phydrv key/value to the string if supported and if defined
-	if(obj->isKey("phydrv") && obj->physicsDriver != NULL)
-		ret += "  phydrv " + obj->physicsDriver->getName() + "\n";
+	if(obj->isKey("phydrv")) {
+		for ( map< string, PhysicsSlot >::iterator i = obj->physicsSlots.begin(); i != obj->physicsSlots.end(); i++ ) {
+			if ( i->second.phydrv.get() != NULL ) {
+				if ( i->first == "" )
+					ret += "  phydrv " + i->second.phydrv->getName() + "\n";
+				else 
+					ret += "  " + i->first + " phydrv " + i->second.phydrv->getName() + "\n";
+			}
+		}
+	}
 
 	// add all matref key/value pairs to the string if supported and defined
-	if(obj->isKey("matref") && obj->materials.size() != 0) {
-		for(vector<material* >::iterator i = obj->materials.begin(); i != obj->materials.end(); i++) {
-			ret += "  matref " + (*i)->getName() + "\n";
+	if(obj->isKey("matref")) {
+		for ( map< string, MaterialSlot >::iterator i = obj->materialSlots.begin(); i != obj->materialSlots.end(); i++ ) {
+			for(vector< material* >::iterator j = i->second.materials.begin(); j != i->second.materials.end(); j++) {
+				if ( *j != NULL ) {
+					if ( i->first == "" )
+						ret += "  matref " + (*j)->getName() + "\n";
+					else 
+						ret += "  " + i->first + " matref " + (*j)->getName() + "\n";
+				}
+			}
 		}
 	}
 
@@ -517,7 +584,7 @@ int bz2object::update( UpdateMessage& message )
 
 			vector< material* >* materialList = message.getAsMaterialList();
 			if( materialList != NULL ) {
-				materials = *materialList;
+				materialSlots[""].materials = *materialList;
 				refreshMaterial();
 			}
 			break;
@@ -546,12 +613,12 @@ int bz2object::update( UpdateMessage& message )
 			material* mat = message.getAsMaterial();
 
 			// search for the material in the list
-			if( materials.size() > 0 ) {
+			if( materialSlots[""].materials.size() > 0 ) {
 				unsigned int i = 0;
-				for( vector< material* >::iterator itr = materials.begin(); itr != materials.end(); itr++, i++) {
+				for( vector< material* >::iterator itr = materialSlots[""].materials.begin(); itr != materialSlots[""].materials.end(); itr++, i++) {
 					if( *itr == mat ) {
 						printf(" updating material...\n");
-						materials[i] = mat;
+						materialSlots[""].materials[i] = mat;
 						break;
 					}
 				}
@@ -559,7 +626,7 @@ int bz2object::update( UpdateMessage& message )
 				refreshMaterial();
 			}
 			else {
-				materials.push_back( mat );
+				materialSlots[""].materials.push_back( mat );
 				printf(" adding material...\n" );
 				refreshMaterial();
 			}
@@ -613,26 +680,26 @@ void bz2object::recomputeTransformations( vector< osg::ref_ptr< BZTransform > >*
 }
 
 // add a material to the object
-void bz2object::addMaterial( material* mat ) {
+void bz2object::addMaterial( material* mat, string slot ) {
 	if( mat != NULL ) {
-		materials.push_back( mat );
+		materialSlots[ slot ].materials.push_back( mat );
 		refreshMaterial();
 	}
 }
 
 // insert a material
-void bz2object::insertMaterial( unsigned int index, material* mat )
+void bz2object::insertMaterial( unsigned int index, material* mat, string slot )
 {
-	if( index > materials.size() - 1 )
+	if( index > materialSlots[ slot ].materials.size() - 1 )
 		return;
 
-	if( materials.size() == 0 ) {
-		materials.push_back( mat );
+	if( materialSlots[ slot ].materials.size() == 0 ) {
+		materialSlots[ slot ].materials.push_back( mat );
 	} else {
-		vector< material* >::iterator itr = materials.begin();
-		for( unsigned int i = 0; i < materials.size(); i++, itr++ ) {
+		vector< material* >::iterator itr = materialSlots[ slot ].materials.begin();
+		for( unsigned int i = 0; i < materialSlots[ slot ].materials.size(); i++, itr++ ) {
 			if( i == index ) {
-				materials.insert( itr, mat );
+				materialSlots[ slot ].materials.insert( itr, mat );
 				break;
 			}
 		}
@@ -642,14 +709,14 @@ void bz2object::insertMaterial( unsigned int index, material* mat )
 }
 
 // remove a material
-void bz2object::removeMaterial( material* mat )
+void bz2object::removeMaterial( material* mat, string slot )
 {
-	if( materials.size() == 0 || mat == NULL )
+	if( materialSlots[ slot ].materials.size() == 0 || mat == NULL )
 		return;
 
-	for( vector< material* >::iterator i = materials.begin(); i != materials.end(); i++ ) {
+	for( vector< material* >::iterator i = materialSlots[ slot ].materials.begin(); i != materialSlots[ slot ].materials.end(); i++ ) {
 		if( *i == mat ) {
-			materials.erase( i );
+			materialSlots[ slot ].materials.erase( i );
 			break;
 		}
 	}
@@ -658,15 +725,15 @@ void bz2object::removeMaterial( material* mat )
 }
 
 // remove a material by index
-void bz2object::removeMaterial( unsigned int index )
+void bz2object::removeMaterial( unsigned int index, string slot )
 {
-	if( index >= materials.size() || index < 0 )
+	if( index >= materialSlots[ slot ].materials.size() || index < 0 )
 		return;
 
-	vector< material* >::iterator itr = materials.begin();
-	for( unsigned int i = 0; i < materials.size(); i++, itr++ ) {
+	vector< material* >::iterator itr = materialSlots[ slot ].materials.begin();
+	for( unsigned int i = 0; i < materialSlots[ slot ].materials.size(); i++, itr++ ) {
 		if( i == index ) {
-			materials.erase( itr );
+			materialSlots[ slot ].materials.erase( itr );
 			break;
 		}
 	}
@@ -674,13 +741,42 @@ void bz2object::removeMaterial( unsigned int index )
 	refreshMaterial();
 }
 
+vector<string> bz2object::materialSlotNames() {
+	vector<string> ret;
+	for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+		ret.push_back( i->first );
+	}
+	return ret;
+}
+
+vector<string> bz2object::physicsSlotNames() {
+	vector<string> ret;
+	for ( map< string, PhysicsSlot >::iterator i = physicsSlots.begin(); i != physicsSlots.end(); i++ ) {
+		ret.push_back( i->first );
+	}
+	return ret;
+}
+
 // recompute the material
 void bz2object::refreshMaterial()
 {
-	material* mat = material::computeFinalMaterial( materials );
-	SceneBuilder::assignBZMaterial( mat, this );
+	int index = 0;
+	for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+		osg::StateSet* mat = i->second.defaultMaterial;
+		if ( i->second.materials.size() > 0 ) {
+			mat = material::computeFinalMaterial( i->second.materials );
+		}
+
+		if ( i->first == "" )
+			SceneBuilder::assignBZMaterial( mat, this );
+		else
+			SceneBuilder::assignBZMaterial( mat, i->second.node );
+	}
 }
 
+void bz2object::setMaterials( vector< material* >& _materials, std::string slot ) { 
+	this->materialSlots[ slot ].materials = _materials; 
+}
 
 // add a transformation
 void bz2object::addTransformation( BZTransform* t ) {

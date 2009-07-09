@@ -198,9 +198,8 @@ void SceneBuilder::assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Ve
 }
 
 // assign a BZWB material to a bz2object
-void SceneBuilder::assignBZMaterial( material* bzmat, bz2object* obj ) {
+void SceneBuilder::assignBZMaterial( osg::StateSet* bzmat, osg::Node* obj ) {
 	obj->setStateSet( bzmat );
-
 }
 
 // get the material from a node

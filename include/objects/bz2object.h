@@ -70,9 +70,9 @@ class bz2object : public Renderable, public DataEntry
 		static string BZWLines( bz2object* obj );
 
 		// data getters (makes MasterConfigurationDialog code easier)
-		osg::ref_ptr<physics> getPhyDrv() { return physicsDriver; }
+		osg::ref_ptr<physics> getPhyDrv( std::string slot = "" ) { return physicsSlots[ slot ].phydrv; }
 		vector< osg::ref_ptr<BZTransform> >& getTransformations() { return transformations; }
-		vector< material* >& getMaterials() { return materials; }
+		vector< material* >& getMaterials( std::string slot = "" ) { return materialSlots[ slot ].materials; }
 		bool isSelected() { return selected; }
 
 		// use this instead of getPosition()
@@ -145,9 +145,9 @@ class bz2object : public Renderable, public DataEntry
 		virtual void setRotation( const osg::Vec3& rot ) { setRotation( rot.x(), rot.y(), rot.z() ); }
 
 		// data setters (makes MasterConfigurationDialog code easier)
-		void setPhyDrv( physics* phydrv ) { physicsDriver = phydrv; }
+		void setPhyDrv( physics* phydrv, std::string slot = "" ) { physicsSlots[ slot ].phydrv = phydrv; }
 		void setTransforms( vector< osg::ref_ptr<BZTransform> >& _transformations ) { this->transformations = _transformations; }
-		void setMaterials( vector< material* >& _materials ) { this->materials = _materials; }
+		void setMaterials( vector< material* >& _materials, std::string slot = ""  );
 		void setSelected( bool value ) { selected = value; }
 
 		// set/set the thisNode
@@ -172,26 +172,46 @@ class bz2object : public Renderable, public DataEntry
 		void removeTransformation( unsigned int index );
 
 		// some basic control methods for materials
-		void addMaterial( material* mat );
-		void insertMaterial( unsigned int index, material* mat );
-		void removeMaterial( material* mat );
-		void removeMaterial( unsigned int index );
+		void addMaterial( material* mat, std::string slot = "" );
+		void insertMaterial( unsigned int index, material* mat, std::string slot = "" );
+		void removeMaterial( material* mat, std::string slot = "" );
+		void removeMaterial( unsigned int index, std::string slot = "" );
 
 		// snap to grid methods
 		void snapTranslate( float size, osg::Vec3 position );
 		void snapScale( float size, osg::Vec3 scale );
 		void snapRotate( float size, float rotation );
 
+		// methods for material/physics slots
+		int materialSlotCount() { return materialSlots.size(); }
+		int physicsSlotCount() { return physicsSlots.size(); }
+		std::vector<std::string> materialSlotNames();
+		std::vector<std::string> physicsSlotNames();
+
+		// struct for material slot data
+		struct MaterialSlot {
+			std::vector< std::string > alias;
+			std::vector< material* > materials;
+			osg::StateSet* defaultMaterial;
+			osg::Node* node;
+		};
+
+		struct PhysicsSlot {
+			std::vector< std::string > alias;
+			osg::ref_ptr< physics > phydrv;
+		};
 
 	protected:
-		osg::ref_ptr< physics > physicsDriver;
-		vector< material* > materials;
 		vector< osg::ref_ptr< BZTransform > > transformations;
 		// set true if selected in the 3D scene
 		bool selected;
 
 		// set the material of this object from the list of materials
 		void refreshMaterial();
+
+		// physics/material slot
+		std::map< std::string, PhysicsSlot > physicsSlots;
+		std::map< std::string, MaterialSlot > materialSlots; 
 
 	private:
 		// force these methods to be private, to guarantee that derived classes will use the given replacements

@@ -41,14 +41,31 @@ void pyramid::setDefaults() {
 	for (int i = 0; i < FaceCount; i++) {
 		texSizes[i] = Point2D(-8.0f, -8.0f);
 		texOffsets[i] = Point2D(0.0f, 0.0f);
-		physDrvs[i] = NULL;
 		driveThroughs[i] = false;
 		shootThroughs[i] = false;
 		ricochets[i] = false;
 
 		// set default textures
-		SceneBuilder::assignTexture( "pyrwall", group->getChild(i),
-				osg::StateAttribute::ON);
+		SceneBuilder::assignTexture( "pyrwall", group->getChild(i) );
+
+		// add material/physics slot
+		MaterialSlot mslot;
+		PhysicsSlot pslot;
+		if (i <= YN) {
+			mslot.alias.push_back("sides");
+			pslot.alias.push_back("sides");
+			mslot.alias.push_back("edge");
+			pslot.alias.push_back("edge");
+		}
+		else if (i == ZN) {
+			pslot.alias.push_back("bottom");
+		}
+		mslot.defaultMaterial = group->getChild(i)->getStateSet();
+		mslot.node = group->getChild(i);
+		pslot.phydrv = NULL;
+
+		materialSlots[ string( faceNames[i] ) ] = mslot;
+		physicsSlots[ string( faceNames[i] ) ] = pslot;	
 	}
 
 	flipz = false;
@@ -136,16 +153,6 @@ int pyramid::update(string& data) {
 			return 0;
 		}
 
-		vector<string> matrefs = BZWParser::getValuesByKeyAndFaces("matref", faces, header, pyramidData);
-
-		if (physdrvs.size() > 0) {
-			physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", physdrvs[0] );
-			if (phys != NULL)
-				physDrvs[i] = phys;
-			else
-				printf("pyramid::update(): Error! Couldn't find physics driver %s\n", physdrvs[0].c_str());
-		}
-
 		if (texsizes.size() > 0) {
 			texSizes[i] = Point2D( texsizes[0].c_str() );
 		}
@@ -170,20 +177,6 @@ int pyramid::update(string& data) {
 		if (ricochets.size() > 0) {
 			this->ricochets[i] = true;
 		}
-
-		vector< material* > materials;
-		for (vector<string>::iterator itr = matrefs.begin(); itr != matrefs.end(); itr++) {
-			material* mat = (material*)Model::command( MODEL_GET, "material", *itr );
-			if (mat != NULL)
-				materials.push_back( mat );
-			else
-				printf("pyramid::update(): Error! Couldn't find material %s\n", (*itr).c_str());
-		}
-
-		material* finalMat = material::computeFinalMaterial(materials);
-
-		osg::Group* group = (osg::Group*)getThisNode();
-		group->getChild(i)->setStateSet(finalMat);
 	}
 
 	vector<string> flipzs = BZWParser::getValuesByKey("flipz", header, pyramidData);

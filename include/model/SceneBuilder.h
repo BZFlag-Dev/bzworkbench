@@ -90,7 +90,7 @@ public:
 	static void assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Vec4 specular, osg::Vec4 emissive, float shininess, float alpha, osg::Node* node, osg::StateAttribute::Values val = osg::StateAttribute::OVERRIDE );
 	
 	// assign a BZWB material to the node
-	static void assignBZMaterial( material* mat, bz2object* obj );
+	static void assignBZMaterial( osg::StateSet* mat, osg::Node* obj );
 	
 	// give the string the "select" attribute
 	static string nameSelected( const char* str ) {

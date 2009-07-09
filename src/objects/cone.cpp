@@ -44,7 +44,6 @@ cone::cone(string& data) :
 void cone::setDefaults() {
 	// define some basic values
 	divisions = 16;
-	physicsDriver = NULL;
 	flatShading = false;
 	smoothbounce = true;
 	pyramidStyle = false;
@@ -53,15 +52,29 @@ void cone::setDefaults() {
 
 	// make group and geodes
 	osg::Group* group = new osg::Group();
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < MaterialCount; i++) {
 		group->addChild( new osg::Geode() );
-	setThisNode( group );
 
-	// assign default textures
-	SceneBuilder::assignTexture( "boxwall", group->getChild( 0 ) );
-	SceneBuilder::assignTexture( "roof", group->getChild( 1 ) );
-	SceneBuilder::assignTexture( "wall", group->getChild( 2 ) );
-	SceneBuilder::assignTexture( "wall", group->getChild( 3 ) );
+		string texture;
+		if ( i == Edge ) {
+			texture = "boxwall";
+		}
+		else if ( i == Bottom ) {
+			texture = "roof";
+		}
+		else {
+			texture = "wall";
+		}
+
+		SceneBuilder::assignTexture( texture.c_str(), group->getChild( i ) );
+
+		MaterialSlot mslot;
+		mslot.defaultMaterial = group->getChild( i )->getStateSet();
+		mslot.node = group->getChild( i );
+		materialSlots[ string( sideNames[i] ) ] = mslot;
+	}
+
+	setThisNode( group );
 
 	// default size is 10x10x10
 	setSize( osg::Vec3( 10, 10, 10 ) );
@@ -92,30 +105,6 @@ int cone::update(string& data) {
 	}
 
 	const char* coneData = lines[0].c_str();
-
-	// get the matrefs
-	osg::Group* group = (osg::Group*)getThisNode();
-	for (int i = 0; i < MaterialCount; i++) {
-		vector<string> faces;
-		faces.push_back(sideNames[i]);
-
-		vector<string> matrefs = BZWParser::getValuesByKeyAndFaces("matref", faces, header, coneData);
-
-		if (matrefs.size() > 0) {
-			vector< material* > materials;
-			for (vector<string>::iterator itr = matrefs.begin(); itr != matrefs.end(); itr++) {
-				material* mat = (material*)Model::command( MODEL_GET, "material", *itr );
-				if (mat != NULL)
-					materials.push_back( mat );
-				else
-					printf("cone::update(): Error! Couldn't find material %s\n", (*itr).c_str());
-			}
-
-			material* finalMat = material::computeFinalMaterial(materials);
-
-			group->getChild(i)->setStateSet(finalMat);
-		}
-	}
 
 	// get the texsize
 	vector<string> texsizes = BZWParser::getValuesByKey("texsize", header, coneData);
