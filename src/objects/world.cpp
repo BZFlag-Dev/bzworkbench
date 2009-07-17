@@ -19,15 +19,6 @@ world::world() : DataEntry("world", "<name><size><flagHeight><noWalls>") {
 	flagHeight = 10.0f;
 }
 
-world::world(string& data) : DataEntry("world", "<name><size><flagHeight><noWalls>", data.c_str()) {
-	worldName = string("");
-	size = 400.0;
-	noWalls = false;
-	flagHeight = 10.0f;
-	
-	update(data);	
-}
-
 // send the data
 string world::get(void) {
 	return toString();
@@ -79,6 +70,15 @@ int world::update(string& data) {
 	noWalls = (noWallses.size() == 0 ? false : true);
 	
 	return 1;
+}
+
+// bzw methods
+bool world::parse( std::string& line ) {
+	return false;
+}
+
+void world::finalize() {
+
 }
 
 // toString method

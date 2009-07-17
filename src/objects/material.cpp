@@ -44,39 +44,11 @@ material::material() :
 	setEmissive( osg::Vec4( 1, 1, 1, 1) );
 }
 
-// constructor with data
-material::material(string& data) :
-	DataEntry("material", "<name><texture><addtexture><matref><notextures><notexcolor><notexalpha><texmat><dyncol><ambient><diffuse><color><specular><emission><shininess><resetmat><spheremap><noshadow><noculling><nosort><noradar><nolighting><groupalpha><occluder><alphathresh>", data.c_str()),
-	osg::StateSet() {
-	name = SceneBuilder::makeUniqueName("material");
-	dynCol = NULL;
-	color = string("");
-	textures = vector< TextureInfo >();
-	noTextures = true;
-	noRadar = noShadow = noCulling = noLighting = noSorting = groupAlpha = occluder = false;
-	alphaThreshold = 1.0f;
-
-	// allocate a material
-	osg::Material* finalMaterial = new osg::Material();
-	setAttribute( finalMaterial, osg::StateAttribute::ON  | osg::StateAttribute::OVERRIDE );
-
-	setAmbient( osg::Vec4( 1, 1, 1, 1) );
-	setDiffuse( osg::Vec4( 1, 1, 1, 1) );
-	setSpecular( osg::Vec4( 0, 0, 0, 1) );
-	setEmissive( osg::Vec4( 0, 0, 0, 1) );
-
-	// deactivate texturing
-	setTextureMode( 0, GL_TEXTURE_2D, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
-
-
-	update(data);
-}
-
 // getter
 string material::get(void) { return toString(); }
 
 // setter
-int material::update(string& data) {
+/*int material::update(string& data) {
 
 	const char* header = getHeader().c_str();
 
@@ -241,6 +213,119 @@ int material::update(string& data) {
 	computeFinalTexture();
 
 	return 1;
+}*/
+
+// bzw methods
+bool material::parse( std::string& line ) {
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	if ( key == "name") {
+		name = value;
+	}
+	else if ( key == "resetmat" ) {
+		reset();
+	}
+	else if ( key == "dyncol" ) { // get the dynamic color
+		dynamicColor* d = dynamic_cast<dynamicColor*>( Model::command( MODEL_GET, "dynamicColor", value ) );
+
+		if ( d != NULL ) {
+			dynCol = d;
+		}
+		else {
+			throw BZWReadError( this, string( "Couldn't find dynamic color, " ) + value );
+		}
+	}
+	else if ( key == "texmat" ) { // get the texture matrix
+		string value = BZWParser::value( "texmat", line.c_str() );
+		texturematrix* texmat = (texturematrix*)Model::command( MODEL_GET, "texturematrix", value);
+		if ( texmat != NULL)
+			setTextureMatrix( texmat );
+		else
+			throw BZWReadError( this, string( "Could not find texmat, " ) + value );
+	}
+	else if ( key == "color" || key == "diffuse" ) { // get the diffuse colors
+		setDiffuse( RGBA( value.c_str() ) );
+	}
+	else if ( key == "ambient" ) { // get the ambient colors
+		setAmbient( RGBA( value.c_str() ) );
+	}
+	else if ( key == "emission" ) { // get the emissive colors
+		setEmissive( RGBA( value.c_str() ) );
+	}
+	else if ( key == "specular" ) { // get the specular colors
+		setSpecular( RGBA( value.c_str() ) );
+	}
+	else if ( key == "shininess" ) { // get the specular colors
+		setShininess( atof( value.c_str() ) );
+	}
+	else if ( key == "texture" ) { // get the textures
+		setTexture( value );
+	}
+	else if ( key == "addtexture" ) { // get the addtextures
+		addTexture( value);
+	}
+	else if ( key == "notexture" ) { // get notextures
+		noTextures = true;
+	}
+	else if ( key == "notexcolor" ) { // get notexcolor
+		setNoTexColor( true );
+	}
+	else if ( key == "notexalpha" ) { // get notexalpha
+		setNoTexAlpha( true );
+	}
+	else if ( key == "spheremap" ) { // get spheremap
+		setSphereMap( true );
+	}
+	else if ( key == "noshadow" ) { // get noshadow
+		setNoShadows( true );
+	}
+	else if ( key == "noculling" ) { // get noculling
+		setNoCulling( true );
+	}
+	else if ( key == "nolighting" ) { // get nolighting
+		setNoLighting( true );
+	}
+	else if ( key == "nosorting" ) { // get nosorting
+		setNoSorting( true );
+	}
+	else if ( key == "noradar" ) { // get noradar
+		setNoRadar( true );
+	}
+	else if ( key == "groupalpha" ) { // get groupalpha
+		setGroupAlpha( true );
+	}
+	else if ( key == "occluder" ) { // get occluder
+		setOccluder( true );
+	}
+	else if ( key == "alphathresh" ) { // get alpha threshold
+		setAlphaThreshold( atof( value.c_str() ) );
+	}
+	else if ( key == "matref" ) {
+		// get the materials from the model
+		material* mat = (material*)Model::command( MODEL_GET, "material", value );
+		if( mat != NULL )
+			materials.push_back( mat );
+		else
+			throw BZWReadError( this, string( "Could not find matref, " ) + value );
+	}
+	else {
+		throw BZWReadError( this, string( "Unknown key, " ) + key );
+	}
+
+	return true;
+}
+
+void material::finalize() {
+	// compute the final material
+	computeFinalMaterial();
+
+	// compute the final texture
+	computeFinalTexture();
 }
 
 // tostring

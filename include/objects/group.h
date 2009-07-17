@@ -36,21 +36,18 @@ class group : public bz2object {
 	
 		// constructor
 		group();
-		
-		// constructor with data
-		group(string& data);
-		
+
 		static DataEntry* init() { return new group(); }
-		static DataEntry* init(string& data) { return new group(data); }
 		
 		// getter
 		string get(void);
 		
-		// setter
-		int update(string& data);
-		
 		// event handler
 		int update( UpdateMessage& msg);
+
+		// bzw methods
+		bool parse( std::string& line );
+		void finalize();
 		
 		// toString
 		string toString(void);

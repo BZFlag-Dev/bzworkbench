@@ -87,10 +87,13 @@ class BZWParser {
   static vector<string> getLineElements(const char* line, int count);
 
   // the big tamale: the top-level file loader
-  static vector<string> loadFile(const char* filename);
+  static bool loadFile(const char* filename);
 
   // get list of integers from a string
   static vector<int> getIntList( const char* line );
+
+  // remove whitespace from either side of a string (includes comments)
+  static std::string cutWhiteSpace(std::string line);
 
   // checks if a string is all whitespace
   static bool allWhitespace( const char* line );

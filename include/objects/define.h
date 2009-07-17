@@ -34,21 +34,18 @@ public:
 	// constructor
 	define();
 	
-	// constructor with data
-	define(string& data);
-	
 	// static constructor
 	static DataEntry* init() { return new define(); }
-	static DataEntry* init(string& data) { return new define(data); }
 	
 	// destructor
 	~define();
 	
 	// getter
 	string get(void);
-	
-	// setter
-	int update(string& data);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString
 	string toString(void);

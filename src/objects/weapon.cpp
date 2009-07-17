@@ -23,14 +23,6 @@ weapon::weapon() :
 	setDefaults();
 }
 
-// constructor with data
-weapon::weapon(string& data) :
-	bz2object("weapon", "<name><rotation><position><color><tilt><initdelay><delay><type><trigger><eventteam>", data.c_str()) {
-	setDefaults();
-
-	update(data);
-}
-
 void weapon::setDefaults() {
 	type = string("");
 	trigger = string("");
@@ -48,7 +40,7 @@ void weapon::setDefaults() {
 string weapon::get(void) { return toString(); }
 
 // setter
-int weapon::update(string& data) {
+/*int weapon::update(string& data) {
 	const char* header = getHeader().c_str();
 	
 	// get the chunk of data
@@ -167,6 +159,15 @@ int weapon::update(string& data) {
 	team = (colorVals.size() > 0 ? atoi( colorVals[0].c_str() ) : 0);
 	
 	return 1;
+}*/
+
+// bzw methods
+bool weapon::parse( std::string& line ) {
+	return false;
+}
+
+void weapon::finalize() {
+
 }
 
 // toString

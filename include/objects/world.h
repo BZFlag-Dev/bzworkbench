@@ -24,11 +24,7 @@ class world : public DataEntry {
 		// default constructor
 		world();
 		
-		// constructor with data
-		world(string& data);
-		
 		static DataEntry* init() { return new world(); }
-		static DataEntry* init(string& data) { return new world(data); }
 		
 		// send the data
 		string get(void);
@@ -38,6 +34,10 @@ class world : public DataEntry {
 		
 		// toString method
 		string toString(void);
+
+		// bzw methods
+		bool parse( std::string& line );
+		void finalize();
 		
 		// render method
 		int render(void);

@@ -24,19 +24,16 @@ public:
 	// default constructor
 	weapon();
 	
-	// constructor with data
-	weapon(string& data);
-	
 	static DataEntry* init() { return new weapon(); }
-	static DataEntry* init(string& data) { return new weapon(data); }
 	
 	void setDefaults();
 
 	// getter
 	string get(void);
-	
-	// setter
-	int update(string& data);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString
 	string toString(void);

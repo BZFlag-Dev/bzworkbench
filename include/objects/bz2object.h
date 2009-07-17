@@ -42,14 +42,8 @@ class bz2object : public Renderable, public DataEntry
 		// default constructor
 		bz2object(const char* name, const char* keys);
 
-		// constructor with data
-		bz2object(const char* name, const char* keys, const char* data);
-
 		// constructor with node
 		bz2object( const char* name, const char* keys, osg::Node* node );
-
-		// constructor with node and data
-		bz2object( const char* name, const char* keys, const char* data, osg::Node* node );
 
 		// destructor
 		virtual ~bz2object() { }
@@ -57,11 +51,14 @@ class bz2object : public Renderable, public DataEntry
 		// getter
 		string get(void);
 
-		// setter
-		virtual int update(string& data);
-
 		// specific update message
 		virtual int update(UpdateMessage& msg);
+
+		// parse a single bzw line
+		virtual bool parse( std::string& line );
+
+		// called after done parsing to finalize the changes
+		virtual void finalize();
 
 		// toString
 		virtual string toString(void);
@@ -86,9 +83,7 @@ class bz2object : public Renderable, public DataEntry
 
 		// use this instead of setPosition()
 		virtual void setPos( const osg::Vec3d& newPos ) {
-			startShift->setData( -newPos );
 			setPosition( newPos );
-			endShift->setData( newPos );
 		}
 
 		// use this instead of setScale()
@@ -99,50 +94,20 @@ class bz2object : public Renderable, public DataEntry
 
 		// override Renderable's setRotationX() method
 		virtual void setRotationX( float x ) {
-			Renderable::setRotationX( x );
-			// rotation.set( x, rotation.y(), rotation.z() );
-
-			vector<float> spinData;
-			spinData.push_back( x );	spinData.push_back(1.0);	spinData.push_back(0.0);	spinData.push_back(0.0);
-			spin_x->setData( spinData );
+			return; // x rotation should only be done with transforms
 		}
 
 		// override Renderable's setRotationY() method
 		virtual void setRotationY( float y ) {
-			Renderable::setRotationY( y );
-			// rotation.set( rotation.x(), y, rotation.z() );
-
-			vector<float> spinData;
-			spinData.push_back( y );	spinData.push_back(0.0);	spinData.push_back(1.0);	spinData.push_back(0.0);
-			spin_y->setData( spinData );
-		}
-
-		// override Renderable's setRotationZ() method
-		virtual void setRotationZ( float z ) {
-			Renderable::setRotationZ( z );
-			// rotation.set( rotation.x(), rotation.y(), z );
-
-			vector<float> spinData;
-			spinData.push_back( z );	spinData.push_back(0.0);	spinData.push_back(0.0);	spinData.push_back(1.0);
-
-			spin_z->setData( spinData );
+			return; // y rotation should only be done with transforms
 		}
 
 		// override Renderable's setRotation() method
 		virtual void setRotation( float x, float y, float z ) {
-			Renderable::setRotation( x, y, z );
-			// rotation.set( x, y, z );
-
-			vector<float> spinData_x, spinData_y, spinData_z;
-			spinData_x.push_back(x);	spinData_x.push_back(1.0);	spinData_x.push_back(0.0);	spinData_x.push_back(0.0);
-			spinData_y.push_back(y);	spinData_y.push_back(0.0);	spinData_y.push_back(1.0);	spinData_y.push_back(0.0);
-			spinData_z.push_back(z);	spinData_z.push_back(0.0);	spinData_z.push_back(0.0);	spinData_z.push_back(1.0);
-
-			spin_x->setData( spinData_x );
-			spin_y->setData( spinData_y );
-			spin_z->setData( spinData_z );
+			// only set z rotation, other rotation should be done with a transform
+			Renderable::setRotation( 0, 0, z );
 		}
-		virtual void setRotation( const osg::Vec3& rot ) { setRotation( rot.x(), rot.y(), rot.z() ); }
+		virtual void setRotation( const osg::Vec3& rot ) { setRotation( 0, 0, rot.z() ); }
 
 		// data setters (makes MasterConfigurationDialog code easier)
 		void setPhyDrv( physics* phydrv, std::string slot = "" ) { physicsSlots[ slot ].phydrv = phydrv; }
@@ -153,9 +118,16 @@ class bz2object : public Renderable, public DataEntry
 		// set/set the thisNode
 		osg::Node* getThisNode() { return thisNode.get(); }
 		void setThisNode( osg::Node* node ) {
-			endShift->removeChild( thisNode.get() );
-			thisNode = node;
-			endShift->addChild( thisNode.get() );
+			if ( transformations.size() > 0 ) {
+				transformations[ transformations.size() - 1 ]->removeChild( thisNode.get() );
+				thisNode = node;
+				transformations[ transformations.size() - 1 ]->addChild( thisNode.get() );
+			}
+			else {
+				this->removeChild( thisNode.get() );
+				thisNode = node;
+				this->addChild( thisNode.get() );
+			}
 		}
 
 		// make this public
@@ -222,8 +194,8 @@ class bz2object : public Renderable, public DataEntry
 		void setScale( const osg::Vec3d& newScale ) { Renderable::setScale( newScale ); }
 		void setAttitude( const osg::Quat& newAttitude ) { Renderable::setAttitude( newAttitude ); }
 
-		// start and end shift transformations (manditory), as well as angular orientation transformations
-		osg::ref_ptr< BZTransform > startShift, endShift, spin_x, spin_y, spin_z;
+		// only used when parsing bzw
+		vector< osg::ref_ptr< BZTransform > > newTransformations;
 
 		// recompute the transformation stack
 		void recomputeTransformations( vector< osg::ref_ptr< BZTransform > >* newTransformations);

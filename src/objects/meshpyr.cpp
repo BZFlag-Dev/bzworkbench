@@ -21,13 +21,6 @@ meshpyr::meshpyr() {
 	setDefaults();
 }
 
-// constructor with data
-meshpyr::meshpyr(string& data) {
-	setDefaults();
-
-	update(data);
-}
-
 void meshpyr::setDefaults() {
 	// set the header
 	setHeader( "meshpyr" );

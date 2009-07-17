@@ -28,11 +28,7 @@ public:
 	// constructor
 	base();
 
-	// constructor with data
-	base(string& data);
-
 	static DataEntry* init() { return new base(); }
-	static DataEntry* init(string& data) { return new base(data); }
 
 	// restore default values
 	void setDefaults();
@@ -40,8 +36,9 @@ public:
 	// getter
 	string get(void);
 
-	// setter
-	int update(string& data);
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// event handler
 	int update( UpdateMessage& msg );

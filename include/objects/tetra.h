@@ -21,17 +21,14 @@ public:
 	// no arg constructor
 	tetra();
 	
-	// data constructor
-	tetra(string& data);
-	
 	static DataEntry* init() { return new tetra(); }
-	static DataEntry* init(string& data) { return new tetra(data); }
 	
 	// getter
 	string get(void);
-	
-	// setter
-	int update(string& data);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// tostring
 	string toString(void);

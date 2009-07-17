@@ -23,13 +23,6 @@ meshbox::meshbox() {
 	setDefaults();
 }
 
-// construct a box from data
-meshbox::meshbox(string& data) {
-	setDefaults();
-
-	update(data);
-}
-
 void meshbox::setDefaults() {
 	// set the header
 	setHeader( "meshbox" );

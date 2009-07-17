@@ -18,14 +18,6 @@ waterLevel::waterLevel() : DataEntry("waterLevel", "<name><height><matref>") {
 	height = -1.0f;
 }
 
-waterLevel::waterLevel(string& data) : DataEntry("waterLevel", "<name><height><matref>", data.c_str()) {
-	name = string("");
-	material = string("");
-	height = -1.0f;
-	
-	update(data);
-}
-
 // get method
 string waterLevel::get(void) {
 	return toString();
@@ -78,6 +70,15 @@ int waterLevel::update(string& data) {
 	
 	return 1;
 	
+}
+
+// bzw methods
+bool waterLevel::parse( std::string& line ) {
+	return false;
+}
+
+void waterLevel::finalize() {
+
 }
 
 // toString method

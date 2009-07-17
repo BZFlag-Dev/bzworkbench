@@ -19,8 +19,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class arc : public bz2object {
 
 public:
@@ -36,10 +34,10 @@ public:
 
 	arc();
 	
-	arc(string& data);
+	arc(std::string& data);
 	
 	static DataEntry* init() { return new arc(); }
-	static DataEntry* init(string& data) { return new arc(data); }
+	static DataEntry* init(std::string& data) { return new arc(data); }
 	
 	virtual void setDefaults();
 
@@ -47,9 +45,12 @@ public:
 	string get(void);
 	
 	// setter
-	int update(string& data);
 	int update(UpdateMessage& message);
-	
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
+
 	// toString
 	string toString(void);
 	

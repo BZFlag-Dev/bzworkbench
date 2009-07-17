@@ -24,18 +24,6 @@ teleporter::teleporter() :
 	updateGeometry();
 }
 
-// constructor with data
-teleporter::teleporter(string& data) :	// don't pass the data to the parent class (this prevents super-sized teleporters)
-	bz2object("teleporter", "<position><size><rotation><name><border>") {
-
-	setDefaults();
-
-	update( data );
-
-	// make sure geometry is built
-	updateGeometry();
-}
-
 void teleporter::setDefaults() {
 	osg::Group* teleporter = new osg::Group();
 	osg::Geode* portal = new osg::Geode();
@@ -60,7 +48,7 @@ void teleporter::setDefaults() {
 string teleporter::get(void) {  return toString(); }
 
 // setter
-int teleporter::update(string& data) {
+/*int teleporter::update(string& data) {
 	// get header
 	const char* header = getHeader().c_str();
 
@@ -106,7 +94,7 @@ int teleporter::update(string& data) {
 	setBorder( (borders.size() != 0 ? atof( borders[0].c_str() ) : 0.0f) );
 
 	return 1;
-}
+}*/
 
 // update with binary message
 int teleporter::update( UpdateMessage& message ) {
@@ -144,6 +132,36 @@ int teleporter::update( UpdateMessage& message ) {
 	}
 
 	return 1;
+}
+
+// bzw methods
+bool teleporter::parse( std::string& line ) {
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	// parse keys
+	if ( key == "teleporter" ) {
+		Object::setName( value );
+	}
+	else if ( key == "border" ) {
+		border = atof( value.c_str() );
+	}
+	else if ( key == "size" ) {
+		realSize = Point3D( value.c_str() );
+	}
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
+}
+
+void teleporter::finalize() {
+	updateGeometry();
 }
 
 // tostring

@@ -18,19 +18,11 @@ tetra::tetra() : bz2object("tetra", "<name><vertex><scale><shift><shear><spin><m
 		vertexes[i] = Point3D(0.0f, 0.0f, 0.0f);
 }
 
-// data constructor
-tetra::tetra(string& data) : bz2object("tetra", "<name><vertex><scale><shift><shear><spin><matref>", data.c_str()) {
-	for(int i = 0; i < 4; i++)
-		vertexes[i] = Point3D(0.0f, 0.0f, 0.0f);
-		
-	update(data);
-}
-
 // getter
 string tetra::get(void) { return toString(); }
 
 // setter
-int tetra::update(string& data) {
+/*int tetra::update(string& data) {
 	const char* header = getHeader().c_str();
 	
 	// get the sections
@@ -63,6 +55,15 @@ int tetra::update(string& data) {
 	}
 	
 	return 1;
+}*/
+
+// bzw methods
+bool tetra::parse( std::string& line ) {
+	return false;
+}
+
+void tetra::finalize() {
+
 }
 
 // tostring

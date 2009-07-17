@@ -33,14 +33,6 @@ cone::cone() :
 	setDefaults();
 }
 
-// constructor with data
-cone::cone(string& data) :
-	bz2object("cone", "<position><rotation><size><angle><flatshading><name><texsize><flipz><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref>") {
-	setDefaults();
-
-	update(data);
-}
-
 void cone::setDefaults() {
 	// define some basic values
 	divisions = 16;
@@ -87,7 +79,7 @@ void cone::setDefaults() {
 string cone::get(void) { return toString(); }
 
 // setter
-int cone::update(string& data) {
+/*int cone::update(string& data) {
 	const char* header = getHeader().c_str();
 	// get the chunk we need
 	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str(), "end");
@@ -167,6 +159,43 @@ int cone::update(string& data) {
 	smoothbounce = (smoothBounces.size() == 0 ? false : true);
 
 	return 1;
+}*/
+
+// bzw methods
+bool cone::parse( std::string& line ) {
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	// parse keys
+	if ( key == "texsize" ) {
+		texsize = Point2D( value.c_str() );
+	}
+	else if ( key == "divisions" ) {
+		divisions = atof( value.c_str() );
+	}
+	else if ( key == "angle" ) {
+		sweepAngle = atof( value.c_str() );
+	}
+	else if ( key == "flatshading" ) {
+		flatShading = true;
+	}
+	else if ( key == "smoothbounce" ) {
+		smoothbounce = true;
+	}
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
+}
+
+void cone::finalize() {
+	updateShadeModel();
+	buildGeometry();
 }
 
 // event handler

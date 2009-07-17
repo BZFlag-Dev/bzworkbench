@@ -40,17 +40,14 @@ public:
 	// default constructor
 	material();
 
-	// constructor with data
-	material(string& data);
-
 	static DataEntry* init() { return new material(); }
-	static DataEntry* init(string& data) { return new material(data); }
 
 	// getter
 	string get(void);
 
-	// setter
-	int update(string& data);
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// tostring
 	string toString(void);

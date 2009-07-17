@@ -17,16 +17,13 @@ options::options() : DataEntry("options", "") {
 	optionsString = string("");
 }
 
-// constructor with data
-options::options(string& data) : DataEntry("options", "", data.c_str()) { update(data); }
-
 // get method
 string options::get(void) {
 	return toString();
 }
 
 // update method
-int options::update(string& data) {
+/*int options::update(string& data) {
 	
 	const char* header = getHeader().c_str();
 	// get options objects
@@ -52,6 +49,15 @@ int options::update(string& data) {
 	
 	return (DataEntry::update(data));
 	
+}*/
+
+// bzw methods
+bool options::parse( std::string& line ) {
+	return false;
+}
+
+void options::finalize() {
+
 }
 
 // toString method

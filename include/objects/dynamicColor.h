@@ -23,17 +23,14 @@ public:
 	// default constructor
 	dynamicColor();
 
-	// constructor with data
-	dynamicColor(string& data);
-
 	static DataEntry* init() { return new dynamicColor(); }
-	static DataEntry* init(string& data) { return new dynamicColor(data); }
 
 	// getter
 	string get(void);
 
-	// setter
-	int update(string& data);
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// toString
 	string toString(void);

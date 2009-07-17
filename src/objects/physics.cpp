@@ -47,24 +47,11 @@ physics::physics( const osg::Referenced& ref ) :
 	angular = Point3D(0.0f, 0.0f, 0.0f);
 }
 
-// constructor with string data
-physics::physics(string& data) :
-	DataEntry("physics", "<name><linear><angular><slide><death>", data.c_str()),
-	osg::Referenced() {
-	name = SceneBuilder::makeUniqueName( "physics" );
-	deathMessage = string("");
-	slide = 0.0f;
-	linear = Point3D(0.0f, 0.0f, 0.0f);
-	angular = Point3D(0.0f, 0.0f, 0.0f);
-
-	update(data);
-}
-
 // getter
 string physics::get(void) { return toString(); }
 
 // setter
-int physics::update(string& data) {
+/*int physics::update(string& data) {
 
 	const char* header = getHeader().c_str();
 
@@ -108,6 +95,15 @@ int physics::update(string& data) {
 		deathMessage = deathMessages[0];
 
 	return 1;
+}*/
+
+// bzw methods
+bool physics::parse( std::string& line ) {
+	return false;
+}
+
+void physics::finalize() {
+
 }
 
 // toString

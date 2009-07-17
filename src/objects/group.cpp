@@ -28,30 +28,13 @@ group::group() :
 	this->geoRing = NULL;
 }
 
-// constructor with data
-group::group(string& data) : 
-	bz2object("group", "<shift><shear><scale><spin><team><tint><drivethrough><shootthrough><phydrv><matref>", data.c_str()) {
-	this->team = 0;
-	this->def = NULL;
-	this->tintColor = RGBA(1, 1, 1, 1);
-	this->driveThrough = false;
-	this->shootThrough = false;
-	this->setName("");
-	this->setPos( osg::Vec3( 0.0, 0.0, 0.0 ) );
-	
-	this->container = new Renderable();
-	this->geoRing = NULL;
-	
-	this->update(data);
-}
-
 // getter
 string group::get(void) {
 	return this->toString(); 
 }
 
 // setter
-int group::update(string& data) {
+/*int group::update(string& data) {
 	const char* header = this->getHeader().c_str();
 	
 	// get the section from the data
@@ -114,7 +97,7 @@ int group::update(string& data) {
 	
 	return 1;
 	
-}
+}*/
 
 // event handler
 int group::update( UpdateMessage& message ) {
@@ -174,6 +157,15 @@ int group::update( UpdateMessage& message ) {
 	}
 	
 	return 1;	
+}
+
+// bzw methods
+bool group::parse( std::string& line ) {
+	return false;
+}
+
+void group::finalize() {
+
 }
 
 // toString

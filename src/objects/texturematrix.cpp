@@ -31,23 +31,6 @@ texturematrix::texturematrix() :
 	spin = 0.0f;
 }
 
-// constructor with data
-texturematrix::texturematrix(string& data) :
-	DataEntry("texturematrix", "<name><scale><spin><shift><center><fixedscale><fixedspin><fixedshift><fixedcenter>", data.c_str()) {
-
-	name = SceneBuilder::makeUniqueName("texturematrix");
-	fixedSpin = 0.0f;
-	texCenter = TexCoord2D();
-	texFixedScale = TexCoord2D();
-	texFixedShift = TexCoord2D();
-	texFreq = TexCoord2D();
-	texScale = TexCoord2D();
-	texShift = TexCoord2D();
-	spin = 0.0f;
-
-	update( data );
-}
-
 // getter
 string texturematrix::get(void) { return toString(); }
 
@@ -135,6 +118,15 @@ int texturematrix::update(string& data) {
 	fixedSpin = atof( fixedSpins[0].c_str() );
 
 	return 1;
+}
+
+// bzw methods
+bool texturematrix::parse( std::string& line ) {
+	return false;
+}
+
+void texturematrix::finalize() {
+
 }
 
 // toString

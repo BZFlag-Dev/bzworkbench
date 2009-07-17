@@ -21,17 +21,14 @@ public:
 	// default constructor
 	info();
 
-	// constructor with data
-	info(string& data);
-
 	static DataEntry* init() { return new info(); }
-	static DataEntry* init(string& data) { return new info(data); }
 
 	// getter
 	string get(void);
 
-	// setter
-	int update(string& data);
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// toString
 	string toString(void);

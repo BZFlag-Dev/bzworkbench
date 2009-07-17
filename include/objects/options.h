@@ -24,17 +24,14 @@ public:
 	// default constructor
 	options();
 	
-	// constructor with data
-	options(string& data);
-	
 	static DataEntry* init() { return new options(); }
-	static DataEntry* init(string& data) { return new options(data); }
-	
+
 	// get method
 	string get(void);
-	
-	// update method
-	int update(string& data);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString method
 	string toString(void);

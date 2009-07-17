@@ -26,19 +26,6 @@ dynamicColor::dynamicColor() :
 	alphaCommands = vector<ColorCommand>();
 }
 
-// constructor with data
-dynamicColor::dynamicColor(string& data) :
-	DataEntry("dynamicColor", "<red><green><blue><alpha><name>", data.c_str()) {
-
-	name = SceneBuilder::makeUniqueName( "dynamicColor" );
-	redCommands = vector<ColorCommand>();
-	greenCommands = vector<ColorCommand>();
-	blueCommands = vector<ColorCommand>();
-	alphaCommands = vector<ColorCommand>();
-
-	update(data);
-}
-
 // getter
 string dynamicColor::get(void) { return toString(); }
 
@@ -100,7 +87,7 @@ string stringifyCommands(vector<ColorCommand>& commands, const char* color) {
 }
 
 // setter
-int dynamicColor::update(string& data) {
+/*int dynamicColor::update(string& data) {
 	const char* header = getHeader().c_str();
 
 	// get the section
@@ -151,6 +138,15 @@ int dynamicColor::update(string& data) {
 		name = names[0];
 
 	return 1;
+}*/
+
+// bzw methods
+bool dynamicColor::parse( std::string& line ) {
+	return false;
+}
+
+void dynamicColor::finalize() {
+
 }
 
 // toString

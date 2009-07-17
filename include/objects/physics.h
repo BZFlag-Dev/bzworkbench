@@ -31,17 +31,14 @@ public:
 	physics( bool threadSafe );
 	physics( const osg::Referenced& ref );
 
-	// constructor with data
-	physics(std::string& data);
-
 	static DataEntry* init() { return new physics(); }
-	static DataEntry* init(std::string& data) { return new physics(data); }
 
 	// getter
 	std::string get(void);
 
-	// setter
-	int update(std::string& data);
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// toString
 	std::string toString(void);

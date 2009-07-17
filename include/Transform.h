@@ -33,6 +33,7 @@ class BZTransform : public DataEntry, public osg::MatrixTransform {
 			this->name = string("");
 			this->data = vector<float>();
 			this->useThis = true;
+			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
 		}
 
 		BZTransform(string& _data) : DataEntry("", ""), osg::MatrixTransform() {
@@ -40,6 +41,7 @@ class BZTransform : public DataEntry, public osg::MatrixTransform {
 			this->data = vector<float>();
 			this->useThis = true;
 			this->update(_data);
+			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
 		}
 
 		BZTransform( string _name, vector<float> _data ) : DataEntry("", ""), osg::MatrixTransform() {
@@ -47,6 +49,7 @@ class BZTransform : public DataEntry, public osg::MatrixTransform {
 			this->data = _data;
 			this->useThis = true;
 			this->refreshMatrix();
+			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
 		}
 
 		BZTransform( string _name, float n1, float n2, float n3, float n4 ) : DataEntry("", ""), osg::MatrixTransform() {
@@ -58,6 +61,7 @@ class BZTransform : public DataEntry, public osg::MatrixTransform {
 			this->data.push_back(n3);
 			this->data.push_back(n4);
 			this->refreshMatrix();
+			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
 		}
 
 		// getter

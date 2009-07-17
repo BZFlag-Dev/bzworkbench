@@ -234,193 +234,183 @@ DataEntry* Model::_command(const string& _command, const string& object, const s
 }
 
 // the static build method
-bool Model::build(vector<string>& bzworld) { return modRef->_build(bzworld); }
+bool Model::build( std::istream& data ) { return modRef->_build(data); }
 
-// the real build method
-bool Model::_build(vector<string>& bzworld) {
+bool Model::_build( std::istream& data ) {
+	clear();
 
-	// don't bother for empty vectors
-	if(bzworld.size() == 0)
-		return false;
-
-	// clear out the previous objects
-	this->materials.clear();
-	this->phys.clear();
-	this->dynamicColors.clear();
-	this->links.clear();
-	this->textureMatrices.clear();
-	this->_unselectAll();
-	if( this->objects.size() > 0 ) {
-		objRefList::iterator itr = this->objects.begin();
-		while( itr != this->objects.end() ) {
-
-			ObserverMessage obs( ObserverMessage::REMOVE_OBJECT, itr->get() );
-			notifyObservers( &obs );
-
-			this->objects.erase( itr );
-			itr = this->objects.begin();
-
-		}
-	}
-	this->objects.clear();
-	this->notifyObservers( NULL );
-
-	// load the data in
+	string buff, header;
 	bool foundWorld = false;
-	for(vector<string>::iterator i = bzworld.begin(); i != bzworld.end(); i++) {
-		string header = BZWParser::headerOf(i->c_str());
-		if(header == "world") {
-			if(this->cmap.count(header) > 0) {
-				this->worldData->update(*i);
-				foundWorld = true;		// there must be a world
-				// tell the observers we have a different world
-				ObserverMessage obs( ObserverMessage::UPDATE_WORLD, worldData );
-				this->notifyObservers( &obs );
-				continue;
-			}
-			else {
-				printf("Model::build(world): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
+	int lineCount = 0;
 
-		// parse waterLevel
-		else if(header == "waterLevel") {
-			if(this->cmap.count(header) > 0) {
-				this->waterLevelData->update(*i);
-				// tell the observers we have a different world
-				ObserverMessage obs( ObserverMessage::UPDATE_WORLD, worldData );
-				this->notifyObservers( &obs );
-				continue;
-			}
-			else {
-				printf("Model::build(waterLevel): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
+	world* worldObj = NULL;
+	waterLevel* waterLevelObj = NULL;
+	options* optionsObj = NULL;
+	info* infoObj = NULL;
+	material* materialObj = NULL;
+	physics* physicsObj = NULL;
+	dynamicColor* dyncolObj = NULL;
+	define* defineObj = NULL;
+	Tlink* linkObj = NULL;
+	texturematrix* texmatObj = NULL;
+	bz2object* object = NULL;
 
-		// parse options
-		else if(header == "options") {
-			if(this->cmap.count(header) > 0) {
-				this->optionsData->update(*i);
-				continue;
-			}
-			else {
-				printf("Model::build(options): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
+	while(!data.eof()) {
+		// read in lines until we find a key
+		getline( data, buff );
 
-		// parse info
-		else if(header == "info") {
-			if(this->cmap.count(header) > 0) {
-				this->infoData->update(*i);
-				continue;
-			}
-			else {
-				printf("Model::build(options): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
+		lineCount++;
+		buff = BZWParser::cutWhiteSpace( buff );
+		header = BZWParser::key( buff.c_str() );
+		
 
-		// parse materials
-		else if(header == "material") {
-			if(this->cmap.count(header) > 0) {
-				material* mat = ((material*)this->cmap[header](*i));
-				if( mat ) {
-					this->materials[ mat->getName() ] = mat;
+		try {
+			if ( header == "" )
+				continue; // if the line is blank move to the next one
+
+			// first check if we are currently parsing an object
+			else if ( worldObj ) {
+				if ( !worldObj->parse( buff ) ) {
+					worldObj->finalize();
+					this->worldData = worldObj;
+					foundWorld = true;		// there must be a world
+					worldObj = NULL;
+
+					// tell the observers we have a different world
+					ObserverMessage obs( ObserverMessage::UPDATE_WORLD, worldData );
+					this->notifyObservers( &obs );
 				}
 			}
-			else {
-				printf("Model::build(material): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
+			else if ( waterLevelObj ) {
+				if ( !waterLevelObj->parse( buff ) ) {
+					waterLevelObj->finalize();
+					this->waterLevelData = waterLevelObj;
+					waterLevelObj = NULL;
 
-		// parse physics
-		else if(header == "physics") {
-			if(this->cmap.count(header) > 0) {
-				physics* p = (physics*)this->cmap[header](*i);
-				if( p ) {
-					this->phys[ p->getName() ] = p;
+					// tell the observers we have a different world
+					ObserverMessage obs( ObserverMessage::UPDATE_WORLD, worldData );
+					this->notifyObservers( &obs );
 				}
 			}
-			else {
-				printf("Model::build(physics): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
-
-		// parse dynamicColors
-		else if(header == "dynamicColor") {
-			if(this->cmap.count(header) > 0) {
-				dynamicColor* dynCol = (dynamicColor*)this->cmap[header](*i);
-				if( dynCol ) {
-					this->dynamicColors[ dynCol->getName() ] = dynCol;
+			else if ( optionsObj ) {
+				if ( !optionsObj->parse( buff ) ) {
+					optionsObj->finalize();
+					this->optionsData = optionsObj;
+					optionsObj = NULL;
 				}
 			}
-			else {
-				printf("Model::build(dynamicColor): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
-
-		// parse group definitions
-		else if(header == "define") {
-			if(this->cmap.count(header) > 0) {
-				define* def = (define*)this->cmap[header](*i);
-				if( def ) {
-					this->groups[ def->getName() ] = def;
+			else if ( infoObj ) {
+				if ( !infoObj->parse( buff ) ) {
+					infoObj->finalize();
+					this->infoData = infoObj;
+					infoObj = NULL;
 				}
 			}
-			else {
-				printf("Model::build(define): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
-
-		// parse links
-		else if(header == "link") {
-			if(this->cmap.count(header) > 0) {
-				Tlink* link = (Tlink*)this->cmap[header](*i);
-				if( link ) {
-					this->links[ link->getName() ] = link;
+			else if ( materialObj ) {
+				if ( !materialObj->parse( buff ) ) {
+					materialObj->finalize();
+					this->materials[ materialObj->getName() ] = materialObj;
+					materialObj = NULL;
 				}
 			}
-			else {
-				printf("Model::build(link): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
-			}
-		}
-
-		// parse texturematrices
-		else if(header == "texturematrix") {
-			if(this->cmap.count(header) > 0) {
-				texturematrix* tm = (texturematrix*)this->cmap[header](*i);
-				if( tm ) {
-					this->textureMatrices[ tm->getName() ] = tm;
+			else if ( physicsObj ) {
+				if ( !physicsObj->parse( buff ) ) {
+					physicsObj->finalize();
+					this->phys[ physicsObj->getName() ] = physicsObj;
+					physicsObj = NULL;
 				}
 			}
+			else if ( dyncolObj ) {
+				if ( !dyncolObj->parse( buff ) ) {
+					dyncolObj->finalize();
+					this->dynamicColors[ dyncolObj->getName() ] = dyncolObj;
+					dyncolObj = NULL;
+				}
+			}
+			else if ( defineObj ) {
+				if ( !defineObj->parse( buff ) ) {
+					defineObj->finalize();
+					this->groups[ defineObj->getName() ] = defineObj;
+					defineObj = NULL;
+				}
+			}
+			else if ( linkObj ) {
+				if ( !linkObj->parse( buff ) ) {
+					linkObj->finalize();
+					this->links[ linkObj->getName() ] = linkObj;
+					linkObj = NULL;
+				}
+			}
+			else if ( texmatObj ) {
+				if ( !texmatObj->parse( buff ) ) {
+					texmatObj->finalize();
+					this->textureMatrices[ texmatObj->getName() ] = texmatObj;
+					texmatObj = NULL;
+				}
+			}
+			else if ( object ) {
+				if ( !object->parse( buff ) ) {
+					object->finalize();
+					_addObject( object );
+					object = NULL;
+				}
+			}
+
+			// find what object to parse based on its header
+			else if( header == "world" ) {
+				worldObj = (world*)this->cmap["world"]();
+			}
+			else if( header == "waterLevel" ) {
+				waterLevelObj = (waterLevel*)this->cmap["waterLevel"]();
+			}
+			else if( header == "options" ) {
+				optionsObj = (options*)this->cmap["options"]();
+			}
+			else if( header == "info" ) {
+				infoObj = (info*)this->cmap["info"]();
+			}
+			else if( header == "material" ) {
+				materialObj = (material*)this->cmap["material"]();
+			}
+			else if( header == "physics" ) {
+				physicsObj = (physics*)this->cmap["physics"]();
+			}
+			else if( header == "dynamicColor" ) {
+				dyncolObj = (dynamicColor*)this->cmap["dynamicColor"]();
+			}
+			else if( header == "define" ) {
+				defineObj = (define*)this->cmap["define"]();
+			}
+			else if( header == "link" ) {
+				linkObj = (Tlink*)this->cmap["link"]();
+			}
+			else if( header == "texturematrix" ) {
+				texmatObj = (texturematrix*)this->cmap["texturematrix"]();
+			}
+			// teleporter is a special case object since the name can be in the title
+			// so we need to make sure it gets parsed
+			else if ( header == "teleporter" ) {
+				object = (bz2object*)cmap[buff]();
+				object->parse( buff );
+			}
 			else {
-				printf("Model::build(texturematrix): Skipping undefined object \"%s\"\n", header.c_str());
-				this->unusedData.push_back(*i);
+				if( this->cmap.count(buff) > 0 ) {
+					object = (bz2object*)cmap[buff]();
+				}
+				else {
+					printf("Model::build(): Skipping undefined object \"%s\"\n", buff.c_str());
+					//this->unusedData.push_back( buff );
+				}
 			}
 		}
-
-		// parse all other objects
-		else {
-			if(this->cmap.count(header) > 0) {
-				this->_addObject((bz2object*)cmap[header](*i));
-			}
-			else {
-				printf("Model::build(): Skipping undefined object \"%s\"\n", header.c_str());
-				printf("data: \n%s\n", i->c_str());
-				this->unusedData.push_back(*i);
-			}
+		catch ( BZWReadError err ) { // catch any read errors
+			// TODO: add error stuff
+			return false;
 		}
 	}
-	// if there's no world, then there's no level
-	if(!foundWorld)
+
+	// need a world
+	if (!foundWorld)
 		return false;
 
 	return true;
@@ -439,15 +429,15 @@ info* Model::getInfoData() { return modRef->_getInfoData(); }
  * (usually, this is the static init() method in the built-in objects).
  * Returns true of the object was added; false if there's something already registered with that name
  */
-bool Model::registerObject(string& name, DataEntry* (*init)(string&)) { return modRef->_registerObject(name, init); }
-bool Model::registerObject(const char* name, const char* hierarchy, const char* terminator, DataEntry* (*init)(string&), ConfigurationDialog* (*config)(DataEntry*))
+bool Model::registerObject(string& name, DataEntry* (*init)()) { return modRef->_registerObject(name, init); }
+bool Model::registerObject(const char* name, const char* hierarchy, const char* terminator, DataEntry* (*init)(), ConfigurationDialog* (*config)(DataEntry*))
 	{ return modRef->_registerObject(name, hierarchy, terminator, init, config); }
 
-bool Model::_registerObject(string& name, DataEntry* (*init)(string&)) {
+bool Model::_registerObject(string& name, DataEntry* (*init)()) {
 	return this->_registerObject( name.c_str(), "", "end", init, NULL);
 }
 
-bool Model::_registerObject(const char* _name, const char* _hierarchy, const char* _terminator, DataEntry* (*init)(string&), ConfigurationDialog* (*config)(DataEntry*)) {
+bool Model::_registerObject(const char* _name, const char* _hierarchy, const char* _terminator, DataEntry* (*init)(), ConfigurationDialog* (*config)(DataEntry*)) {
 	// catch NULLs
 	if(_name == NULL)
 		return false;
@@ -951,8 +941,7 @@ DataEntry* Model::_buildObject( const char* header ) {
 	if( this->cmap.find( name ) == this->cmap.end() )
 		return NULL;
 
-	string blank = "";
-	return this->cmap[name](blank);
+	return this->cmap[name]();
 }
 
 // cut objects from the scene
@@ -996,7 +985,7 @@ bool Model::_copySelection() {
 // paste the objectBuffer to the scene
 bool Model::pasteSelection() { return modRef->_pasteSelection(); }
 bool Model::_pasteSelection() {
-	if( this->objectBuffer.size() <= 0)
+	/*if( this->objectBuffer.size() <= 0)
 		return false;
 
 
@@ -1021,7 +1010,8 @@ bool Model::_pasteSelection() {
 
 	this->notifyObservers(NULL);
 
-	return true;
+	return true;*/
+	return false;
 }
 
 // delete a selection
@@ -1050,19 +1040,18 @@ bool Model::_deleteSelection() {
 // make a new world
 bool Model::newWorld() { return modRef->_newWorld(); }
 bool Model::_newWorld() {
-	// make a fake list of world objects (to be fed to Model::build() )
-	vector< string > theNewWorld = vector< string >();
-
 	// add a default new "options" object
-	options newOptions = options();
-	theNewWorld.push_back( newOptions.toString() );
+	options* newOptions = new options();
 
 	// add a default new "world" object
-	world _newWorld = world();
-	theNewWorld.push_back( _newWorld.toString() );
+	world* _newWorld = new world();
 
-	// build a blank world
-	this->_build( theNewWorld );
+	// clear previous objects
+	clear();
+
+	// set new world data
+	this->optionsData = newOptions;
+	this->worldData = _newWorld;
 
 	return true;
 }
@@ -1452,4 +1441,28 @@ void Model::_ungroupObjects( group* g ) {
 		this->groups.erase( g->getDefine()->getName() );
 	}
 
+}
+
+void Model::clear() {
+	// clear out the previous objects
+	this->materials.clear();
+	this->phys.clear();
+	this->dynamicColors.clear();
+	this->links.clear();
+	this->textureMatrices.clear();
+	this->_unselectAll();
+	if( this->objects.size() > 0 ) {
+		objRefList::iterator itr = this->objects.begin();
+		while( itr != this->objects.end() ) {
+
+			ObserverMessage obs( ObserverMessage::REMOVE_OBJECT, itr->get() );
+			notifyObservers( &obs );
+
+			this->objects.erase( itr );
+			itr = this->objects.begin();
+
+		}
+	}
+	this->objects.clear();
+	this->notifyObservers( NULL );
 }

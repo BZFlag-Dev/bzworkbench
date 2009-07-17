@@ -24,17 +24,17 @@ public:
 	// default constructor
 	texturematrix();
 
-	// constructor with data
-	texturematrix(string& data);
-
 	static DataEntry* init() { return new texturematrix(); }
-	static DataEntry* init(string& data) { return new texturematrix(data); }
 
 	// getter
 	string get(void);
 
 	// setter
 	int update(string& data);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// toString
 	string toString(void);

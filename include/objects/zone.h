@@ -70,11 +70,7 @@ public:
 	// constructor
 	zone();
 	
-	// constructor with data
-	zone(string& data);
-	
 	static DataEntry* init() { return new zone(); }
-	static DataEntry* init(string& data) { return new zone(data); }
 
 	void setDefaults();
 	
@@ -82,9 +78,11 @@ public:
 	string get(void);
 	
 	// setter
-	int update( string& data );
 	int update( UpdateMessage& message );
 
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString
 	string toString(void);

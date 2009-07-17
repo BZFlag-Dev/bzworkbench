@@ -27,11 +27,7 @@ public:
 	// default constructor
 	sphere();
 	
-	// constructor with data
-	sphere(string& data);
-	
 	static DataEntry* init() { return new sphere(); }
-	static DataEntry* init(string& data) { return new sphere(data); }
 
 	// restore default values
 	void setDefaults();
@@ -40,8 +36,11 @@ public:
 	string get(void);
 	
 	// setter
-	int update(string& data);
 	int update(UpdateMessage& message);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString
 	string toString(void);

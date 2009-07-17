@@ -26,12 +26,6 @@ box::box() : bz2object("box", "<name><position><rotation><size><matref><phydrv><
 	setDefaults();
 }
 
-box::box(string& data) : bz2object("box", "<name><position><rotation><size><matref><phydrv><drivethrough><shootthrough><passable><ricochet><texsize><texoffset><shift><shear><scale><spin>") {
-	setDefaults();
-
-	this->update( data );
-}
-
 // nothing to destroy...
 box::~box() { }
 
@@ -49,7 +43,7 @@ void box::setDefaults() {
 		ricochets[i] = false;
 
 		// set default textures
-		SceneBuilder::assignTexture((i >= ZP) ? "roof" : "boxwall", group->getChild(i) );
+		//SceneBuilder::assignTexture((i >= ZP) ? "roof" : "boxwall", group->getChild(i) );
 
 		// add material/physics slot
 		MaterialSlot mslot;
@@ -87,115 +81,53 @@ string box::get(void) {
 	return toString();
 }
 
-// setter (string data)
-int box::update(string& data) {
-	// get the header
-	const char* header = getHeader().c_str();
+// bzw methods
+bool box::parse( std::string& line ) {
+	// first check if this is the end
+	if ( line == "end" )
+		return false;
 
-	// get the sections
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
 
-	// quit if there aren't any
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
+	// first parse per face keys
+	for ( int i = 0; i < FaceCount; i++ ) {
+		if ( key == faceNames[i] ) {
+			string realKey = BZWParser::key( value.c_str() );
 
-	if(!hasOnlyOne(lines, "box"))
-		return 0;
+			if ( realKey == "texsize" ) {
+				texSizes[i] = Point2D( value.c_str() );
+			}
+			else if ( realKey == "texoffset" ) {
+				texOffsets[i] = Point2D( value.c_str() );
+			}
+			else if ( realKey == "drivethrough" ) {
+				driveThroughs[i] = true;
+			}
+			else if ( realKey == "shootthrough" ) {
+				shootThroughs[i] = true;
+			}
+			else if ( realKey == "passable" ) {
+				driveThroughs[i] = true;
+				shootThroughs[i] = true;
+			}
+			else if ( realKey == "ricochet" ) {
+				ricochets[i] = true;
+			}
+			else {
+				break;
+			}
 
-	const char* boxData = lines[0].c_str();
-
-	for (int i = 0; i < FaceCount; i++) {
-		string faceName(faceNames[i]);
-		vector<string> faces;
-		faces.push_back(faceNames[i]);
-
-		// need to be able to parse the meshbox face names
-		if (i <= YN) {
-			faces.push_back("sides");
-			faces.push_back("outside");
-		}
-		else if (i == ZP) {
-			faces.push_back("top");
-		}
-		else if (i == ZN) {
-			faces.push_back("bottom");
-		}
-
-		vector<string> texsizes = BZWParser::getValuesByKeyAndFaces("texsize", faces, header, boxData);
-		if(texsizes.size() > 1) {
-			printf("box::update(): Error! Defined \"%s texsize\" %d times!\n", faceName.c_str(), (int)texsizes.size());
-			return 0;
-		}
-
-		vector<string> texoffsets = BZWParser::getValuesByKeyAndFaces("texoffset", faces, header, boxData);
-		if(texoffsets.size() > 1) {
-			printf("box::update(): Error! Defined \"%s texoffset\" %d times!\n", faceName.c_str(), (int)texoffsets.size());
-			return 0;
-		}
-
-		vector<string> drivethroughs = BZWParser::getValuesByKeyAndFaces("drivethrough", faces, header, boxData);
-		if(drivethroughs.size() > 1) {
-			printf("box::update(): Error! Defined \"%s drivethrough\" %d times!\n", faceName.c_str(), (int)drivethroughs.size());
-			return 0;
-		}
-
-		vector<string> passables = BZWParser::getValuesByKeyAndFaces("passable", faces, header, boxData);
-		if(passables.size() > 1) {
-			printf("box::update(): Error! Defined \"%s passable\" %d times!\n", faceName.c_str(), (int)passables.size());
-			return 0;
-		}
-
-		vector<string> shootthroughs = BZWParser::getValuesByKeyAndFaces("shootthrough", faces, header, boxData);
-		if(shootthroughs.size() > 1) {
-			printf("box::update(): Error! Defined \"%s shootthrough\" %d times!\n", faceName.c_str(), (int)shootthroughs.size());
-			return 0;
-		}
-
-		vector<string> ricochets = BZWParser::getValuesByKeyAndFaces("drivethrough", faces, header, boxData);
-		if(ricochets.size() > 1) {
-			printf("box::update(): Error! Defined \"%s ricochet\" %d times!\n", faceName.c_str(), (int)ricochets.size());
-			return 0;
-		}
-
-		if (texsizes.size() > 0) {
-			texSizes[i] = Point2D( texsizes[0].c_str() );
-		}
-
-		if (texoffsets.size() > 0) {
-			texSizes[i] = Point2D( texoffsets[0].c_str() );
-		}
-
-		if (passables.size() > 0) {
-			driveThroughs[i] = true;
-			shootThroughs[i] = true;
-		}
-
-		if (drivethroughs.size() > 0) {
-			driveThroughs[i] = true;
-		}
-
-		if (shootthroughs.size() > 0) {
-			shootThroughs[i] = true;
-		}
-
-		if (ricochets.size() > 0) {
-			this->ricochets[i] = true;
+			return true;
 		}
 	}
 
+	return bz2object::parse( line );
+}
 
-	osg::Vec3 size = getSize();
-
-	int result = bz2object::update( data );
-	if( result == 0 )
-		return result;
-
-	// if size changes then UVs must be regenerated
-	if( getSize() != size ) {
-		setSize(getSize());
-	}
-
-	return result;
+void box::finalize() {
+	// just regen UV coords based on any size changes
+	Primitives::rebuildBoxUV( (osg::Group*)getThisNode(), getSize() );
 }
 
 // setter (with binary data)

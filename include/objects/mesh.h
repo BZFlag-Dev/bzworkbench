@@ -30,20 +30,17 @@ public:
 
 	// constructor
 	mesh(void);
-	
-	// constructor with data
-	mesh(string& data);
 
 	~mesh();
 	
 	static DataEntry* init() { return new mesh(); }
-	static DataEntry* init(string& data) { return new mesh(data); }
 	
 	// getter
 	string get(void);
-	
-	// setter
-	int update(string& data);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString
 	string toString(void);

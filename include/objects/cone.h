@@ -32,11 +32,7 @@ public:
 	// default constructor
 	cone();
 	
-	// constructor with data
-	cone(string& data);
-	
 	static DataEntry* init() { return new cone(); }
-	static DataEntry* init(string& data) { return new cone(data); }
 	
 	virtual void setDefaults();
 
@@ -44,8 +40,11 @@ public:
 	string get(void);
 	
 	// setter
-	int update(string& data);
 	int update(UpdateMessage& msg);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString
 	string toString(void);

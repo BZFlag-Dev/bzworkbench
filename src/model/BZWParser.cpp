@@ -18,7 +18,7 @@ Model* BZWParser::_modelRef = NULL;
 /**
  * Helper method:  eliminate the whitespace on the ends of the line
  */
-string cutWhiteSpace(string line) {
+string BZWParser::cutWhiteSpace(string line) {
 	// don't bother with empty strings
 	if( line.length() <= 0 )
 		return line;
@@ -75,7 +75,7 @@ bool hasLine(string text) {
  * Helper method:  determines whether or not the passed key is the key of the passed line
  */
  bool isKey(string key, string line) {
- 	line = cutWhiteSpace(line);
+	 line = BZWParser::cutWhiteSpace(line);
 
 	string::size_type index = line.find(key);
 	if (index == 0) {
@@ -872,129 +872,19 @@ const vector<string> BZWParser::findSections(const char* _header, vector<string>
  * the entire file into RAM and calls BZWParser::getSections() to parse it.
  */
 
-vector<string> BZWParser::loadFile(const char* filename) {
-
-	vector<string> ret = vector<string>();
-
+bool BZWParser::loadFile(const char* filename) {
 	if( _modelRef == NULL )
-		return ret;
+		return false;
 
 	ifstream fileInput(filename);
 
 	// if its not open, its not there
 	if(!fileInput.is_open()) {
 		printf("BZWParser::loadFile(): Error! Could not open input stream\n");
-		return vector<string>();
+		return false;
 	}
 
-	// start reading the stuff in
-	string buff, key, objstr, line, supportedKeys = _modelRef->_getSupportedObjects(), hierarchy = _modelRef->_getSupportedHierarchies();
-	vector<string> lineElements = vector<string>();
-
-	while(!fileInput.eof()) {
-
-		// read in lines until we find a key
-		getline( fileInput, buff );
-
-		buff = cutWhiteSpace( buff );
-
-		// get the line elements
-		lineElements = BZWParser::getLineElements(buff.c_str());
-
-		// if there are no line elements, continue
-		if(lineElements.size() == 0)
-			continue;
-
-		// get the key
-		key = BZWParser::key( lineElements[0].c_str() );
-
-		// is it a valid key?
-		if( supportedKeys.find( "<" + key + ">", 0 ) != string::npos) {
-			// if so, read in the object
-			objstr = buff + "\n";
-
-			// depth count--determines how deep the parser is in an object hierarchy
-			// initialized to 1 now that we are in an object
-			int depthCount = 1;
-
-			// get any sub-object keys
-			vector<string> subobjects = subobjectsOf( key.c_str() );
-
-			// get number of subobjects
-			int numSubobjects = subobjects.size();
-
-			// terminator stack
-			vector<string> terminatorStack = vector<string>();
-
-			// header stack
-			vector<string> headerStack = vector<string>();
-
-			// add the header token of the base object
-			headerStack.push_back( key );
-
-			// add the terminator token of the base object
-			terminatorStack.push_back( BZWParser::terminatorOf(key.c_str()) );
-
-			// loop through the text until we have depth 0 (i.e. we exit the object) or we run out of text
-			while(!fileInput.eof() && depthCount > 0) {
-				// get a line
-				getline( fileInput, buff );
-
-				// trim buff
-				buff = cutWhiteSpace(buff);
-				line = buff;
-
-				// don't continue of there was nothing to begin with
-				if(line.length() == 0)
-					continue;
-
-				line += " ";
-
-				// see if it's a subobject (if so, increase depthcount, save the subobject header, and load in new subobject keys)
-				if(numSubobjects > 0) {
-					for(int i = 0; i < numSubobjects; i++) {
-						if( line.find( subobjects[i] + " ", 0 ) == 0 ) {
-							depthCount++;
-							terminatorStack.push_back( BZWParser::terminatorOf(subobjects[i].c_str()) );
-							headerStack.push_back( subobjects[i] );
-							subobjects = subobjectsOf( subobjects[i].c_str() );
-							numSubobjects = subobjects.size();
-
-							break;
-						}
-					}
-				}
-
-				// see if we're at an "end" (if so, decrease depthcount)
-				if(line.find(terminatorStack[ terminatorStack.size() - 1 ] + " ", 0) != string::npos) {
-					depthCount--;
-					if(depthCount < 0) {
-						objstr += line + "\n";
-						break;
-					}
-
-					terminatorStack.pop_back();
-					headerStack.pop_back();
-
-					if(headerStack.size() > 0)
-						subobjects = subobjectsOf( headerStack[ headerStack.size() - 1 ].c_str() );
-					else
-						subobjects.clear();
-
-					numSubobjects = subobjects.size();
-				}
-
-				objstr += line + "\n";
-
-			}
-
-			// add the object to ret
-			ret.push_back(objstr);
-
-		}
-	}
-
-	return ret;
+	return Model::build( fileInput );
 }
 
 vector<int> BZWParser::getIntList( const char* line ) {

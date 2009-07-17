@@ -19,13 +19,6 @@ zone::zone() : bz2object("zone", "<name><position><size><rotation><team><flag><s
 	setDefaults();
 }
 
-// constructor with data
-zone::zone(string& data) : bz2object("zone", "<name><position><size><rotation><team><flag><safety><zoneflag>", data.c_str()) {
-	setDefaults();
-
-	update(data);
-}
-
 void zone::setDefaults() {
 	updateGeometry();
 
@@ -38,7 +31,7 @@ void zone::setDefaults() {
 string zone::get(void) { return toString(); }
 
 // setter
-int zone::update(string& data) {
+/*int zone::update(string& data) {
 	const char* header = getHeader().c_str();
 
 	// get the sections
@@ -156,7 +149,7 @@ int zone::update(string& data) {
 	flags = flagElements;
 
 	return 1;
-}
+}*/
 
 int zone::update( UpdateMessage& message ) {
 	switch( message.type ) {
@@ -189,6 +182,15 @@ int zone::update( UpdateMessage& message ) {
 	}
 
 	return 1;
+}
+
+// bzw methods
+bool zone::parse( std::string& line ) {
+	return false;
+}
+
+void zone::finalize() {
+
 }
 
 // toString

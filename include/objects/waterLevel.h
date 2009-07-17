@@ -24,17 +24,17 @@ public:
 	// default constructor
 	waterLevel();
 	
-	// constructor with data
-	waterLevel(string& data);
-	
 	static DataEntry* init() { return new waterLevel(); }
-	static DataEntry* init(string& data) { return new waterLevel(data); }
 	
 	// get method
 	string get(void);
 	
 	// update method
 	int update(string& data);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString method
 	string toString(void);

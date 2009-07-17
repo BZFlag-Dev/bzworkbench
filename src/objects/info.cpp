@@ -13,18 +13,13 @@ using namespace std;
 info::info() : bz2object("info", "") {
 }
 
-// constructor with data
-info::info(string& data) : bz2object("info", "")  {
-	update( data );
-}
-
 // getter
 string info::get(void) {
 	return toString();
 }
 
 // setter
-int info::update(string& data) {
+/*int info::update(string& data) {
 	const char* header = getHeader().c_str();
 	// get the chunk we need
 	vector<string> chunks = BZWParser::getSectionsByHeader(header, data.c_str(), "end");
@@ -49,6 +44,15 @@ int info::update(string& data) {
 	}
 
 	return 1;
+}*/
+
+// bzw methods
+bool info::parse( std::string& line ) {
+	return false;
+}
+
+void info::finalize() {
+
 }
 
 // toString

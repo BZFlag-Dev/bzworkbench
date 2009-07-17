@@ -31,14 +31,6 @@ arc::arc() :
 	setDefaults();
 }
 
-// data constructor
-arc::arc(string& data) :
-	bz2object("arc", "<position><rotation><size><flatshading><angle><ratio><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref>", data.c_str()) {
-	setDefaults();
-
-	update(data);
-}
-
 void arc::setDefaults() {
 	// define some basic values
 	ratio = 1.0f;
@@ -81,73 +73,6 @@ void arc::setDefaults() {
 // getter
 string arc::get(void) { return toString(); }
 
-// setter
-int arc::update(string& data) {
-	const char* header = getHeader().c_str();
-	// get the chunk we need
-
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
-
-	// check and see if the proper data segment was found
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
-
-	string key = (boxStyle == true ? "meshbox" : "arc");
-	if(!hasOnlyOne(lines, key.c_str()))
-		return 0;
-
-	const char* arcData = lines[0].c_str();
-
-	// get the texsize
-	vector<string> texsizes = BZWParser::getValuesByKey("texsize", header, arcData);
-	if(texsizes.size() > 1) {
-		printf("arc::update(): Error! Defined \"texsize\" %d times!\n", (int)texsizes.size());
-		return 0;
-	}
-
-	// get the angle
-	vector<string> angles = BZWParser::getValuesByKey("angle", header, arcData);
-	if(!hasOnlyOne(angles, "angle"))
-		return 0;
-
-	// get the divisions
-	vector<string> vDivisions = BZWParser::getValuesByKey("divisions", header, arcData);
-	if(!hasOnlyOne(vDivisions, "divisions"))
-		return 0;
-
-	// get the ratio
-	vector<string> ratios = BZWParser::getValuesByKey("ratio", header, arcData);
-	if(!hasOnlyOne(ratios, "ratio"))
-		return 0;
-
-	// get flatshading
-	vector<string> flatShadings = BZWParser::getValuesByKey("flatshading", header, arcData);
-
-	// get smoothbounce
-	vector<string> smoothBounces =  BZWParser::getValuesByKey("smoothbounce", header, arcData);
-
-	// do base class update
-	if(!bz2object::update(data))
-		return 0;
-
-	// set the data
-	if ( angles.size() > 0 )
-		angle = atof( angles[0].c_str() );
-	if ( vDivisions.size() > 0 )
-		divisions = atoi( vDivisions[0].c_str() );
-	if ( ratios.size() > 0 )
-		ratio = atof( ratios[0].c_str() );
-	if ( texsizes.size() > 0 ) {
-		texsize = Point4D( texsizes[0].c_str() );
-	}
-	flatShading = (flatShadings.size() == 0 ? false : true);
-	smoothbounce = (smoothBounces.size() == 0 ? false : true);
-
-	updateGeometry();
-
-	return 1;
-}
-
 int arc::update(UpdateMessage& message) {
 	int result = bz2object::update( message );
 
@@ -187,6 +112,44 @@ int arc::update(UpdateMessage& message) {
 	}
 
 	return 1;
+}
+
+bool arc::parse( std::string& line ) {
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	// parse keys
+	if ( key == "texsize" ) {
+		texsize = Point4D( value.c_str() );
+	}
+	else if ( key == "divisions" ) {
+		divisions = atof( value.c_str() );
+	}
+	else if ( key == "angle" ) {
+		angle = atof( value.c_str() );
+	}
+	else if ( key == "ratio" ) {
+		ratio = atof( value.c_str() );
+	}
+	else if ( key == "flatshading" ) {
+		flatShading = true;
+	}
+	else if ( key == "smoothbounce" ) {
+		smoothbounce = true;
+	}
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
+}
+
+void arc::finalize() {
+	updateGeometry();
 }
 
 // toString

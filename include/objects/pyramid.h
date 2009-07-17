@@ -40,22 +40,19 @@ public:
 	// default constructor
 	pyramid();
 
-	// constructor with data
-	pyramid(string& data);
-
 	static DataEntry* init() { return new pyramid(); }
-	static DataEntry* init(string& data) { return new pyramid(data); }
 
 	void setDefaults();
 
 	// getter
 	string get();
 
-	// setter
-	int update(string& data);
-
 	// setter with messaging
 	int update(UpdateMessage& message);
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// toString
 	string toString(void);

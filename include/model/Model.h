@@ -44,6 +44,18 @@ class group;
 #include <osg/ref_ptr>
 #include <osg/Vec3>
 
+
+// thrown when there is an error reading a bzw file
+struct BZWReadError {
+	BZWReadError( DataEntry* obj, std::string message ) :
+		bzobject( obj ),
+		message( message )
+	{ }
+
+	DataEntry* bzobject;
+	std::string message;
+};
+
 class Model : public Observable
 {
 public:
@@ -63,13 +75,12 @@ public:
 	// the real query method
 	DataEntry* _command(const std::string& command, const std::string& object, const std::string& name, const std::string& data = "" );
 
-	// this method builds the model from a vector of BZW-formatted strings
-	// returns true of it builds properly
-	static bool build(std::vector<std::string>& bzworld);
+	// build the model from a stream of bzw data
+	static bool build( std::istream& data );
 
 	// the real build method
 	// returns false if it fails
-	bool _build(std::vector<std::string>& bzworld);
+	bool _build( std::istream& data );
 
 	// universal getter
 	static std::string& toString(void);
@@ -168,8 +179,8 @@ public:
 	void _ungroupObjects( group* g );
 
 	// plugin-specific API
-	static bool registerObject(std::string& name, DataEntry* (*init)(std::string&));
-	static bool registerObject(const char* name, const char* hierarchy, const char* terminator, DataEntry* (*init)(std::string&), ConfigurationDialog* (*config)(DataEntry*) = NULL);
+	static bool registerObject(std::string& name, DataEntry* (*init)());
+	static bool registerObject(const char* name, const char* hierarchy, const char* terminator, DataEntry* (*init)(), ConfigurationDialog* (*config)(DataEntry*) = NULL);
 	static bool isSupportedObject(const char* name);
 	static bool isSupportedTerminator(const char* name, const char* end);
 	static bool isSupportedHierarchy(const char* name);
@@ -201,8 +212,8 @@ public:
 	bool _removeSupportedHierarchy(const char* name);
 
 	// instantiated plug-in API
-	bool _registerObject(std::string& name, DataEntry* (*init)(std::string&));
-	bool _registerObject(const char* name, const char* hierarchy, const char* terminator, DataEntry* (*init)(std::string&), ConfigurationDialog* (*config)(DataEntry*));
+	bool _registerObject(std::string& name, DataEntry* (*init)());
+	bool _registerObject(const char* name, const char* hierarchy, const char* terminator, DataEntry* (*init)(), ConfigurationDialog* (*config)(DataEntry*));
 	bool _isSupportedObject(const char* name);
 	bool _isSupportedTerminator(const char* name, const char* end);
 	bool _isSupportedHierarchy(const char* name);
@@ -249,13 +260,16 @@ private:
 	std::vector<std::string> data;
 
 // map from strings to initializers
-	std::map<std::string, DataEntry* (*)(std::string&)> cmap;
+	std::map<std::string, DataEntry* (*)()> cmap;
 
 // map from strings to configuration dialog initializers
 	std::map<std::string, ConfigurationDialog* (*)(DataEntry*)> configMap;
 
 // build the default bzw objects in
 	void buildDatabase();
+
+	// clear all objects
+	void clear();
 
 // list of registered object keys
 	std::string supportedObjects;

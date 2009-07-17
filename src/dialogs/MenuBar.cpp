@@ -127,10 +127,10 @@ void MenuBar::open_world_real( Fl_Widget* w ) {
 	printf("file: %s\n", filename.c_str());
 
 	// invoke BZWParser and load it
-	vector<string> world = BZWParser::loadFile( filename.c_str() );
+	bool success = BZWParser::loadFile( filename.c_str() );
 
-	// invoke the Model to build the world
-	parent->getModel()->_build( world );
+	if (!success)
+		parent->error( "Failed to load bzw file." );
 }
 
 void MenuBar::save_world_real( Fl_Widget* w ) {

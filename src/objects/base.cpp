@@ -21,15 +21,6 @@ base::base() :
 	setDefaults();
 }
 
-// constructor with data
-base::base(string& data) :
-	bz2object("base", "<position><rotation><size><team><color><oncap><shift><shear><scale><spin>", data.c_str()) {
-
-	setDefaults();
-
-	update( data );
-}
-
 void base::setDefaults() {
 	updateGeometry();
 
@@ -45,57 +36,35 @@ void base::setDefaults() {
 // getter
 string base::get(void) { return toString(); }
 
-// setter
-int base::update(string& data) {
-	// get the header
-	const char* header = getHeader().c_str();
+// bzw methods
+bool base::parse( std::string& line ) {
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
 
-	// get the section
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
 
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
-
-	if(!hasOnlyOne(lines, "base"))
-		return 0;
-
-	// get the section data
-	const char* baseData = lines[0].c_str();
-
-	// get the team
-	vector<string> teamkeys;
-	teamkeys.push_back("color");
-	teamkeys.push_back("team");
-	vector<string> teams = BZWParser::getValuesByKeys(teamkeys, header, baseData);
-	if(teams.size() > 1) {
-		printf("base::update():  Error! Defined \"color\" %d times!\n", (int)teams.size());
-		return 0;
+	// parse keys
+	if ( key == "color" || key == "team" ) {
+		// make sure that the team value is sane
+		int t = atoi( value.c_str() );
+		if(!(t == BASE_RED || t == BASE_GREEN || t == BASE_BLUE || t == BASE_PURPLE)) {
+			throw BZWReadError( this, string( "Invalid base team, " ) + value );
+		}
 	}
-	if( teams.size() == 0 )
-		teams.push_back("0");
-
-	// get the weapon
-	vector<string> weapons = BZWParser::getValuesByKey("oncap", header, baseData);
-	if(weapons.size() > 1) {
-		printf("base::update():  Error! Defined \"oncap\" %d times!\n", (int)weapons.size());
-		return 0;
+	else if ( key == "oncap" ) {
+		setWeapon( value.c_str() );
+	}
+	else {
+		return bz2object::parse( line );
 	}
 
-	// make sure that the team value is sane
-	int t = atoi(teams[0].c_str());
-	if(!(t == BASE_RED || t == BASE_GREEN || t == BASE_BLUE || t == BASE_PURPLE)) {
-		printf("base::update():  Warning! Base team (%d) is not recognized...\n", t);
-	}
+	return true;
+}
 
-	// do superclass update
-	if(!bz2object::update(data))
-		return 0;
-
-	// load in the data
-	setTeam( t );
-	setWeapon( (weapons.size() > 0 ? weapons[0] : string("")).c_str() );
-
-	return 1;
+void base::finalize() {
+	setBaseColor( team );
 }
 
 // tostring

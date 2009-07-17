@@ -18,13 +18,6 @@ define::define() : DataEntry("define", "<arc><base><box><cone><group><mesh><mesh
 	name = "";	
 }
 
-// constructor with data
-define::define(string& data) : DataEntry("define", "<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>", data.c_str()) {
-	objects = vector< osg::ref_ptr<bz2object> >();
-	name = "";	
-	update(data);
-}
-
 // destructor
 define::~define() {
 	// free previous objects
@@ -35,7 +28,7 @@ define::~define() {
 string define::get(void) { return toString(); }
 
 // setter
-int define::update(string& data) {
+/*int define::update(string& data) {
 	const char* header = getHeader().c_str();
 	
 	// get the text
@@ -308,6 +301,15 @@ int define::update(string& data) {
 	}
 	
 	return 1;
+}*/
+
+// bzw methods
+bool define::parse( std::string& line ) {
+	return false;
+}
+
+void define::finalize() {
+
 }
 
 // toString

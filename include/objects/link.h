@@ -33,17 +33,14 @@ public:
 	// constructor
 	Tlink();
 	
-	// constructor with data
-	Tlink(string& data);
-	
 	static DataEntry* init() { return new Tlink(); }
-	static DataEntry* init(string& data) { return new Tlink(data); }
 	
 	// getter
 	string get(void);
 	
-	// setter
-	int update(string& data);
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 	
 	// toString
 	string toString(void);

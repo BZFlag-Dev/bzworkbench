@@ -19,20 +19,11 @@ Tlink::Tlink() : bz2object("link", "<name><from><to>") {
 	to = NULL;
 }
 
-// constructor with data
-Tlink::Tlink(string& data) : bz2object("link", "<name><from><to>") {
-	name = string("default_link");
-	from = NULL;
-	to = NULL;
-	
-	update(data);	
-}
-
 // getter
 string Tlink::get(void) { return toString(); }
 
 // setter
-int Tlink::update(string& data) {
+/*int Tlink::update(string& data) {
 	const char* header = getHeader().c_str();
 	
 	// get the data chunks
@@ -81,6 +72,15 @@ int Tlink::update(string& data) {
 		buildGeometry();
 	
 	return 1;
+}*/
+
+// bzw methods
+bool Tlink::parse( std::string& line ) {
+	return false;
+}
+
+void Tlink::finalize() {
+
 }
 
 // toString

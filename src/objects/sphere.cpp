@@ -23,14 +23,6 @@ bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divis
 	setDefaults();
 }
 
-sphere::sphere(string& data) :
-	bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref>", data.c_str()) {
-
-	setDefaults();
-
-	update(data);
-}
-
 void sphere::setDefaults() {
 	osg::Group* group = new osg::Group();
 	osg::Geode* outside = new osg::Geode();
@@ -67,7 +59,7 @@ void sphere::setDefaults() {
 string sphere::get(void) { return toString(); }
 
 // setter
-int sphere::update(string& data) {
+/*int sphere::update(string& data) {
 	const char* header = getHeader().c_str();
 	// get the chunk we need
 
@@ -140,7 +132,7 @@ int sphere::update(string& data) {
 	smoothbounce = (smoothBounces.size() == 0 ? false : true);
 
 	return 1;
-}
+}*/
 
 int sphere::update(UpdateMessage& message) {
 	int result = bz2object::update( message );
@@ -185,6 +177,14 @@ int sphere::update(UpdateMessage& message) {
 	return 1;
 }
 
+// bzw methods
+bool sphere::parse( std::string& line ) {
+	return false;
+}
+
+void sphere::finalize() {
+
+}
 
 // toString
 string sphere::toString(void) {

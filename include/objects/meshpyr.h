@@ -19,10 +19,8 @@ class meshpyr : public cone {
 public:
 	
 	meshpyr();
-	meshpyr(std::string& data);
 	
 	static DataEntry* init() { return new meshpyr(); }
-	static DataEntry* init(string& data) { return new meshpyr(data); }
 	
 	// restore default values
 	virtual void setDefaults();

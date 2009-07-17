@@ -27,23 +27,6 @@ mesh::mesh(void) :
 	materialMap = map<string, string>();
 }
 
-// constructor with data
-mesh::mesh(string& data) :
-	bz2object("mesh", "<vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo>", data.c_str()) {
-
-	vertices = vector<Point3D>();
-	texCoords = vector<Point2D>();
-	normals = vector<Point3D>();
-	insidePoints = vector<Point3D>();
-	outsidePoints = vector<Point3D>();
-	decorative = false;
-	faces = vector<MeshFace*>();
-	drawInfo = NULL;
-	materialMap = map<string, string>();
-
-	update(data);
-}
-
 mesh::~mesh() {
 	// clean up
 	/*if (drawInfo != NULL)
@@ -59,7 +42,7 @@ mesh::~mesh() {
 string mesh::get(void) { return toString(); }
 
 // setter
-int mesh::update(string& data) {
+/*int mesh::update(string& data) {
 	const char* header = getHeader().c_str();
 
 	// get lines
@@ -170,6 +153,15 @@ int mesh::update(string& data) {
 	updateGeometry();
 
 	return 1;
+}*/
+
+// bzw methods
+bool mesh::parse( std::string& line ) {
+	return false;
+}
+
+void mesh::finalize() {
+
 }
 
 // to string

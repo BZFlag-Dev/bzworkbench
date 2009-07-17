@@ -26,13 +26,7 @@ public:
 	// constructor
 	teleporter();
 
-	// constructor with data
-	teleporter(string& data);
-
-	static DataEntry* init() {
-		return new teleporter();
-	}
-	static DataEntry* init(std::string& data) { return new teleporter(data); }
+	static DataEntry* init() { return new teleporter(); }
 
 	// restore default values
 	void setDefaults();
@@ -41,12 +35,15 @@ public:
 	std::string get(void);
 
 	// setter
-	int update(std::string& data);
 	int update(UpdateMessage& message);
 
 	// override the getSize and setSize methods
 	osg::Vec3 getSize() { return osg::Vec3( realSize.x(), realSize.y(), realSize.z() ); }
 	void setSize( osg::Vec3 newSize );
+
+	// bzw methods
+	bool parse( std::string& line );
+	void finalize();
 
 	// tostring
 	string toString(void);
