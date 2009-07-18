@@ -36,8 +36,6 @@ void arc::setDefaults() {
 	ratio = 1.0f;
 	divisions = 16;
 	angle = 360.0f;
-	flatShading = false;
-	smoothbounce = false;
 	texsize.set( -8.0f, -8.0f, -8.0f, -8.0f  );
 	boxStyle = false;
 
@@ -135,12 +133,6 @@ bool arc::parse( std::string& line ) {
 	else if ( key == "ratio" ) {
 		ratio = atof( value.c_str() );
 	}
-	else if ( key == "flatshading" ) {
-		flatShading = true;
-	}
-	else if ( key == "smoothbounce" ) {
-		smoothbounce = true;
-	}
 	else {
 		return bz2object::parse( line );
 	}
@@ -175,7 +167,7 @@ string arc::toString(void) {
 		ret += "  divisions " + string(itoa(divisions)) + "\n" +
 			   "  angle " + string(ftoa(angle) ) + "\n" +
 			   "  ratio " + string(ftoa(ratio)) + "\n" +
-			   (flatShading == true ? "  flatshading\n" : "");
+			   (flatshading == true ? "  flatshading\n" : "");
 
 	ret += string("") +
 		   (smoothbounce == true ? "  smoothbounce\n" : "") +
@@ -199,14 +191,6 @@ osg::Vec3 arc::getSize() {
 	return realSize;
 }
 
-bool arc::getFlatshading() {
-	return flatShading;
-}
-
-bool arc::getSmoothbounce() {
-	return smoothbounce;
-}
-
 float arc::getSweepAngle() {
 	return angle;
 }
@@ -221,15 +205,6 @@ int arc::getDivisions() {
 
 Point4D arc::getTexsize() {
 	return texsize;
-}
-
-
-void arc::setFlatshading( bool value ) {
-	flatShading = value;
-}
-
-void arc::setSmoothbounce( bool value ) {
-	smoothbounce = value;
 }
 
 void arc::setSweepAngle( float value ) {

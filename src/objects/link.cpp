@@ -14,7 +14,7 @@
 
 // constructor
 Tlink::Tlink() : bz2object("link", "<name><from><to>") {
-	name = string("default_link");
+	Object::setName( SceneBuilder::makeUniqueName( "link" ) );
 	from = NULL;
 	to = NULL;
 }
@@ -22,65 +22,32 @@ Tlink::Tlink() : bz2object("link", "<name><from><to>") {
 // getter
 string Tlink::get(void) { return toString(); }
 
-// setter
-/*int Tlink::update(string& data) {
-	const char* header = getHeader().c_str();
-	
-	// get the data chunks
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
-	
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
-	
-	if(!hasOnlyOne(lines, "link"))
-		return 0;
-		
-	// get the data to the block
-	const char* linkData = lines[0].c_str();
-	
-	// get the name
-	vector<string> names = BZWParser::getValuesByKey("name", header, linkData);
-	if(names.size() > 1) {
-		printf("link::update(): Error! Defined \"name\" %d times!\n", (int)names.size());
-		return 0;
-	}
-		
-	// get the from
-	vector<string> froms = BZWParser::getValuesByKey("from", header, linkData);
-	if(!hasOnlyOne(froms, "from"))
-		return 0;
-		
-	// get the to
-	vector<string> tos = BZWParser::getValuesByKey("to", header, linkData);
-	if(!hasOnlyOne(tos, "to"))
-		return 0;
-		
-	// superclass update
-	if(!DataEntry::update(data))
-		return 0;
-	
-	// load in the data
-	name = (names.size() != 0 ? names[0] : "");
-	
-	teleporter* prevFrom = from;
-	teleporter* prevTo = to;
-	
-	from = dynamic_cast< teleporter* > (Model::command( MODEL_GET, "teleporter", froms[0] ));
-	to = dynamic_cast< teleporter* > (Model::command( MODEL_GET, "teleporter", tos[0] ));
-	
-	if( from && to && (prevFrom != from || prevTo != to) )
-		buildGeometry();
-	
-	return 1;
-}*/
-
 // bzw methods
 bool Tlink::parse( std::string& line ) {
-	return false;
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	// parse keys
+	if ( key == "from" ) {
+		from = dynamic_cast< teleporter* > (Model::command( MODEL_GET, "teleporter", value ));
+	}
+	else if ( key == "to" ) {
+		to = dynamic_cast< teleporter* > (Model::command( MODEL_GET, "teleporter", value ));
+	}
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
 }
 
 void Tlink::finalize() {
-
+	buildGeometry();
+	bz2object::finalize();
 }
 
 // toString
@@ -89,7 +56,7 @@ string Tlink::toString(void) {
 	string toName = (to == NULL ? "# to:(unknown)\n" : "  to " + to->getName() + "\n" );
 	
 	return string("link\n") +
-				  (name.length() != 0 ? "  name " + name : "# name") + "\n" +
+				  (getName().length() != 0 ? "  name " + getName() : "# name") + "\n" +
 				  fromName + 
 				  toName + 
 				  "end\n";

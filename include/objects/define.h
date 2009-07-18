@@ -64,6 +64,9 @@ private:
 
 	// the objects in the definition 
 	vector< osg::ref_ptr< bz2object > > objects;
+
+	// used for parsing bzw;
+	bz2object* currentObject;
 };
 
 #endif /*DEFINE_H_*/

@@ -29,9 +29,6 @@ public:
 	// getter
 	string get(void);
 
-	// setter
-	int update(string& data);
-
 	// bzw methods
 	bool parse( std::string& line );
 	void finalize();

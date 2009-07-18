@@ -50,14 +50,9 @@ public:
 	string toString(void);
 	
 	// getters/setters
-	bool hasFlatShading() { return flatShading; }
-	bool hasSmoothBounce() { return smoothbounce; }
 	float getSweepAngle() { return sweepAngle; }
 	int getDivisions() { return divisions; }
 	
-	void setFlatShading(bool value);
-	
-	void setSmoothBounce(bool value) { smoothbounce = value; }
 	
 	void setSweepAngle(float value);
 	
@@ -71,8 +66,6 @@ public:
 protected:
 	static const char* sideNames[MaterialCount];
 
-	bool flatShading;
-	bool smoothbounce;
 	bool flipz;
 	int divisions;
 	bool pyramidStyle;
@@ -84,10 +77,6 @@ protected:
 	
 	// helper method to build the geometry
 	void buildGeometry();
-	
-	// helper method to change the node's shading (flat-shaded or smooth-shaded)
-	void updateShadeModel();
-	
 };
 
 #endif /*CONE_H_*/

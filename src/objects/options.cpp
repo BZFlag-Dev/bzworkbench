@@ -22,42 +22,20 @@ string options::get(void) {
 	return toString();
 }
 
-// update method
-/*int options::update(string& data) {
-	
-	const char* header = getHeader().c_str();
-	// get options objects
-	vector<string> optionses = BZWParser::getSectionsByHeader(header, data.c_str());
-	
-	if(optionses[0] == BZW_NOT_FOUND)
-		return 0;
-	
-	if(!hasOnlyOne(optionses, "options"))
-		return 0;
-	
-	const char* opts = optionses[0].c_str();
-	
-	// get the lines
-	vector<string> options = BZWParser::getLines(header, opts);
-	
-	// concat the lines
-	optionsString.clear();
-	
-	for(vector<string>::iterator i = options.begin(); i != options.end(); i++) {
-		optionsString += *i + " ";
-	}
-	
-	return (DataEntry::update(data));
-	
-}*/
-
 // bzw methods
 bool options::parse( std::string& line ) {
-	return false;
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	// otherwise add to the optionsString
+	optionsString += line + " ";
+
+	return true;
 }
 
 void options::finalize() {
-
+	// nothing to do
 }
 
 // toString method

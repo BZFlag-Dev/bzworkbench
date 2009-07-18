@@ -50,25 +50,6 @@ bool areValidCommands(vector<string>& commandList) {
 }
 
 /**
- * Helper method: convert a vector of string-ified color commands into a vector of ColorCommand objects
- */
-
-vector<ColorCommand> parseCommands(vector<string> commandList) {
-	vector<ColorCommand> ret = vector<ColorCommand>();
-
-	// return an empty list if there are no commands in commandList
-	if(commandList.size() == 0)
-		return ret;
-
-	// iterate through the commandList and build ColorCommand objects from them
-	for(vector<string>::iterator i = commandList.begin(); i != commandList.end(); i++) {
-		ret.push_back( ColorCommand( *i ) );
-	}
-
-	return ret;
-}
-
-/**
  * 	Helper method: convert a vector of ColorCommand objects into one huge BZW-formatted string
  */
 string stringifyCommands(vector<ColorCommand>& commands, const char* color) {
@@ -86,67 +67,38 @@ string stringifyCommands(vector<ColorCommand>& commands, const char* color) {
 	return ret;
 }
 
-// setter
-/*int dynamicColor::update(string& data) {
-	const char* header = getHeader().c_str();
-
-	// get the section
-	vector<string> lines = BZWParser::getSectionsByHeader( header, data.c_str() );
-
-	// break of there isn't only one
-	if(!hasOnlyOne(lines, "header"))
-		return 0;
-
-	// get the data
-	const char* dynamicColorData = lines[0].c_str();
-
-	// get the name
-	vector<string> names = BZWParser::getValuesByKey( "name", header, dynamicColorData );
-	if(!hasOnlyOne(names, "name"))
-		return 0;
-
-	// get and validate the "red" commands
-	vector<string> redCommandVals = BZWParser::getValuesByKey( "red", header, dynamicColorData );
-	if(! areValidCommands(redCommandVals) )
-		return 0;
-
-	// get and validate the "green" commands
-	vector<string> greenCommandVals = BZWParser::getValuesByKey( "green", header, dynamicColorData );
-	if(! areValidCommands(greenCommandVals) )
-		return 0;
-
-	// get and validate the "blue" commands
-	vector<string> blueCommandVals = BZWParser::getValuesByKey( "blue", header, dynamicColorData );
-	if(! areValidCommands(blueCommandVals) )
-		return 0;
-
-	// get validate the "alpha" commands
-	vector<string> alphaCommandVals = BZWParser::getValuesByKey( "alpha", header, dynamicColorData );
-	if(! areValidCommands(alphaCommandVals) )
-		return 0;
-
-	// update superclass
-	if(! DataEntry::update(data) )
-		return 0;
-
-	// commit the data
-	redCommands = parseCommands( redCommandVals );
-	greenCommands = parseCommands( greenCommandVals );
-	blueCommands = parseCommands( blueCommandVals );
-	alphaCommands = parseCommands( alphaCommandVals );
-	if ( names.size() > 0 )
-		name = names[0];
-
-	return 1;
-}*/
-
 // bzw methods
 bool dynamicColor::parse( std::string& line ) {
-	return false;
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+
+	if ( key == "name" ) {
+		name = BZWParser::value( key.c_str(), line.c_str() );
+	}
+	else if ( key == "red" ) {
+		redCommands.push_back( ColorCommand( line ) );
+	}
+	else if ( key == "green" ) {
+		greenCommands.push_back( ColorCommand( line ) ); 
+	}
+	else if ( key == "blue" ) {
+		blueCommands.push_back( ColorCommand( line ) );
+	}
+	else if ( key == "alpha" ) {
+		alphaCommands.push_back( ColorCommand( line ) );
+	}
+	else {
+		throw BZWReadError( this, string( "Unknown key, " ) + key );
+	}
+
+	return true;	
 }
 
 void dynamicColor::finalize() {
-
+	// nothing to do
 }
 
 // toString

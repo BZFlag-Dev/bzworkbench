@@ -157,6 +157,7 @@ string BZWParser::value(const char* _key, const char* _text) {
  */
 string BZWParser::key(const char* _text) {
 	string text = cutWhiteSpace(_text);
+	text = TextUtils::tolower( text );
 	string::size_type index = text.find(" ", 0);
 	if(index == string::npos)
 		return text;

@@ -13,6 +13,7 @@
 #include "objects/bz2object.h"
 
 #include <cmath>
+#include <osg/ShadeModel>
 
 // default constructor
 bz2object::bz2object(const char* name, const char* keys):
@@ -32,7 +33,10 @@ bz2object::bz2object(const char* name, const char* keys):
 	setName( "(unknown bz2object)" );
 
 	savedStateSet = NULL;
-
+	drivethrough = false;
+	shootthrough = false;
+	flatshading = false;
+	smoothbounce = false;
 };
 
 // constructor with node data
@@ -54,6 +58,10 @@ bz2object::bz2object(const char* name, const char* keys, osg::Node* node ):
 	setName( "(unknown bz2object)" );
 
 	savedStateSet = NULL;
+	drivethrough = false;
+	shootthrough = false;
+	flatshading = false;
+	smoothbounce = false;
 }
 
 // getter
@@ -69,9 +77,13 @@ bool bz2object::parse( std::string& line ) {
 
 
 	// get the name (break if there are more than one)
-	if ( key == "name" && isKey( "name" ) ) {
-		setName( value );
+	if ( (key == "name" || key == header) && isKey( "name" ) ) {
+		Object::setName( value );
 		return true;
+	}
+
+	else if ( key == header ) {
+		return true; // just ignore
 	}
 
 	// get the position
@@ -102,6 +114,36 @@ bool bz2object::parse( std::string& line ) {
 		return true;
 	}
 
+	else if ( key == "texsize" && isKey( "texsize" ) ) {
+		texsize = Point2D( value.c_str() );
+		return true;
+	}
+
+	else if ( key == "texoffset" && isKey( "texoffset" ) ) {
+		texoffset = Point2D( value.c_str() );
+		return true;
+	}
+
+	else if ( key == "drivethrough" && isKey( "drivethrough" ) ) {
+		drivethrough = true;
+		return true;
+	}
+
+	else if ( key == "shootthrough" && isKey( "shootthrough" ) ) {
+		shootthrough = true;
+		return true;
+	}
+
+	else if ( key == "flatshading" && isKey("flatshading" ) ) { 
+		flatshading = true;
+		return true;
+	}
+
+	else if ( key == "smoothbounce" && isKey( "smoothbounce" ) ) {
+		smoothbounce = true;
+		return true;
+	}
+
 	// get phydrvs
 	if ( isKey( "phydrv" ) ) {
 		for ( map< string, PhysicsSlot >::iterator i = physicsSlots.begin(); i != physicsSlots.end(); i++ ) {
@@ -118,6 +160,8 @@ bool bz2object::parse( std::string& line ) {
 						throw BZWReadError( this, string( "Couldn't find phydrv, " ) + realValue );
 
 					i->second.phydrv = phys;
+
+					return true;
 				}
 			}
 
@@ -125,6 +169,8 @@ bool bz2object::parse( std::string& line ) {
 			else if ( key == "phydrv" ) {
 				physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", value );
 				i->second.phydrv = phys;
+
+				return true;
 			}
 		}
 	}
@@ -140,27 +186,32 @@ bool bz2object::parse( std::string& line ) {
 					string realValue = BZWParser::value( "matref", value.c_str() );
 
 					// use the model to resolve the reference into a material pointer
-					/*material* mat = (material*)Model::command( MODEL_GET, "material", realValue );
+					material* mat = (material*)Model::command( MODEL_GET, "material", realValue );
 					if( mat )
 						i->second.materials.push_back( mat );
 					else
-						throw BZWReadError( this, string( "Couldn't find material, " ) + realValue );*/
+						throw BZWReadError( this, string( "Couldn't find material, " ) + realValue );
+
+					return true;
 				}
 			
 			}
 
 			// otherwise it might apply to all faces
 			else if ( key == "matref" ) {
-				/*material* mat = (material*)Model::command( MODEL_GET, "material", value );
+				material* mat = (material*)Model::command( MODEL_GET, "material", value );
 				if( mat )
 					i->second.materials.push_back( mat );
 				else
-					throw BZWReadError( this, string( "Couldn't find material, " ) + value );*/
+					throw BZWReadError( this, string( "Couldn't find material, " ) + value );
+
+				return true;
 			}
 		}
 	}
 
-	return true;
+	// ran out of possibilities throw an error
+	throw BZWReadError( this, string( "Unknown key, " ) + key );
 }
 
 // called after done parsing to finalize the changes
@@ -177,6 +228,9 @@ void bz2object::finalize() {
 
 	// update the transformation stack
 	this->recomputeTransformations( &newTransformations );
+
+	// update the shade model
+	updateShadeModel();
 }
 
 // toString
@@ -571,4 +625,26 @@ void bz2object::snapRotate( float size, float rotation ) {
 	tmp = osg::round( tmp );
 	tmp *= size;
 	setRotationZ( tmp );
+}
+
+// set the shade model based on the value of flatShading
+void bz2object::updateShadeModel() {
+	// get state set
+	osg::StateSet* states = getOrCreateStateSet();
+
+	// get the shade model
+	osg::ShadeModel* shadeModel = dynamic_cast< osg::ShadeModel* >( states->getAttribute( osg::StateAttribute::SHADEMODEL ) );
+	if( shadeModel == NULL ) {
+		shadeModel = new osg::ShadeModel();		// if one doesn't exist, then make one
+	}
+
+	if( flatshading ) {
+		shadeModel->setMode( osg::ShadeModel::FLAT );
+	}
+	else {
+		shadeModel->setMode( osg::ShadeModel::SMOOTH );
+	}
+
+	// set the shade model
+	states->setAttribute( shadeModel );
 }

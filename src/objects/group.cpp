@@ -18,8 +18,6 @@ group::group() :
 	this->team = 0;
 	this->def = NULL;
 	this->tintColor = RGBA(1, 1, 1, 1);
-	this->driveThrough = false;
-	this->shootThrough = false;
 	this->setName("");
 	this->setPos( osg::Vec3( 0.0, 0.0, 0.0 ) );
 	
@@ -32,72 +30,6 @@ group::group() :
 string group::get(void) {
 	return this->toString(); 
 }
-
-// setter
-/*int group::update(string& data) {
-	const char* header = this->getHeader().c_str();
-	
-	// get the section from the data
-	const vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
-	
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
-		
-	if(!hasOnlyOne(lines, "group"))
-		return 0;
-	
-	const char* groupData = lines[0].c_str();
-	
-	// get name (from the first line)
-	vector<string> headers = BZWParser::getValuesByKey("group", header, groupData);
-	
-	// get tint
-	vector<string> tints = BZWParser::getValuesByKey("tint", header, groupData);
-	if(tints.size() > 1) {
-		printf("group::update(): Error! Defined \"tint\" %d times\n", (int)tints.size());
-		return 0;	
-	}
-	
-	// get team
-	vector<string> teams = BZWParser::getValuesByKey("team", header, groupData);
-	if(teams.size() > 1) {
-		printf("group::update(): Error! Defined \"team\" %d times\n", (int)tints.size());
-		return 0;	
-	}
-	
-	// get drivethrough
-	vector<string> driveThroughs = BZWParser::getValuesByKey("drivethrough", header, groupData);
-		
-	// get shootthrough
-	vector<string> shootThroughs = BZWParser::getValuesByKey("shootthrough", header, groupData);
-			
-	// do base class update
-	if(!bz2object::update(data))
-		return 0;
-		
-	// the superclass bz2object will apply "spin" transformations if present.  These need to be forwarded
-	// to the container object, and removed from the group for correct rendering
-	osg::Vec3 rot = this->getRotation();
-	if( this->container.get() != NULL )
-		this->container->setRotation( rot );
-		
-	this->setRotation( osg::Vec3( 0, 0, 0 ) );
-	
-	// assign data
-	// see if the name changed (if so, recompute the object list)
-	string oldName = this->getName();
-	this->setName( headers[0] );
-	if( oldName != this->getName() )
-		this->updateObjects();
-		
-	tintColor = (tints.size() > 0 ? RGBA( tints[0].c_str() ) : RGBA(-1, -1, -1, -1));
-	team = (teams.size() > 0 ? (int)(atof( teams[0].c_str() )) : -1);
-	driveThrough = (driveThroughs.size() == 0 ? false : true);
-	shootThrough = (shootThroughs.size() == 0 ? false : true);
-	
-	return 1;
-	
-}*/
 
 // event handler
 int group::update( UpdateMessage& message ) {
@@ -161,11 +93,31 @@ int group::update( UpdateMessage& message ) {
 
 // bzw methods
 bool group::parse( std::string& line ) {
-	return false;
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+
+	// parse keys
+	if ( key == "tint" ) {
+		string value = BZWParser::value( key.c_str(), line.c_str() );
+		tintColor = RGBA( value.c_str() );
+	}
+	else if ( key == "team" ) {
+		string value = BZWParser::value( key.c_str(), line.c_str() );
+		team = atoi( value.c_str() );
+	}
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
 }
 
 void group::finalize() {
-
+	updateObjects();
+	bz2object::finalize();
 }
 
 // toString
@@ -184,8 +136,8 @@ string group::toString(void) {
 	string ret = string("group ") + this->getName() + "\n" +
 				  tintString + 
 				  teamString +
-				  (driveThrough == true ? "  drivethrough\n" : "") +
-				  (shootThrough == true ? "  shootThrough\n" : "") +
+				  (drivethrough == true ? "  drivethrough\n" : "") +
+				  (shootthrough == true ? "  shootThrough\n" : "") +
 				  this->BZWLines( this ) +
 				  "end\n";
 				  

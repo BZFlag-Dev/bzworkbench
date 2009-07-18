@@ -61,7 +61,6 @@ class group : public bz2object {
 	private:
 		// member data
 		RGBA tintColor;
-		bool driveThrough, shootThrough;
 		int team;
 		
 		// the actual object group container

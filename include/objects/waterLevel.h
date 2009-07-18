@@ -16,7 +16,7 @@
 #include "DataEntry.h"
 #include <string>
 
-using namespace std;
+class material;
 
 class waterLevel : public DataEntry {
 public:
@@ -27,10 +27,7 @@ public:
 	static DataEntry* init() { return new waterLevel(); }
 	
 	// get method
-	string get(void);
-	
-	// update method
-	int update(string& data);
+	std::string get(void);
 
 	// bzw methods
 	bool parse( std::string& line );
@@ -41,18 +38,18 @@ public:
 	
 	// getters/setters
 	string getName() { return name; }
-	string getMaterial() { return material; }
+	material* getMaterial() { return waterMaterial; }
 	float getHeight() { return height; }
 	
-	void setName( string _name ) { name = _name; }
-	void setMaterial( string _material ) { material = _material; }
+	void setName( std::string _name ) { name = _name; }
+	void setMaterial( material* _material ) { waterMaterial = _material; }
 	void setHeight( float _height ) { height = _height; }
 	
 	virtual ~waterLevel();
 	
 private:
-	string name;
-	string material;
+	std::string name;
+	material* waterMaterial;
 	float height;
 };
 

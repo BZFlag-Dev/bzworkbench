@@ -50,60 +50,39 @@ physics::physics( const osg::Referenced& ref ) :
 // getter
 string physics::get(void) { return toString(); }
 
-// setter
-/*int physics::update(string& data) {
-
-	const char* header = getHeader().c_str();
-
-	// get the chunk of string we need
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
-
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
-
-	if(!hasOnlyOne(lines, "physics"))
-		return 0;
-
-	const char* physicsData = lines[0].c_str();
-
-	// get name
-	vector<string> names = BZWParser::getValuesByKey("name", header, physicsData);
-	if(!hasOnlyOne(names, "name"))
-		return 0;
-
-	// get linear velocity
-	vector<string> linearVelocities = BZWParser::getValuesByKey("linear", header, physicsData);
-
-	// get angular velocity
-	vector<string> angularVelocities = BZWParser::getValuesByKey("angular", header, physicsData);
-
-	// get slide
-	vector<string> slides = BZWParser::getValuesByKey("slide", header, physicsData);
-
-	// get death message
-	vector<string> deathMessages = BZWParser::getValuesByKey("death", header, physicsData);
-
-	// load the data in
-	if(!DataEntry::update(data))
-		return 0;
-	name = names[0];
-	linear = (linearVelocities.size() != 0 ? Point3D( linearVelocities[0].c_str() ) : Point3D( 0.0f, 0.0f, 0.0f ));
-	angular = (angularVelocities.size() != 0 ? Point3D( angularVelocities[0].c_str() ): Point3D( 0.0f, 0.0f, 0.0f));
-	slide = (slides.size() != 0 ? atof( slides[0].c_str() ) : 0.0f);
-
-	if(deathMessages.size() >= 1)
-		deathMessage = deathMessages[0];
-
-	return 1;
-}*/
-
 // bzw methods
 bool physics::parse( std::string& line ) {
-	return false;
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	if ( key == "name" ) {
+		name = value;
+	}
+	else if ( key == "linear" ) {
+		linear = Point3D( value.c_str() );
+	}
+	else if ( key == "angular" ) {
+		angular = Point3D( value.c_str() );
+	}
+	else if ( key == "slide" ) {
+		slide = atof( value.c_str() );
+	}
+	else if ( key == "death" ) {
+		deathMessage = value;
+	}
+	else {
+		throw BZWReadError( this, string( "Unknown key, " ) + key );
+	}
+
+	return true;
 }
 
 void physics::finalize() {
-
+	// nothing to do
 }
 
 // toString

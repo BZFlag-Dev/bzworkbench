@@ -67,7 +67,6 @@ private:
 	bool flatShading, smoothbounce, hemisphere;
 	int divisions;
 	osg::Vec3 realSize;
-	Point2D texsize;
 
 	void updateGeometry();
 

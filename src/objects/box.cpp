@@ -43,7 +43,7 @@ void box::setDefaults() {
 		ricochets[i] = false;
 
 		// set default textures
-		//SceneBuilder::assignTexture((i >= ZP) ? "roof" : "boxwall", group->getChild(i) );
+		SceneBuilder::assignTexture((i >= ZP) ? "roof" : "boxwall", group->getChild(i) );
 
 		// add material/physics slot
 		MaterialSlot mslot;
@@ -128,6 +128,8 @@ bool box::parse( std::string& line ) {
 void box::finalize() {
 	// just regen UV coords based on any size changes
 	Primitives::rebuildBoxUV( (osg::Group*)getThisNode(), getSize() );
+
+	bz2object::finalize();
 }
 
 // setter (with binary data)

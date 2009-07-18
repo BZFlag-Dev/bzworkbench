@@ -39,10 +39,10 @@ ConeConfigurationDialog::ConeConfigurationDialog( cone* _theCone ) :
 	sweepAngleCounter->value( theCone->getSweepAngle() );
 	
 	flatShadingButton = new Fl_Check_Button(5, 80, DEFAULT_WIDTH - 10, DEFAULT_TEXTSIZE + 6, "Flat Shading");
-	flatShadingButton->value( theCone->hasFlatShading() == true ? 1 : 0 );
+	flatShadingButton->value( theCone->getFlatshading() == true ? 1 : 0 );
 	
 	smoothBounceButton = new Fl_Check_Button(5, 105, DEFAULT_WIDTH - 10, DEFAULT_TEXTSIZE + 6, "Smooth Bounce");
-	smoothBounceButton->value( theCone->hasSmoothBounce() == true ? 1 : 0 );
+	smoothBounceButton->value( theCone->getSmoothbounce() == true ? 1 : 0 );
 
 	flipzButton = new Fl_Check_Button(5, 130, DEFAULT_WIDTH - 10, DEFAULT_TEXTSIZE + 6, "Flip Z");
 	flipzButton->value( theCone->getFlipz() == true ? 1 : 0 );
@@ -58,10 +58,10 @@ ConeConfigurationDialog::ConeConfigurationDialog( cone* _theCone ) :
 // OK callback
 void ConeConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 	// call cone-specific setters from the UI
-	theCone->setSmoothBounce( smoothBounceButton->value() == 1 ? true : false );
+	theCone->setSmoothbounce( smoothBounceButton->value() == 1 ? true : false );
 	theCone->setSweepAngle( sweepAngleCounter->value() );
 	theCone->setDivisions( (int)subdivisionCounter->value() );
-	theCone->setFlatShading( flatShadingButton->value() == 1 ? true : false );
+	theCone->setFlatshading( flatShadingButton->value() == 1 ? true : false );
 	theCone->setTexsize( Point2D( texsizeXField->value(), texsizeYField->value() ) );
 	theCone->setFlipz( flipzButton->value() == 1 ? true : false );
 	

@@ -31,7 +31,7 @@ void meshbox::setDefaults() {
 	ratio = 1.0f;
 	divisions = 4;
 	angle = 360.0f;
-	flatShading = true;
+	flatshading = true;
 	smoothbounce = false;
 	texsize.set( -8.0f, -8.0f, -8.0f, -8.0f  );
 	boxStyle = true;
@@ -52,4 +52,14 @@ void meshbox::setDefaults() {
 
 	setSize( osg::Vec3( 10, 10, 10 ) );
 
+}
+
+bool meshbox::parse( std::string& line ) {
+	if ( line == "obstacle" ) {
+		// don't know what this is for
+		return true;
+	}
+	else {
+		return arc::parse( line );
+	}
 }

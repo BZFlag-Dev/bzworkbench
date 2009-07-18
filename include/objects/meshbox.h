@@ -26,6 +26,8 @@ public:
 	static DataEntry* init() { return new meshbox(); }
 
 	void setDefaults();
+
+	bool parse( std::string& line );
 };
 
 #endif /*MESHBOX_H_*/

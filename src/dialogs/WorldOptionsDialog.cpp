@@ -12,6 +12,9 @@
 
 #include "dialogs/WorldOptionsDialog.h"
 
+#include "model/Model.h"
+#include "objects/material.h"
+
 // helper method--concat strings from a vector of strings
 string concat(vector<string> strings) {
 	string ret = string("");
@@ -40,7 +43,7 @@ WorldOptionsDialog::WorldOptionsDialog( world* theWorld, options* theOptions, wa
 	string options = optionsData->getOptionsString();
 	
 	float waterHeight = waterLevelData->getHeight();
-	string waterMaterial = waterLevelData->getMaterial();		
+	material* waterMaterial = waterLevelData->getMaterial();		
 		
 	// initialize widgets
 	worldNameLabel = new QuickLabel("Name:", 5, 5);
@@ -67,7 +70,8 @@ WorldOptionsDialog::WorldOptionsDialog( world* theWorld, options* theOptions, wa
 	
 	waterTextureLabel = new QuickLabel("Water Material:", 5, 155);
 	waterTextureField = new Fl_Input(120, 155, 180, DEFAULT_TEXTSIZE + 6);
-	waterTextureField->value(waterMaterial.c_str());
+	if ( waterMaterial != NULL )
+		waterTextureField->value( waterMaterial->getName().c_str() );
 	
 	noWallsCheckButton = new Fl_Check_Button(5, 185, DEFAULT_TEXTSIZE + 6, DEFAULT_TEXTSIZE + 6, "No Walls");
 	noWallsCheckButton->value(noWalls);
@@ -119,7 +123,7 @@ void WorldOptionsDialog::OKButtonCallback_real(Fl_Widget* w) {
 	
 	string optionsString = string(worldOptionsField->value());
 	
-	string waterMaterialString = string(waterTextureField->value());
+	material* waterMaterialString = dynamic_cast< material* >( Model::command( MODEL_GET, "material", string( waterTextureField->value() ) ) );
 	
 	float size = worldSizeField->value();
 	

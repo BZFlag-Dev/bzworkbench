@@ -36,7 +36,7 @@ cone::cone() :
 void cone::setDefaults() {
 	// define some basic values
 	divisions = 16;
-	flatShading = false;
+	flatshading = false;
 	smoothbounce = true;
 	pyramidStyle = false;
 
@@ -78,89 +78,6 @@ void cone::setDefaults() {
 // getter
 string cone::get(void) { return toString(); }
 
-// setter
-/*int cone::update(string& data) {
-	const char* header = getHeader().c_str();
-	// get the chunk we need
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str(), "end");
-
-	// check and see if the proper data segment was found
-	if(lines[0] == BZW_NOT_FOUND) {
-		printf("cone: data not found\n");
-		return 0;
-	}
-
-	string key = (pyramidStyle == true ? "meshpyr" : "cone");
-	if(!hasOnlyOne(lines, key.c_str())) {
-		printf("cone: improper data\n");
-		return 0;
-	}
-
-	const char* coneData = lines[0].c_str();
-
-	// get the texsize
-	vector<string> texsizes = BZWParser::getValuesByKey("texsize", header, coneData);
-	if(texsizes.size() > 1) {
-		printf("cone::update(): Error! Defined \"texsize\" %d times!\n", (int)texsizes.size());
-		return 0;
-	}
-
-	// get the divisions
-	vector<string> vDivisions = BZWParser::getValuesByKey("divisions", header, coneData);
-	if( vDivisions.size() > 1 ) {
-		printf("cone::update(): error! defined \"divisions\" %d times\n", (int)vDivisions.size() );
-		return 0;
-	}
-	if( vDivisions.size() == 0 )
-		vDivisions.push_back( string("16") );		// default # of divisions is 16
-
-	// get the sweep angle
-	vector<string> sweepAngles = BZWParser::getValuesByKey("angle", header, coneData);
-	if( sweepAngles.size() > 1 ) {
-		printf("cone::update(): error! defined \"divisions\" %d times\n", (int)sweepAngles.size() );
-		return 0;
-	}
-	if( sweepAngles.size() == 0 )
-		sweepAngles.push_back( string("360") );		// default sweep is 360
-
-	// get flatshading
-	vector<string> flatShadings = BZWParser::getValuesByKey("flatshading", header, coneData);
-
-	// get smoothbounce
-	vector<string> smoothBounces =  BZWParser::getValuesByKey("smoothbounce", header, coneData);
-
-	// do base class update
-	if(!bz2object::update(data))
-		return 0;
-
-
-	// see if the divisions changed (if so, then update the geometry)
-	int oldDivisions = divisions;
-	if (vDivisions.size() > 0) 
-		divisions = atoi( vDivisions[0].c_str() );
-	
-
-	float oldSweepAngle = sweepAngle;
-	if (sweepAngles.size() > 0)
-		sweepAngle = atof( sweepAngles[0].c_str() );
-
-	// if the number of divisions changed or the sweep angle changed, rebuild the geometry
-	if( divisions != oldDivisions || sweepAngle != oldSweepAngle ) {
-		buildGeometry();
-	}
-
-	if (texsizes.size() > 0) {
-		texsize = Point2D( texsizes[0].c_str() );
-	}
-
-	flatShading = (flatShadings.size() == 0 ? false : true);
-	updateShadeModel();		// update the shade model
-
-	smoothbounce = (smoothBounces.size() == 0 ? false : true);
-
-	return 1;
-}*/
-
 // bzw methods
 bool cone::parse( std::string& line ) {
 	// check if we reached the end of the section
@@ -171,20 +88,11 @@ bool cone::parse( std::string& line ) {
 	string value = BZWParser::value( key.c_str(), line.c_str() );
 
 	// parse keys
-	if ( key == "texsize" ) {
-		texsize = Point2D( value.c_str() );
-	}
-	else if ( key == "divisions" ) {
+	if ( key == "divisions" ) {
 		divisions = atof( value.c_str() );
 	}
 	else if ( key == "angle" ) {
 		sweepAngle = atof( value.c_str() );
-	}
-	else if ( key == "flatshading" ) {
-		flatShading = true;
-	}
-	else if ( key == "smoothbounce" ) {
-		smoothbounce = true;
 	}
 	else {
 		return bz2object::parse( line );
@@ -194,8 +102,9 @@ bool cone::parse( std::string& line ) {
 }
 
 void cone::finalize() {
-	updateShadeModel();
 	buildGeometry();
+
+	bz2object::finalize();
 }
 
 // event handler
@@ -267,18 +176,13 @@ string cone::toString(void) {
 			   "  angle " + string(ftoa(sweepAngle) ) + "\n";
 
 	ret += string("") +
-		   (flatShading == true ? "  flatshading\n" : "") +
+		   (flatshading == true ? "  flatshading\n" : "") +
 		   (smoothbounce == true ? "  smoothbounce\n" : "") +
 		   "  texsize " + texsize.toString() + "\n" +
 		   (flipz == true ? "  flipz\n" : "") +
 		   "end\n";
 
 	return ret;
-}
-
-void cone::setFlatShading(bool value) {
-	flatShading = value;
-	updateShadeModel();
 }
 
 void cone::setSweepAngle(float value) {
@@ -453,26 +357,4 @@ void cone::buildGeometry() {
 		endGeometry->setTexCoordArray( 0, crossSectionTexCoords );
 		endGeometry->addPrimitiveSet( endIndices );
    	}
-}
-
-// set the shade model based on the value of flatShading
-void cone::updateShadeModel() {
-	// get state set
-	osg::StateSet* states = getOrCreateStateSet();
-
-	// get the shade model
-	osg::ShadeModel* shadeModel = dynamic_cast< osg::ShadeModel* >( states->getAttribute( osg::StateAttribute::SHADEMODEL ) );
-	if( shadeModel == NULL ) {
-		shadeModel = new osg::ShadeModel();		// if one doesn't exist, then make one
-	}
-
-	if( flatShading ) {
-		shadeModel->setMode( osg::ShadeModel::FLAT );
-	}
-	else {
-		shadeModel->setMode( osg::ShadeModel::SMOOTH );
-	}
-
-	// set the shade model
-	states->setAttribute( shadeModel );
 }

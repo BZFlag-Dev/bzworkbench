@@ -155,6 +155,7 @@ private:
 	// to make each node name identical
 	static int nameCount;
 	
+	static std::map< std::string, osg::ref_ptr< osg::StateSet > > stateCache;
 };
 
 #endif /*SCENEDATA_H_*/

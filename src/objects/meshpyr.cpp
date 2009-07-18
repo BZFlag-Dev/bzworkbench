@@ -27,7 +27,7 @@ void meshpyr::setDefaults() {
 
 	// define some basic values
 	divisions = 4;
-	flatShading = false;
+	flatshading = false;
 	smoothbounce = true;
 	flipz = false;
 	pyramidStyle = true;

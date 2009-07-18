@@ -19,7 +19,7 @@
 const char* sphere::sideNames[MaterialCount] = { "edge", "bottom" };
 
 sphere::sphere() :
-bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref>" ) {
+bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref><hemisphere>" ) {
 	setDefaults();
 }
 
@@ -48,8 +48,6 @@ void sphere::setDefaults() {
 	realSize = osg::Vec3( 10, 10, 10 );
 	texsize.set( -4.0f, -4.0f );
 	divisions = 16;
-	flatShading = false;
-	smoothbounce = false;
 	hemisphere = false;
 
 	updateGeometry();
@@ -57,82 +55,6 @@ void sphere::setDefaults() {
 
 // getter
 string sphere::get(void) { return toString(); }
-
-// setter
-/*int sphere::update(string& data) {
-	const char* header = getHeader().c_str();
-	// get the chunk we need
-
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
-
-	// check and see if the proper data segment was found
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
-
-	if(!hasOnlyOne(lines, "sphere"))
-		return 0;
-	const char* sphereData = lines[0].c_str();
-
-	// get the name
-	vector<string> names = BZWParser::getValuesByKey("name", header, sphereData);
-	if(names.size() > 1) {
-		printf("sphere::update(): Error! Defined \"name\" %d times!\n", (int)names.size());
-		return 0;
-	}
-
-	// get the divisions
-	vector<string> vDivisions = BZWParser::getValuesByKey("divisions", header, sphereData);
-	if(vDivisions.size() > 1) {
-		printf("sphere::update(): Error! Defined \"divisions\" %d times!\n", (int)names.size());
-		return 0;
-	}
-
-	// get the radius
-	vector<string> radii = BZWParser::getValuesByKey("radius", header, sphereData);
-	if(radii.size() > 1) {
-		printf("sphere::update(): Error! Defined \"radius\" %d times!\n", (int)radii.size());
-		return 0;
-	}
-
-	// get flatshading
-	vector<string> flatShadings = BZWParser::getValuesByKey("flatshading", header, sphereData);
-
-	// get smoothbounce
-	vector<string> smoothBounces =  BZWParser::getValuesByKey("smoothbounce", header, sphereData);
-
-	// Before we call the superclass's update method, we need to see if "size" is defined.
-	// It's perfectly legal to not define a size but to define a radius; if we have a radius,
-	// we can add a size and forget the radius.
-	vector<string> sizes = BZWParser::getValuesByKey("size", header, sphereData);
-	if(sizes.size() < 1 && radii.size() >= 1) {
-		// encapsulate the sphere data inside a string
-		string sphData = string(sphereData);
-
-		// find the line after the header
-		string::size_type index = sphData.find("\n", 0);
-
-		// create an appropriate size string
-		string size = string("  size ") + radii[0] + " " + radii[0] + " " + radii[0]+ "\n";
-
-		// insert the size string into the object data
-		sphData.insert(index+1, size.c_str());
-
-		// make data the new sphere data
-		data = sphData;
-	}
-
-	// do base class update
-	if(!bz2object::update(data))
-		return 0;
-
-	// set the data
-	setName(names.size() > 0 ? names[0] : "");
-	divisions = (vDivisions.size() > 0 ? atoi( vDivisions[0].c_str() ) : 16);
-	flatShading = (flatShadings.size() == 0 ? false : true);
-	smoothbounce = (smoothBounces.size() == 0 ? false : true);
-
-	return 1;
-}*/
 
 int sphere::update(UpdateMessage& message) {
 	int result = bz2object::update( message );
@@ -179,11 +101,37 @@ int sphere::update(UpdateMessage& message) {
 
 // bzw methods
 bool sphere::parse( std::string& line ) {
-	return false;
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	// parse keys
+	if ( key == "divisions" ) {
+		divisions = atof( value.c_str() );
+	}
+	else if ( key == "radius" ) {
+		float r = atof( value.c_str() );
+		realSize = Point3D( r, r, r );
+	}
+	else if ( key == "size" ) {
+		realSize = Point3D( value.c_str() );
+	}
+	else if ( key == "hemisphere" ) {
+		hemisphere = true;
+	}
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
 }
 
 void sphere::finalize() {
-
+	updateGeometry();
+	bz2object::finalize();
 }
 
 // toString

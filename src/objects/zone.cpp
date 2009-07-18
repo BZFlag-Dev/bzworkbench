@@ -186,7 +186,83 @@ int zone::update( UpdateMessage& message ) {
 
 // bzw methods
 bool zone::parse( std::string& line ) {
-	return false;
+	// check if we reached the end of the section
+	if ( line == "end" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+
+	// parse keys
+	if ( key == "team" ) {
+		vector<string> teamElements = BZWParser::getLineElements( value.c_str() );
+		
+		// candidate teams
+		vector<int> teamCandidates = vector<int>();
+
+		// determine whether or not the given teams are valid (throw a error if invalid)
+		for(vector<string>::iterator i = teamElements.begin(); i != teamElements.end(); i++) {
+			int teamNumber = atoi( i->c_str() );
+			if(teamNumber < 0 || teamNumber > 4) {
+				throw BZWReadError( this, string( "Undefined team, " ) + value);
+			}
+			teamCandidates.push_back(teamNumber);
+		}
+
+		teams = teamCandidates;
+	}
+	else if ( key == "safety" ) {
+		vector<string> safetyElements = BZWParser::getLineElements( value.c_str() );
+
+		// candidate safeties
+		vector<int> safetyCandidates = vector<int>();
+
+		// determine whether or not the given safety values are valid (throw a warning if not)
+		if(safetyElements.size() > 0) {
+			for(vector<string>::iterator i = safetyElements.begin(); i != safetyElements.end(); i++) {
+				int teamNumber = atoi( i->c_str() );
+				if(teamNumber < 0 || teamNumber > 4) {
+					throw BZWReadError( this, string( "Undefined safety, " ) + value );
+				}
+				safetyCandidates.push_back(teamNumber);
+			}
+		}
+
+		safety = safetyCandidates;
+	}
+	else if ( key == "flag" ) {
+		vector<string> flagElements = BZWParser::getLineElements(value.c_str());
+
+		// determine whether or not the given flags are valid (throw a error if its invalid)
+		for(vector<string>::iterator i = flagElements.begin(); i != flagElements.end(); i++) {
+			if(	! (Flag::isFlag( i->c_str() )  || (*i) == "good" || (*i) == "bad") ) {
+				throw BZWReadError( this, string( "Unrecognized flag type, " ) + *i);
+			}
+		}
+
+		flags = flagElements;
+	}
+	else if ( key == "zoneflag" ) {
+		// read the flag
+		string flag = BZWParser::key( value.c_str() );
+		// see if its valid
+		if(!Flag::isFlag(flag.c_str()))
+			throw BZWReadError( this, string( "Unrecognized flag type, " ) + value);
+		// try to read the quantity
+		string val = BZWParser::value(flag.c_str(), value.c_str());
+		// try to atoi() the value
+		int num = atoi( val.c_str() );
+		// num will be zero if atoi() failed...
+		if(num == 0)
+			throw BZWReadError( this, string( "Unrecognized flag quantity, " ) + value );
+
+		zoneflags.push_back( FlagElement( flag, num ) );
+	}
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
 }
 
 void zone::finalize() {

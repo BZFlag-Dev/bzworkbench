@@ -46,17 +46,14 @@ public:
 	string toString(void);
 	
 	// getters
-	string& getName() { return name; }
 	teleporter* getFrom() { return from; }
 	teleporter* getTo() { return to; }
 	
 	// setters
-	void setName( const string& _name ) { this->name = _name; }
 	void setFrom( teleporter* _from ) { from = _from; }
 	void setTo( teleporter* _to ) { to = _to; }
 	
 private:
-	string name;
 	teleporter *from;
 	teleporter *to;
 	

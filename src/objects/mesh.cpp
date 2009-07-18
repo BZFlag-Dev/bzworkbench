@@ -161,7 +161,8 @@ bool mesh::parse( std::string& line ) {
 }
 
 void mesh::finalize() {
-
+	updateGeometry();
+	bz2object::finalize();
 }
 
 // to string

@@ -144,10 +144,7 @@ bool teleporter::parse( std::string& line ) {
 	string value = BZWParser::value( key.c_str(), line.c_str() );
 
 	// parse keys
-	if ( key == "teleporter" ) {
-		Object::setName( value );
-	}
-	else if ( key == "border" ) {
+	if ( key == "border" ) {
 		border = atof( value.c_str() );
 	}
 	else if ( key == "size" ) {

@@ -16,6 +16,7 @@
 #include "DataEntry.h"
 #include "render/Renderable.h"
 #include "render/Point3D.h"
+#include "render/Point2D.h"
 #include "Transform.h"
 
 #include "objects/material.h"
@@ -71,6 +72,8 @@ class bz2object : public Renderable, public DataEntry
 		vector< osg::ref_ptr<BZTransform> >& getTransformations() { return transformations; }
 		vector< material* >& getMaterials( std::string slot = "" ) { return materialSlots[ slot ].materials; }
 		bool isSelected() { return selected; }
+		bool getFlatshading() { return flatshading; }
+		bool getSmoothbounce() { return smoothbounce; }
 
 		// use this instead of getPosition()
 		virtual osg::Vec3 getPos() { return getPosition(); }
@@ -114,6 +117,8 @@ class bz2object : public Renderable, public DataEntry
 		void setTransforms( vector< osg::ref_ptr<BZTransform> >& _transformations ) { this->transformations = _transformations; }
 		void setMaterials( vector< material* >& _materials, std::string slot = ""  );
 		void setSelected( bool value ) { selected = value; }
+		void setFlatshading( bool value ) { flatshading = value; updateShadeModel(); }
+		void setSmoothbounce( bool value ) { smoothbounce = value; }
 
 		// set/set the thisNode
 		osg::Node* getThisNode() { return thisNode.get(); }
@@ -185,6 +190,15 @@ class bz2object : public Renderable, public DataEntry
 		std::map< std::string, PhysicsSlot > physicsSlots;
 		std::map< std::string, MaterialSlot > materialSlots; 
 
+		// texsize/offset
+		Point2D texsize;
+		Point2D texoffset;
+
+		bool drivethrough;
+		bool shootthrough;
+		bool flatshading;
+		bool smoothbounce;
+
 	private:
 		// force these methods to be private, to guarantee that derived classes will use the given replacements
 		osg::Vec3f getPosition() { return Renderable::getPosition(); }
@@ -199,6 +213,9 @@ class bz2object : public Renderable, public DataEntry
 
 		// recompute the transformation stack
 		void recomputeTransformations( vector< osg::ref_ptr< BZTransform > >* newTransformations);
+
+		// update the shade model based on flatshading
+		void updateShadeModel();
 
 		// reference to node data inside the Renderable (for changing the transformation stack)
 		osg::ref_ptr< osg::Node > thisNode;

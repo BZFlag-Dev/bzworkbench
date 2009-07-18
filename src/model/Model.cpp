@@ -240,7 +240,6 @@ bool Model::_build( std::istream& data ) {
 	clear();
 
 	string buff, header;
-	bool foundWorld = false;
 	int lineCount = 0;
 
 	world* worldObj = NULL;
@@ -273,7 +272,6 @@ bool Model::_build( std::istream& data ) {
 				if ( !worldObj->parse( buff ) ) {
 					worldObj->finalize();
 					this->worldData = worldObj;
-					foundWorld = true;		// there must be a world
 					worldObj = NULL;
 
 					// tell the observers we have a different world
@@ -360,7 +358,7 @@ bool Model::_build( std::istream& data ) {
 			else if( header == "world" ) {
 				worldObj = (world*)this->cmap["world"]();
 			}
-			else if( header == "waterLevel" ) {
+			else if( header == "waterlevel" ) {
 				waterLevelObj = (waterLevel*)this->cmap["waterLevel"]();
 			}
 			else if( header == "options" ) {
@@ -375,7 +373,7 @@ bool Model::_build( std::istream& data ) {
 			else if( header == "physics" ) {
 				physicsObj = (physics*)this->cmap["physics"]();
 			}
-			else if( header == "dynamicColor" ) {
+			else if( header == "dynamiccolor" ) {
 				dyncolObj = (dynamicColor*)this->cmap["dynamicColor"]();
 			}
 			else if( header == "define" ) {
@@ -387,15 +385,10 @@ bool Model::_build( std::istream& data ) {
 			else if( header == "texturematrix" ) {
 				texmatObj = (texturematrix*)this->cmap["texturematrix"]();
 			}
-			// teleporter is a special case object since the name can be in the title
-			// so we need to make sure it gets parsed
-			else if ( header == "teleporter" ) {
-				object = (bz2object*)cmap[buff]();
-				object->parse( buff );
-			}
 			else {
-				if( this->cmap.count(buff) > 0 ) {
-					object = (bz2object*)cmap[buff]();
+				if( this->cmap.count(header) > 0 ) {
+					object = (bz2object*)cmap[header]();
+					object->parse( buff );
 				}
 				else {
 					printf("Model::build(): Skipping undefined object \"%s\"\n", buff.c_str());
@@ -409,9 +402,9 @@ bool Model::_build( std::istream& data ) {
 		}
 	}
 
-	// need a world
-	if (!foundWorld)
-		return false;
+	// need a world so if we didn't find one make a default one
+	if (!worldData)
+		worldData = new world();
 
 	return true;
 }

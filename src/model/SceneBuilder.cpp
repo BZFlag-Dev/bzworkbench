@@ -17,6 +17,8 @@
 
 int SceneBuilder::nameCount;
 
+std::map< std::string, osg::ref_ptr< osg::StateSet > > SceneBuilder::stateCache;
+
 // constructor
 bool SceneBuilder::init() {
 	nameCount = 0;
@@ -146,21 +148,27 @@ osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
 // assign a texture to a Node
 void SceneBuilder::assignTexture( const char* _textureName, osg::Node* node, unsigned int mode ) {
 	if(_textureName != NULL) {
-		string textureName = string(_textureName) + SCENEBUILDER_TAIL_TEXTURE2D;
+		// if the stateset is already in the cache, assign it
+		if ( stateCache.count( string( _textureName ) ) > 0 ) {
+			node->setStateSet( stateCache[ _textureName ].get() );
+		}
+		// otherwise load the texture and make a stateset
+		else {
+			osg::Texture2D* texture = buildTexture2D( _textureName );
+			
+			if (texture != NULL) {
+				// make a new state set for the texture (so we can manipulate the texture attributes)
+				osg::StateSet* texStateSet = new osg::StateSet();
 
-		// the texture itself
-		osg::Texture2D* texture = buildTexture2D( _textureName );
+				// assign the texture to the state set and activate it
+				texStateSet->setTextureAttributeAndModes( 0, texture, mode );
 
-		if (texture != NULL) {
+				// finally, attach the texture to the geode
+				node->setStateSet( texStateSet );
 
-			// make a new state set for the texture (so we can manipulate the texture attributes)
-			osg::StateSet* texStateSet = node->getOrCreateStateSet();
-
-			// assign the texture to the state set and activate it
-			texStateSet->setTextureAttributeAndModes( 0, texture, mode );
-
-			// finally, attach the texture to the geode
-			node->setStateSet( texStateSet );
+				// save it to the cache
+				stateCache[ _textureName ] = texStateSet;
+			}
 		}
 	}
 }

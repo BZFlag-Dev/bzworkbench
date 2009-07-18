@@ -29,9 +29,6 @@ class world : public DataEntry {
 		// send the data
 		string get(void);
 		
-		// receive the data
-		int update(string& data);
-		
 		// toString method
 		string toString(void);
 
