@@ -30,6 +30,7 @@ using namespace std;
  */
 
 class BZTransform;
+struct TransformData;
 class material;
 class physics;
 
@@ -108,7 +109,7 @@ public:
 		this->data.indexedMaterial = _data;
 	}
 
-	UpdateMessage( int _type, vector< osg::ref_ptr<BZTransform> >* _data) {
+	UpdateMessage( int _type, vector< TransformData >* _data) {
 		this->type = _type;
 		this->data.transforms = _data;
 	}
@@ -138,7 +139,7 @@ public:
 	osg::Vec3* getAsRotationFactor() { return data.vec; }
 
 	BZTransform* getAsTransformation() { return data.transform; }
-	vector< osg::ref_ptr<BZTransform> >* getAsTransformationStack() { return data.transforms; }
+	vector< TransformData >* getAsTransformationStack() { return data.transforms; }
 	IndexedTransform* getAsIndexedTransform() { return data.indexedTransformation; }
 
 	material* getAsMaterial() { return data.mat; }
@@ -157,7 +158,7 @@ private:
 
 		IndexedTransform* indexedTransformation;	// transformation to be inserted
 
-		vector< osg::ref_ptr<BZTransform> >* transforms;	// transformations
+		vector< TransformData >* transforms;	// transformations
 
 		material* mat;			// a material to be pushed/popped
 		vector< material* >* materials;		// material stack

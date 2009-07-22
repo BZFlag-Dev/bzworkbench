@@ -25,8 +25,8 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Scroll.H>
 #include "QuickLabel.h"
-#include "../ftoa.h"
-#include "../Transform.h"
+#include "ftoa.h"
+#include "Transform.h"
 
 #include <string>
 #include <vector>
@@ -51,20 +51,26 @@ public:
 	static void getTransformationCallback(Fl_Widget* w, void* data);
 	
 	// getters
-	string getTransformationType(void);
+	string getTransformationString(void);
+	TransformType getTransformationType(void);
 	vector<string> getSupportedTransformations(void);
 	bool isActive(void);
+	osg::Vec4 getFields();
 	
 	// setters
 	// changes the type of transformation and changes the fields
 	void setTransformationType(string& s);
 	void setTransformationType(const char* s);
+	void setTransformationType(TransformType t);
 	
 	// set the fields with string represented values
 	void setFields(vector<string> fieldValues);
 	
 	// set the fields with float values
 	void setFields(vector<float> fieldValues);
+
+	// set the fields with a osg::vec4
+	void setFields(osg::Vec4 fieldValues);
 	
 	
 	// return string representation in BZW format

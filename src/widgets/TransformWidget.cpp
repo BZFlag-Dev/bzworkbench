@@ -89,9 +89,39 @@ void TransformWidget::getTransformationCallback(Fl_Widget* w, void* data) {
 }
 
 // getters
-string TransformWidget::getTransformationType(void) { return string( typeMenu->label() ); }
+string TransformWidget::getTransformationString(void) { return string( typeMenu->label() ); }
+TransformType TransformWidget::getTransformationType(void) { 
+	string str( typeMenu->label() );
+	if ( str == "shift" ) {
+		return ShiftTransform;
+	}
+	else if ( str == "scale" ) {
+		return ScaleTransform;
+	}
+	else if ( str == "shear" ) {
+		return ShearTransform;
+	}
+	else if ( str == "spin" ) {
+		return SpinTransform;
+	}
+	else {
+		return ShiftTransform;
+	}
+}
+
 vector<string> TransformWidget::getSupportedTransformations(void) { return transformTypes; }
 bool TransformWidget::isActive(void) { return (activeButton->value() == 1 ? true : false); }
+
+osg::Vec4 TransformWidget::getFields() {
+	osg::Vec4 vec;
+
+	int index = 0;
+	for(vector<Fl_Float_Input*>::iterator i = fields.begin(); i != fields.end() && index < 4; i++, index++) {
+		vec[ index ] = atof( (*i)->value() );
+	}	
+	
+	return vec;
+}
 
 // setters
 // changes the type of transformation and changes the fields
@@ -102,6 +132,23 @@ void TransformWidget::setTransformationType(string& s) {
 void TransformWidget::setTransformationType(const char* s) {
 	string str = string(s);
 	setTransformationType(str);	
+}
+
+void TransformWidget::setTransformationType(TransformType t) {
+	switch ( t ) {
+		case ShiftTransform:
+			setTransformationType( "shift" );
+			break;
+		case ScaleTransform:
+			setTransformationType( "scale" );
+			break;
+		case ShearTransform:
+			setTransformationType( "shear" );
+			break;
+		case SpinTransform:
+			setTransformationType( "spin" );
+			break;
+	}
 }
 
 // set the fields with string represented values
@@ -120,6 +167,15 @@ void TransformWidget::setFields(vector<float> fieldValues) {
 		(*i)->value(ftoa(fieldValues[index]).c_str());
 		index++;
 	}	
+}
+
+void TransformWidget::setFields(osg::Vec4 fieldValues) {
+	vector<float> vals;
+	vals.push_back( fieldValues.x() );
+	vals.push_back( fieldValues.y() );
+	vals.push_back( fieldValues.z() );
+	vals.push_back( fieldValues.w() );
+	setFields( vals );
 }
 
 

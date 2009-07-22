@@ -22,7 +22,8 @@ bz2object::bz2object(const char* name, const char* keys):
 {
 	thisNode = NULL;
 
-	transformations = vector< osg::ref_ptr<BZTransform> >();
+	transformations = new BZTransform();
+	addChild( transformations );
 	MaterialSlot mslot;
 	mslot.defaultMaterial = NULL;
 	materialSlots[""] = mslot;
@@ -47,7 +48,8 @@ bz2object::bz2object(const char* name, const char* keys, osg::Node* node ):
 
 	thisNode = node;
 
-	transformations = vector< osg::ref_ptr<BZTransform> >();
+	transformations = new BZTransform();
+	addChild( transformations );
 	MaterialSlot mslot;
 	mslot.defaultMaterial = NULL;
 	materialSlots[""] = mslot;
@@ -110,7 +112,7 @@ bool bz2object::parse( std::string& line ) {
 		( key == "scale" && isKey( "scale" ) ) ||
 		( key == "spin" && isKey( "spin" ) ) ) {
 
-		this->newTransformations.push_back( new BZTransform( line ) );
+		this->transformations->parse( line );
 		return true;
 	}
 
@@ -227,7 +229,7 @@ void bz2object::finalize() {
 	}
 
 	// update the transformation stack
-	this->recomputeTransformations( &newTransformations );
+	this->transformations->refreshMatrix();
 
 	// update the shade model
 	updateShadeModel();
@@ -265,10 +267,7 @@ string bz2object::BZWLines( bz2object* obj )
 		ret += "  scale " + Point3D( obj->getSize() ).toString();
 
 	// add all transformations to the string if they are supported
-	for(vector< osg::ref_ptr<BZTransform> >::iterator i = obj->transformations.begin(); i != obj->transformations.end(); i++) {
-		if(obj->isKey((*i)->getHeader().c_str()) && (*i)->isApplied())
-			ret += "  " + (*i)->toString();
-	}
+	ret += obj->transformations->toString();
 
 	// add phydrv key/value to the string if supported and if defined
 	if(obj->isKey("phydrv")) {
@@ -310,8 +309,9 @@ int bz2object::update( UpdateMessage& message )
 			if( !( isKey("spin") || isKey("shift") || isKey("shear") || isKey("scale") ) )
 				break;
 
-			vector< osg::ref_ptr< BZTransform > >* newTransformations = message.getAsTransformationStack();
-			recomputeTransformations( newTransformations );
+			vector< TransformData >* newTransformations = message.getAsTransformationStack();
+			transformations->setData( *newTransformations );
+			transformations->refreshMatrix();
 			break;
 		}
 
@@ -375,36 +375,6 @@ int bz2object::update( UpdateMessage& message )
 	}
 
 	return 1;
-}
-
-// update the transformation stack with new ones
-void bz2object::recomputeTransformations( vector< osg::ref_ptr< BZTransform > >* newTransformations )
-{
-	// clear all current transformations
-	if( this->transformations.size() > 0 ) {
-		this->removeChild( transformations[0].get() );
-		this->transformations[ this->transformations.size() - 1 ]->removeChild( getThisNode() );
-		this->transformations.clear();
-	} else {
-	  // if there are no current transformations, then try to remove the endShift from the startShift
-	  this->removeChild( getThisNode() );
-	}
-
-	this->transformations = *newTransformations;	// copy the array over
-
-	// add the new transformations
-	if( this->transformations.size() > 0 ) {
-		// add each transformation to the next
-		this->addChild( transformations[0].get() );
-
-		for( unsigned int i = 1; i < transformations.size(); i++ ) {
-			transformations[i-1]->addChild( transformations[i].get() );
-		}
-
-		transformations[ transformations.size() - 1 ]->addChild( getThisNode() );
-	} else {
-		this->addChild( getThisNode() );	// connect the start and end shifts if there are no transformations in between
-	}
 }
 
 // add a material to the object
@@ -504,106 +474,6 @@ void bz2object::refreshMaterial()
 
 void bz2object::setMaterials( vector< material* >& _materials, std::string slot ) { 
 	this->materialSlots[ slot ].materials = _materials; 
-}
-
-// add a transformation
-void bz2object::addTransformation( BZTransform* t ) {
-	if( t != NULL ) {
-		if( this->transformations.size() > 0 ) {
-			// if we actually have othet transformations, we'll need to insert the transformation between
-			// endShift and the last transformation
-			t->addChild( getThisNode() );
-			this->transformations[ this->transformations.size() - 1 ]->removeChild( getThisNode() );
-			this->transformations.push_back( t );
-		}
-		else {
-			// if there are no transformations, then insert this one betweens startShift and endShift
-			t->addChild( getThisNode() );
-			this->removeChild( getThisNode() );
-			this->addChild( t );
-			this->transformations.push_back( t );
-		}
-	}
-}
-
-// insert a transformation
-void bz2object::insertTransformation( unsigned int index, BZTransform* t ) {
-	if( t == NULL )
-		return;		// don't deal with NULL transformations
-
-	// don't deal with out-of-bounds indexes when there are already transformations defined.
-	if( this->transformations.size() >= index )
-		return;
-
-	// if there are no transformations, then insert the transformation between startShift and endShift
-	if( this->transformations.size() == 0 ) {
-		t->addChild( getThisNode() );
-		this->removeChild( getThisNode() );
-		this->addChild( t );
-		this->transformations.push_back( t );
-	}
-	// otherwise...
-	else {
-		// if the index is 0, then insert it between startShift and the start of the transformation list
-		if( index == 0 ) {
-			osg::ref_ptr< BZTransform > t_ref = osg::ref_ptr< BZTransform >( t );
-			// remove the head of the list from startShift
-			this->removeChild( this->transformations[0].get() );
-			// insert the transformation to the head of the list
-			this->transformations.insert( this->transformations.begin(), t );
-			// add the transformation as a child of startShift
-			this->addChild( t_ref.get() );
-		}
-		// if the index is the last one...
-		else if( index == transformations.size()-1 ) {
-			// just invoke the addTransformation() method, since it appends transformations
-			this->addTransformation( t );
-		}
-		// otherwise, the index is somewhere in between, so we need to advance an iterator over to that spot
-		// and insert it
-		else {
-			// count over to the point of insertion
-			vector< osg::ref_ptr< BZTransform > >::iterator itr = this->transformations.begin();
-			unsigned int i = 0;
-			// increment the iterator
-			for(; i < index; i++, ++itr );
-			// now insert the transformation
-			this->transformations[i]->removeChild( this->transformations[i+1].get() );
-			this->transformations.insert( itr, t );
-			// now, transformations[i+1] is the transformation we just added
-			this->transformations[i]->addChild( this->transformations[i+1].get() );
-			this->transformations[i+1]->addChild( this->transformations[i+2].get() );
-		}
-	}
-}
-
-// remove a transformation by pointer (NOTE: removes only the 1st occurence)
-void bz2object::removeTransformation( BZTransform* t ) {
-	if( this->transformations.size() == 0 )
-		return;
-
-	// iterate over the vector and pull the first occurence
-	for( vector< osg::ref_ptr< BZTransform > >::iterator i = this->transformations.begin(); i != this->transformations.end(); ++i ) {
-		if( i->get() == t ) {
-			this->transformations.erase( i );
-			return;
-		}
-	}
-
-}
-
-// remove a transformation by index
-void bz2object::removeTransformation( unsigned int index ) {
-	if( this->transformations.size() == 0 )
-		return;
-
-	// iterate over the vector to find the index
-	unsigned int i = 0;
-	vector< osg::ref_ptr< BZTransform > >::iterator itr = this->transformations.begin();
-	for(; i < index; i++, ++itr );
-
-	// remove the transformation at itr
-	this->transformations.erase( itr );
 }
 
 void bz2object::snapTranslate( float size, osg::Vec3 position ) {

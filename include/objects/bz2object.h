@@ -69,7 +69,7 @@ class bz2object : public Renderable, public DataEntry
 
 		// data getters (makes MasterConfigurationDialog code easier)
 		osg::ref_ptr<physics> getPhyDrv( std::string slot = "" ) { return physicsSlots[ slot ].phydrv; }
-		vector< osg::ref_ptr<BZTransform> >& getTransformations() { return transformations; }
+		osg::ref_ptr<BZTransform> getTransformations() { return transformations; }
 		vector< material* >& getMaterials( std::string slot = "" ) { return materialSlots[ slot ].materials; }
 		bool isSelected() { return selected; }
 		bool getFlatshading() { return flatshading; }
@@ -114,7 +114,7 @@ class bz2object : public Renderable, public DataEntry
 
 		// data setters (makes MasterConfigurationDialog code easier)
 		void setPhyDrv( physics* phydrv, std::string slot = "" ) { physicsSlots[ slot ].phydrv = phydrv; }
-		void setTransforms( vector< osg::ref_ptr<BZTransform> >& _transformations ) { this->transformations = _transformations; }
+		void setTransforms( osg::ref_ptr<BZTransform> _transformations ) { this->transformations = _transformations; }
 		void setMaterials( vector< material* >& _materials, std::string slot = ""  );
 		void setSelected( bool value ) { selected = value; }
 		void setFlatshading( bool value ) { flatshading = value; updateShadeModel(); }
@@ -123,16 +123,9 @@ class bz2object : public Renderable, public DataEntry
 		// set/set the thisNode
 		osg::Node* getThisNode() { return thisNode.get(); }
 		void setThisNode( osg::Node* node ) {
-			if ( transformations.size() > 0 ) {
-				transformations[ transformations.size() - 1 ]->removeChild( thisNode.get() );
-				thisNode = node;
-				transformations[ transformations.size() - 1 ]->addChild( thisNode.get() );
-			}
-			else {
-				this->removeChild( thisNode.get() );
-				thisNode = node;
-				this->addChild( thisNode.get() );
-			}
+			transformations->removeChild( thisNode.get() );
+			thisNode = node;
+			transformations->addChild( thisNode.get() );
 		}
 
 		// make this public
@@ -141,12 +134,6 @@ class bz2object : public Renderable, public DataEntry
 			memcpy(&newObj, &obj, sizeof(bz2object));
 			return newObj;
 		}
-
-		// some basic control methods for transformations
-		void addTransformation( BZTransform* t );
-		void insertTransformation( unsigned int index, BZTransform* t );
-		void removeTransformation( BZTransform* t );
-		void removeTransformation( unsigned int index );
 
 		// some basic control methods for materials
 		void addMaterial( material* mat, std::string slot = "" );
@@ -179,7 +166,7 @@ class bz2object : public Renderable, public DataEntry
 		};
 
 	protected:
-		vector< osg::ref_ptr< BZTransform > > transformations;
+		osg::ref_ptr< BZTransform > transformations;
 		// set true if selected in the 3D scene
 		bool selected;
 
@@ -207,9 +194,6 @@ class bz2object : public Renderable, public DataEntry
 		void setPosition( const osg::Vec3d& newPosition ) { Renderable::setPosition( newPosition ); }
 		void setScale( const osg::Vec3d& newScale ) { Renderable::setScale( newScale ); }
 		void setAttitude( const osg::Quat& newAttitude ) { Renderable::setAttitude( newAttitude ); }
-
-		// only used when parsing bzw
-		vector< osg::ref_ptr< BZTransform > > newTransformations;
 
 		// recompute the transformation stack
 		void recomputeTransformations( vector< osg::ref_ptr< BZTransform > >* newTransformations);

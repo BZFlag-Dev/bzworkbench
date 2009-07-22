@@ -38,8 +38,8 @@ string BZWParser::cutWhiteSpace(string line) {
 	}
 
 	// move the indexes into the string by skipping outside spacess
-	while(startIndex < len && (text[startIndex] == ' ' || text[startIndex] == 9 || text[startIndex] == '\n' || text[startIndex] == '\r')) { startIndex++; }
-	while(endIndex > startIndex && (text[endIndex] == ' ' || text[endIndex] == 9 || text[endIndex] == '\n' || text[endIndex] == '\r')) { endIndex--; }
+	while(startIndex < len && TextUtils::isWhitespace( text[startIndex] )) { startIndex++; }
+	while(endIndex > startIndex && TextUtils::isWhitespace( text[endIndex] )) { endIndex--; }
 
 	// return the line if there was no white space to cut
 	if(startIndex == len)
@@ -654,7 +654,13 @@ vector<string> BZWParser::getLineElements(const char* data, int count) {
 		if(line.length() < 1)
 			break;
 
-		string::size_type spaceIndex = line.find(" ", 0);
+		string::size_type spaceIndex;
+		for ( int i = 0; i < line.length(); i++ )
+			if ( TextUtils::isWhitespace( line[ i ] ) ) {
+				spaceIndex = i;
+				break;
+			}
+
 		string::size_type retIndex = line.find("\n", 0);
 		if(spaceIndex == string::npos &&
 		   retIndex == string::npos)

@@ -39,7 +39,7 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	Point3D size = Point3D(object->getSize());
 	
 	// read transformations
-	vector< osg::ref_ptr<BZTransform> > transforms = (object->getTransformations());
+	osg::ref_ptr<BZTransform> transforms = (object->getTransformations());
 	
 	// find out the supported transformations and determine their field format
 	supportedTransformations = string("");
@@ -145,19 +145,17 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	transformationScrollArea->box(FL_UP_BOX);
 	transformationScrollArea->type(Fl_Scroll::VERTICAL_ALWAYS);
 	// add the transformations if they exist and are supported
-	if(transformationFormat.length() > 0 && transforms.size() > 0) {
+	if(transformationFormat.length() > 0 && transforms->getData().size() > 0) {
 		
 		// add the transforms
-		for(vector< osg::ref_ptr<BZTransform> >::reverse_iterator i = transforms.rbegin(); i != transforms.rend(); i++) {
-			// don't include transformations that won't be written
-			if( !(*i)->isApplied() )
-				continue;
-			
+		for(int i = transforms->getData().size() - 1; i >= 0; i--) {
+			TransformData d = transforms->getData()[ i ];
+
 			// next transform widget (the dimensions of which shall be calculated in the addTransformCallback_real method
 			TransformWidget* nextTransform = new TransformWidget(0, 0, transformationScrollArea->w(), 3*DEFAULT_TEXTSIZE, transformationFormat.c_str(), false);
 			
-			nextTransform->setTransformationType( (*i)->getName().c_str() );
-			nextTransform->setFields( (*i)->getData() );
+			nextTransform->setTransformationType( d.type );
+			nextTransform->setFields( d.data );
 			
 			this->addTransformCallback_real(nextTransform);	
 		}
@@ -242,16 +240,21 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 	osg::Vec3 rotation = osg::Vec3( 0.0, 0.0, zRotation );
 	
 	// get the transformations
-	vector< osg::ref_ptr< BZTransform > > transforms;
+	vector< TransformData > transforms;
 	
 	if(transformations.size() != 0) {
 		for(vector<TransformWidget*>::reverse_iterator i = transformations.rbegin(); i != transformations.rend(); i++) {
 			if( (*i)->active() ) {
-				string widgetData = (*i)->toString();
-				transforms.push_back( new BZTransform( widgetData ) );
+				TransformData d;
+				
+				d.type = (*i)->getTransformationType();
+				d.data = (*i)->getFields();
+
+				transforms.push_back( d );
 			}
 		}
 	}
+	
 	
 	// call updates
 	UpdateMessage positionUpdate( UpdateMessage::SET_POSITION, &position );

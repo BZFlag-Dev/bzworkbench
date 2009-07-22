@@ -22,186 +22,76 @@
 #include <osg/MatrixTransform>
 #include <osg/PositionAttitudeTransform>
 
-using namespace std;
+enum TransformType {
+  ShiftTransform = 0,
+  ScaleTransform = 1,
+  ShearTransform = 2,
+  SpinTransform  = 3,
+  LastTransform
+};
+
+struct TransformData {
+  TransformType type;
+  osg::Vec4 data;
+};
+
 
 // a metadata entry that is used to describe a transformation such as spin, shear, shift, and scale
 class BZTransform : public DataEntry, public osg::MatrixTransform {
 
 	public:
 
-		BZTransform() : DataEntry("", ""), osg::MatrixTransform() {
-			this->name = string("");
-			this->data = vector<float>();
-			this->useThis = true;
-			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
-		}
-
-		BZTransform(string& _data) : DataEntry("", ""), osg::MatrixTransform() {
-			this->name = string("");
-			this->data = vector<float>();
-			this->useThis = true;
-			this->update(_data);
-			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
-		}
-
-		BZTransform( string _name, vector<float> _data ) : DataEntry("", ""), osg::MatrixTransform() {
-			this->name = _name;
-			this->data = _data;
-			this->useThis = true;
-			this->refreshMatrix();
-			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
-		}
-
-		BZTransform( string _name, float n1, float n2, float n3, float n4 ) : DataEntry("", ""), osg::MatrixTransform() {
-			this->name = _name;
-			this->useThis = true;
-			this->data = vector<float>();
-			this->data.push_back(n1);
-			this->data.push_back(n2);
-			this->data.push_back(n3);
-			this->data.push_back(n4);
-			this->refreshMatrix();
-			//this->setReferenceFrame( osg::Transform::RF_ABSOLUTE );
-		}
+		BZTransform();
+		BZTransform( string _name, vector<TransformData>& _data );
+		
 
 		// getter
-		string get(void) {
-			return toString();
-		}
+		string get(void);
 
 		// setter
-		int update(string& newData) {
-			// expect just one line
-			name = BZWParser::key(newData.c_str());
-
-			// break up the line
-			vector<string> elements = BZWParser::getLineElements(newData.c_str());
-
-			// erase the current data
-			data.clear();
-
-			// get the numbers (don't start with elements.begin(), because this is what name is)
-			for(vector<string>::iterator i = elements.begin() + 1; i != elements.end(); i++) {
-				data.push_back( atof( i->c_str() ) );
-			}
-
-			setHeader(name.c_str());
-
-			// recompute this matrix
-			refreshMatrix();
-
-			return 1;
-		}
+		int parse(string& newData);
 
 		// toString
-		string toString(void) {
-			string ret = string(name);
-			for(vector<float>::iterator i = data.begin(); i != data.end(); i++) {
-				ret += " " + string(ftoa(*i));
-			}
-
-			return ret + "\n";
-		}
+		string toString(void);
 
 		// data getters
-		string getName() { return name; }
-		vector<float> getData() { return data; }
+		string getName();
+		vector<TransformData> getData() { return data; }
 
 		// data setters
-		void setName(string& s) { name = s; refreshMatrix(); }
-		void setData(const vector<float>& inputData) { data = inputData; refreshMatrix(); }
-		void setData( const osg::Vec3d& inputData ) {
-			data.clear();
-			data.push_back(inputData.x());
-			data.push_back(inputData.y());
-			data.push_back(inputData.z());
-			refreshMatrix();
-		}
-
-		void setData( const osg::Vec4d& inputData ) {
-			data.clear();
-			data.push_back(inputData.x());
-			data.push_back(inputData.y());
-			data.push_back(inputData.z());
-			data.push_back(inputData.w());
-			refreshMatrix();
-		}
+		void setName(string& s);
+		void setData(vector<TransformData>& d) { data = d; }
 
 		// make this operator public
-		BZTransform operator =( const BZTransform& obj ) {
-			BZTransform newObj = BZTransform();
-			memcpy(&newObj, &obj, sizeof(BZTransform));
-			return newObj;
-		}
+		BZTransform operator =( const BZTransform& obj );
 
-		// should this transform be written to the file, or is it just for BZWB's use?
-		bool isApplied() { return this->useThis; }
+		// transformation adders
+		void addShift( osg::Vec3& value );
+		void addScale( osg::Vec3& value );
+		void addSpin( osg::Vec3& value );
+		void addShear( osg::Vec3& value );
 
-		// set the transformation to be used or not used by BZFlag (BZWB uses all transformations)
-		void setApplied( bool value ) { this->useThis = value; }
+		void refreshMatrix();
 
 	private:
 
 		// make this into a shift matrix
-		void makeShift() {
-
-			osg::Matrixd theMatrix;
-			theMatrix.makeTranslate( osg::Vec3( data[0], data[1], data[2] ) );
-
-			setMatrix( theMatrix );
-		}
+		void makeShift( osg::Vec4& value );
 
 		// make this into a scale matrix
-		void makeScale() {
-			osg::Matrixd theMatrix;
-			theMatrix.makeScale( data[0], data[1], data[2] );
-			setMatrix( theMatrix );
-		}
+		void makeScale( osg::Vec4& value );
 
 		// make this into a spin matrix
-		void makeSpin() {
-
-			// use a quaternion to compute the "spin" matrix
-			osg::Quat quat = osg::Quat( osg::DegreesToRadians(data[0]), osg::Vec3( data[1], data[2], data[3] ) );
-
-			osg::Matrix matrix;
-			matrix.makeRotate( quat );
-
-			setMatrix( matrix );
-		}
+		void makeSpin( osg::Vec4& value );
 
 		// make this into a shear matrix
-		void makeShear() {
-			double matvals[] = {
-				1.0,		0.0,		data[2],	0.0,
-				0.0,		1.0,		0.0,		0.0,
-				data[0],	data[1],	1.0,		0.0,
-				0.0,		0.0,		0.0,		1.0
-			};
-
-			osg::Matrixd matrix = osg::Matrixd( matvals );
-			setMatrix( matrix );
-		}
+		void makeShear( osg::Vec4& value );
 
 
 		// member data
 		string name;
-		vector<float> data;
-		vector<string> transformationFormats;
-
-		// set to true if this transformation is to be used
-		bool useThis;
-
-		void refreshMatrix() {
-			if( name == "shift" )
-				makeShift();
-			else if(name == "spin" )
-				makeSpin();
-			else if(name == "shear" )
-				makeShear();
-			else if(name == "scale" )
-				makeScale();
-		}
+		osg::Matrixd matrix;
+		vector<TransformData> data;
 };
 
 #endif /*TRANSFORM_H_*/

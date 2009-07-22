@@ -210,6 +210,10 @@
 				RelativePath="..\src\TextUtils.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\Transform.cpp"
+				>
+			</File>
 			<Filter
 				Name="Dialogs"
 				>
