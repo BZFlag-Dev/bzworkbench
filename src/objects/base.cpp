@@ -16,7 +16,7 @@
 
 // constructor
 base::base() :
-	bz2object("base", "<position><rotation><size><team><color><oncap><shift><shear><scale><spin>") {
+	bz2object("base", "<name><position><rotation><size><team><color><oncap><shift><shear><scale><spin>") {
 
 	setDefaults();
 }

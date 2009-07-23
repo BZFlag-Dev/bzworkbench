@@ -38,8 +38,8 @@ string BZWParser::cutWhiteSpace(string line) {
 	}
 
 	// move the indexes into the string by skipping outside spacess
-	while(startIndex < len && TextUtils::isWhitespace( text[startIndex] )) { startIndex++; }
-	while(endIndex > startIndex && TextUtils::isWhitespace( text[endIndex] )) { endIndex--; }
+	while(startIndex < len && ( TextUtils::isWhitespace( text[startIndex] ) || text[startIndex] == '\n' || text[startIndex] == '\r' ) ) { startIndex++; }
+	while(endIndex > startIndex && ( TextUtils::isWhitespace( text[endIndex] ) || text[endIndex] == '\n' || text[endIndex] == '\r' ) ) { endIndex--; }
 
 	// return the line if there was no white space to cut
 	if(startIndex == len)
@@ -106,7 +106,7 @@ string removeWhiteSpace(const string& line) {
 	bool whitespace = false;
 	string::const_iterator it;
 	for ( it = line.begin(); it != line.end(); it++ ) {
-		if (*it == ' ' || *it == '\t') {
+		if ( TextUtils::isWhitespace( *it )) {
 			if (!whitespace) {
 				// hit whitespace for the first time
 				ret += ' ';
@@ -158,7 +158,12 @@ string BZWParser::value(const char* _key, const char* _text) {
 string BZWParser::key(const char* _text) {
 	string text = cutWhiteSpace(_text);
 	text = TextUtils::tolower( text );
-	string::size_type index = text.find(" ", 0);
+	string::size_type index = string::npos;
+	for (string::size_type i = 0; i < text.size(); i++)
+		if ( TextUtils::isWhitespace( text[ i ] ) ) {
+			index = i;
+			break;
+		}
 	if(index == string::npos)
 		return text;
 	return text.substr(0, index);

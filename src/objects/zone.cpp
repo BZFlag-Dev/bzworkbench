@@ -244,7 +244,7 @@ bool zone::parse( std::string& line ) {
 	}
 	else if ( key == "zoneflag" ) {
 		// read the flag
-		string flag = BZWParser::key( value.c_str() );
+		string flag = TextUtils::toupper( BZWParser::key( value.c_str() ) );
 		// see if its valid
 		if(!Flag::isFlag(flag.c_str()))
 			throw BZWReadError( this, string( "Unrecognized flag type, " ) + value);
