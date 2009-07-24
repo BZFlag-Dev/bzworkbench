@@ -108,7 +108,7 @@ class bz2object : public Renderable, public DataEntry
 		// override Renderable's setRotation() method
 		virtual void setRotation( float x, float y, float z ) {
 			// only set z rotation, other rotation should be done with a transform
-			Renderable::setRotation( 0, 0, z );
+			orientation->setRotation( 0, 0, z );
 		}
 		virtual void setRotation( const osg::Vec3& rot ) { setRotation( 0, 0, rot.z() ); }
 
@@ -123,9 +123,9 @@ class bz2object : public Renderable, public DataEntry
 		// set/set the thisNode
 		osg::Node* getThisNode() { return thisNode.get(); }
 		void setThisNode( osg::Node* node ) {
-			transformations->removeChild( thisNode.get() );
+			orientation->removeChild( thisNode.get() );
 			thisNode = node;
-			transformations->addChild( thisNode.get() );
+			orientation->addChild( thisNode.get() );
 		}
 
 		// make this public
@@ -188,15 +188,12 @@ class bz2object : public Renderable, public DataEntry
 
 	private:
 		// force these methods to be private, to guarantee that derived classes will use the given replacements
-		osg::Vec3f getPosition() { return Renderable::getPosition(); }
-		osg::Vec3f getScale() { return Renderable::getScale(); }
-		osg::Quat getAttitude() { return Renderable::getAttitude(); }
-		void setPosition( const osg::Vec3d& newPosition ) { Renderable::setPosition( newPosition ); }
-		void setScale( const osg::Vec3d& newScale ) { Renderable::setScale( newScale ); }
-		void setAttitude( const osg::Quat& newAttitude ) { Renderable::setAttitude( newAttitude ); }
-
-		// recompute the transformation stack
-		void recomputeTransformations( vector< osg::ref_ptr< BZTransform > >* newTransformations);
+		osg::Vec3f getPosition() { return orientation->getPosition(); }
+		osg::Vec3f getScale() { return orientation->getScale(); }
+		osg::Quat getAttitude() { return orientation->getAttitude(); }
+		void setPosition( const osg::Vec3d& newPosition ) { orientation->setPosition( newPosition ); }
+		void setScale( const osg::Vec3d& newScale ) { orientation->setScale( newScale ); }
+		void setAttitude( const osg::Quat& newAttitude ) { orientation->setAttitude( newAttitude ); }
 
 		// update the shade model based on flatshading
 		void updateShadeModel();
@@ -206,6 +203,9 @@ class bz2object : public Renderable, public DataEntry
 
 		// saved state set
 		osg::ref_ptr< osg::StateSet > savedStateSet;
+
+		// the orientation of the bz2object
+		osg::ref_ptr< Renderable > orientation;
 };
 
 #include "physics.h"

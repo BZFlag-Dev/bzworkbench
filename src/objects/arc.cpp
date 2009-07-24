@@ -142,6 +142,7 @@ bool arc::parse( std::string& line ) {
 
 void arc::finalize() {
 	updateGeometry();
+	bz2object::finalize();
 }
 
 // toString

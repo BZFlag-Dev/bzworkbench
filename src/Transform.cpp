@@ -13,6 +13,11 @@
 #include "Transform.h"
 
 #include "model/Model.h"
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
 
 using namespace std;
 
@@ -46,21 +51,21 @@ int BZTransform::parse(string& newData) {
 
 	// parse transform type
 	if ( key == "shift" )
-		d.type == ShiftTransform;
+		d.type = ShiftTransform;
 	else if ( key == "spin" )
 		d.type = SpinTransform;
 	else if ( key == "shear" )
 		d.type = ShearTransform;
 	else if ( key == "scale" )
-		d.type == ScaleTransform;
+		d.type = ScaleTransform;
 	else
 		throw BZWReadError( this, string( "Unknown transform type, " ) + key );
 
 
 	// get the numbers (don't start with elements.begin(), because this is what name is)
 	osg::Vec4 vec;
-	for(int i = 0; i < elements.size() && i < 4; i++) {
-		vec[ i ] = atof( elements[ i ].c_str() );
+	for(int i = 1; i < elements.size() && i <= 4; i++) {
+		vec[ i - 1 ] = atof( elements[ i ].c_str() );
 	}
 
 	d.data = vec;
@@ -96,18 +101,30 @@ BZTransform BZTransform::operator =( const BZTransform& obj ) {
 // make this into a shift matrix
 void BZTransform::makeShift( osg::Vec4& value ) {
 
-	osg::Matrixd theMatrix;
-	theMatrix.makeTranslate( osg::Vec3( value[0], value[1], value[2] ) );
+	double matvals[] = {
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		value[0], value[1], value[2], 1.0f
+	};
 
-	matrix *= theMatrix;
+	osg::Matrixd m( matvals );
+
+	matrix *= m;
 }
 
 // make this into a scale matrix
 void BZTransform::makeScale( osg::Vec4& value ) {
-	osg::Matrixd theMatrix;
-	theMatrix.makeScale( value[0], value[1], value[2] );
+	
+	double matvals[] = {
+		value[0], 0.0f, 0.0f, 0.0f,
+		0.0f, value[1], 0.0f, 0.0f,
+		0.0f, 0.0f, value[2], 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+	osg::Matrixd m( matvals );
 
-	matrix *= theMatrix;
+	matrix *= m;
 }
 
 // make this into a spin matrix
@@ -117,8 +134,8 @@ void BZTransform::makeSpin( osg::Vec4& value ) {
 	n.normalize();
 
 	// setup
-	const float cos_val = cosf(value[0]);
-	const float sin_val = sinf(value[0]);
+	const float cos_val = cosf(value[0] * M_PI / 180.0f );
+	const float sin_val = sinf(value[0] * M_PI / 180.0f );
 	const float icos_val = (1.0f - cos_val);
 	osg::Matrixd m;
 

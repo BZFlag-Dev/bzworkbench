@@ -23,7 +23,9 @@ bz2object::bz2object(const char* name, const char* keys):
 	thisNode = NULL;
 
 	transformations = new BZTransform();
+	orientation = new Renderable();
 	addChild( transformations );
+	transformations->addChild( orientation );
 	MaterialSlot mslot;
 	mslot.defaultMaterial = NULL;
 	materialSlots[""] = mslot;
@@ -49,7 +51,9 @@ bz2object::bz2object(const char* name, const char* keys, osg::Node* node ):
 	thisNode = node;
 
 	transformations = new BZTransform();
+	orientation = new Renderable();
 	addChild( transformations );
+	transformations->addChild( orientation );
 	MaterialSlot mslot;
 	mslot.defaultMaterial = NULL;
 	materialSlots[""] = mslot;
@@ -96,7 +100,7 @@ bool bz2object::parse( std::string& line ) {
 
 	// get the rotation
 	else if ( key == "rotation" && isKey( "rotation" ) ) {
-		Renderable::setRotationZ( atof( value.c_str() ) );
+		orientation->setRotationZ( atof( value.c_str() ) );
 		return true;
 	}
 
@@ -227,7 +231,7 @@ void bz2object::finalize() {
 				getThisNode()->setStateSet( material::computeFinalMaterial(i->second.materials) );
 		}
 	}
-
+	
 	// update the transformation stack
 	this->transformations->refreshMatrix();
 
@@ -494,7 +498,7 @@ void bz2object::snapRotate( float size, float rotation ) {
 	float tmp = rotation / size;
 	tmp = osg::round( tmp );
 	tmp *= size;
-	setRotationZ( tmp );
+	orientation->setRotationZ( tmp );
 }
 
 // set the shade model based on the value of flatShading
