@@ -126,6 +126,10 @@ bool pyramid::parse( std::string& line ) {
 	string key = BZWParser::key( line.c_str() );
 	string value = BZWParser::value( key.c_str(), line.c_str() );
 
+	// meshpyr is just an alias for pyramid
+	if ( key == "meshpyr" )
+		return true;
+
 	// first parse per face keys
 	for ( int i = 0; i < FaceCount; i++ ) {
 		if ( key == faceNames[i] ) {

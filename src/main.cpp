@@ -31,9 +31,7 @@
 #include "dialogs/Fl_Error.h"
 #include "dialogs/BoxConfigurationDialog.h"
 #include "dialogs/PyramidConfigurationDialog.h"
-#include "dialogs/MeshpyrConfigurationDialog.h"
 #include "dialogs/ArcConfigurationDialog.h"
-#include "dialogs/MeshboxConfigurationDialog.h"
 #include "dialogs/SphereConfigurationDialog.h"
 #include "dialogs/TeleporterConfigurationDialog.h"
 #include "dialogs/ZoneConfigurationDialog.h"
@@ -51,8 +49,6 @@
 #include "objects/pyramid.h"
 #include "objects/teleporter.h"
 #include "objects/base.h"
-#include "objects/meshbox.h"
-#include "objects/meshpyr.h"
 #include "objects/cone.h"
 #include "objects/sphere.h"
 #include "objects/tetra.h"
@@ -99,8 +95,8 @@ void buildModelDatabase() {
 	// need to do this for faces
 	Model::addTerminatorSupport("face", "endface");
 
-	Model::registerObject("meshbox", NULL, "end", meshbox::init, MeshboxConfigurationDialog::init);
-	Model::registerObject("meshpyr", NULL, "end", meshpyr::init, MeshpyrConfigurationDialog::init);
+	Model::registerObject("meshbox", NULL, "end", box::init, BoxConfigurationDialog::init);
+	Model::registerObject("meshpyr", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
 	Model::registerObject("options", NULL, "end", options::init);
 	Model::registerObject("physics", NULL, "end", physics::init);
 	Model::registerObject("pyramid", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);

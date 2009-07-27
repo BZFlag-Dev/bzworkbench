@@ -90,6 +90,10 @@ bool box::parse( std::string& line ) {
 	string key = BZWParser::key( line.c_str() );
 	string value = BZWParser::value( key.c_str(), line.c_str() );
 
+	// meshbox is just an alias for box
+	if ( key == "meshbox" )
+		return true;
+
 	// first parse per face keys
 	for ( int i = 0; i < FaceCount; i++ ) {
 		if ( key == faceNames[i] ) {
@@ -184,14 +188,17 @@ string box::toString(void) {
 	string faceLines;
 
 	for (int i = 0; i < FaceCount; i++) {
-		faceLines += string(faceNames[i]) + " texsize " + texSizes[i].toString() + "\n";
-		faceLines += string(faceNames[i]) + " texoffset " + texOffsets[i].toString() + "\n";
+		const float defScale = (i >= ZP) ? -2.0f : -8.0f;
+		if ( texSizes[i] != Point2D( defScale, defScale ) ) 
+			faceLines += string(faceNames[i]) + "  texsize " + texSizes[i].toString();
+		if ( texOffsets[i] != Point2D( 0.0f, 0.0f ) )
+			faceLines += string(faceNames[i]) + "  texoffset " + texOffsets[i].toString();
 		if (driveThroughs[i])
-			faceLines += string(faceNames[i]) + " drivethrough\n";
+			faceLines += string(faceNames[i]) + "  drivethrough\n";
 		if (shootThroughs[i])
-			faceLines += string(faceNames[i]) + " shootthrough\n";
+			faceLines += string(faceNames[i]) + "  shootthrough\n";
 		if (ricochets[i])
-			faceLines += string(faceNames[i]) + " ricochet\n";
+			faceLines += string(faceNames[i]) + "  ricochet\n";
 	}
 
 	return string("box\n") +

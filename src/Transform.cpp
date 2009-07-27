@@ -100,29 +100,16 @@ BZTransform BZTransform::operator =( const BZTransform& obj ) {
 
 // make this into a shift matrix
 void BZTransform::makeShift( osg::Vec4& value ) {
-
-	double matvals[] = {
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		value[0], value[1], value[2], 1.0f
-	};
-
-	osg::Matrixd m( matvals );
+	osg::Matrixd m;
+	m.makeTranslate( osg::Vec3( value[0], value[1], value[2] ) );
 
 	matrix *= m;
 }
 
 // make this into a scale matrix
 void BZTransform::makeScale( osg::Vec4& value ) {
-	
-	double matvals[] = {
-		value[0], 0.0f, 0.0f, 0.0f,
-		0.0f, value[1], 0.0f, 0.0f,
-		0.0f, 0.0f, value[2], 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-	};
-	osg::Matrixd m( matvals );
+	osg::Matrixd m;
+	m.makeScale( osg::Vec3( value[0], value[1], value[2] ) );
 
 	matrix *= m;
 }
@@ -133,24 +120,8 @@ void BZTransform::makeSpin( osg::Vec4& value ) {
 	osg::Vec3 n( value[1], value[2], value[3] );
 	n.normalize();
 
-	// setup
-	const float cos_val = cosf(value[0] * M_PI / 180.0f );
-	const float sin_val = sinf(value[0] * M_PI / 180.0f );
-	const float icos_val = (1.0f - cos_val);
 	osg::Matrixd m;
-
-	m(3, 3) = 1.0f;
-	m(0, 3) = m(1, 3) = m(2, 3) = 0.0f;
-	m(3, 0) = m(3, 1) = m(3, 2) = 0.0f;
-	m(0, 0) = (n[0] * n[0] * icos_val) + cos_val;
-	m(0, 1) = (n[0] * n[1] * icos_val) - (n[2] * sin_val);
-	m(0, 2) = (n[0] * n[2] * icos_val) + (n[1] * sin_val);
-	m(1, 0) = (n[1] * n[0] * icos_val) + (n[2] * sin_val);
-	m(1, 1) = (n[1] * n[1] * icos_val) + cos_val;
-	m(1, 2) = (n[1] * n[2] * icos_val) - (n[0] * sin_val);
-	m(2, 0) = (n[2] * n[0] * icos_val) - (n[1] * sin_val);
-	m(2, 1) = (n[2] * n[1] * icos_val) + (n[0] * sin_val);
-	m(2, 2) = (n[2] * n[2] * icos_val) + cos_val;
+	m.makeRotate( value[0] * M_PI / 180.0f, n );
 
 	// execute
 	matrix *= m;

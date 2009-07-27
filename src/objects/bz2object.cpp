@@ -94,7 +94,7 @@ bool bz2object::parse( std::string& line ) {
 
 	// get the position
 	else if ( key == "position" && isKey( "position" ) ) {
-		setPosition( Point3D( value.c_str() ) );
+		orientation->setPosition( Point3D( value.c_str() ) );
 		return true;
 	}
 
@@ -256,15 +256,18 @@ string bz2object::BZWLines( bz2object* obj )
 
 	// add position key/value to the string if supported
 	if(obj->isKey("position"))
-		ret += "  position " + Point3D( obj->getPosition() ).toString();
+		if ( obj->getPosition() != osg::Vec3( 0, 0, 0 ) )
+			ret += "  position " + Point3D( obj->getPosition() ).toString();
 
 	// add rotation key/value to the string if supported
 	if(obj->isKey("rotation"))
-		ret += "  rotation " + string( ftoa(obj->orientation->getRotation().z()) ) + "\n";
+		if ( obj->orientation->getRotation().z() != 0.0f )
+			ret += "  rotation " + string( ftoa(obj->orientation->getRotation().z()) ) + "\n";
 
 	// add size key/value to the string if supported
 	if(obj->isKey("size"))
-		ret += "  size " + Point3D( obj->getSize() ).toString();
+		if ( obj->getSize() != osg::Vec3( 0, 0, 0 ) )
+			ret += "  size " + Point3D( obj->getSize() ).toString();
 
 	// add all transformations to the string if they are supported
 	ret += obj->transformations->toString();

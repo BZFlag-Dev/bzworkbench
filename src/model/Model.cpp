@@ -28,8 +28,6 @@
 #include "objects/link.h"
 #include "objects/material.h"
 #include "objects/mesh.h"
-#include "objects/meshbox.h"
-#include "objects/meshpyr.h"
 #include "objects/options.h"
 #include "objects/physics.h"
 #include "objects/pyramid.h"

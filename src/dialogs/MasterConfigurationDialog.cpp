@@ -231,7 +231,7 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 	// get the data
 	osg::Vec3 position = osg::Vec3( atof(positionXField->value()), atof(positionYField->value()), atof(positionZField->value()) );
 	osg::Vec3 size = osg::Vec3( atof(sizeXField->value()), atof(sizeYField->value()), atof(sizeZField->value()) );
-	osg::Vec3 spinVals = osg::Vec3( atof(spinXField->value()), atof(spinYField->value()), atof(spinZField->value()) );
+	//osg::Vec3 spinVals = osg::Vec3( atof(spinXField->value()), atof(spinYField->value()), atof(spinZField->value()) );
 	
 	float zRotation = atof( rotationField->value() );
 	osg::Vec3 rotation = osg::Vec3( 0.0, 0.0, zRotation );
@@ -251,6 +251,7 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 			}
 		}
 	}
+	
 	
 	
 	// call updates

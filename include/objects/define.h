@@ -13,19 +13,7 @@
 #ifndef DEFINE_H_
 #define DEFINE_H_
 
-#include "arc.h"
-#include "base.h"
-#include "box.h"
-#include "cone.h"
-#include "group.h"
-#include "mesh.h"
-#include "meshbox.h"
-#include "meshpyr.h"
-#include "pyramid.h"
-#include "sphere.h"
-#include "teleporter.h"
-#include "tetra.h"
-
+#include "bz2object.h"
 
 class define : public DataEntry {
 	

@@ -278,14 +278,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\dialogs\MeshboxConfigurationDialog.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\dialogs\MeshpyrConfigurationDialog.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\dialogs\PhysicsConfigurationDialog.cpp"
 					>
 				</File>
@@ -427,14 +419,6 @@
 				</File>
 				<File
 					RelativePath="..\src\objects\mesh.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\objects\meshbox.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\objects\meshpyr.cpp"
 					>
 				</File>
 				<File
@@ -672,14 +656,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\objects\meshbox.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\objects\meshpyr.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\objects\options.h"
 					>
 				</File>
@@ -841,14 +817,6 @@
 				</File>
 				<File
 					RelativePath="..\include\dialogs\MenuBar.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\dialogs\MeshboxConfigurationDialog.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\dialogs\MeshpyrConfigurationDialog.h"
 					>
 				</File>
 				<File
