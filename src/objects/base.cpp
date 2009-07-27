@@ -52,6 +52,7 @@ bool base::parse( std::string& line ) {
 		if(!(t == BASE_RED || t == BASE_GREEN || t == BASE_BLUE || t == BASE_PURPLE)) {
 			throw BZWReadError( this, string( "Invalid base team, " ) + value );
 		}
+		team = t;
 	}
 	else if ( key == "oncap" ) {
 		setWeapon( value.c_str() );

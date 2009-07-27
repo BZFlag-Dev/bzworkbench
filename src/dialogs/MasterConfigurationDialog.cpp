@@ -90,7 +90,7 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	rotationField = new Fl_Float_Input(5 + 100, 45, 100, DEFAULT_TEXTSIZE + 6, "degrees");
 	rotationField->align(FL_ALIGN_RIGHT);
 	
-	if(!object->isKey("rotation") || object->isKey("spin")) {
+	if(!object->isKey("rotation")) {
 		rotationField->deactivate();	// objects supporting "spin" ignore "rotation"
 		rotationLabel->deactivate();
 	}
@@ -99,20 +99,17 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	}
 	
 	// size
-	if( object->isKey("scale") )
-		sizeLabel = new QuickLabel("Scale", 5, 75);
-	else
-		sizeLabel = new QuickLabel("Size", 5, 75);
-	
-		
+	sizeLabel = new QuickLabel("Size", 5, 75);
+
 	sizeXField = new Fl_Float_Input(5 + 100, 75, 100, DEFAULT_TEXTSIZE + 6, "dx");
 	sizeYField = new Fl_Float_Input(5 + 100 + 120, 75, 100, DEFAULT_TEXTSIZE + 6, "dy");
 	sizeZField = new Fl_Float_Input(5 + 100 + 120 + 120, 75, 100, DEFAULT_TEXTSIZE + 6, "dz");
-	
-	if(!(object->isKey("size") || object->isKey("scale")) ) {
+
+	if( !object->isKey("size") ) {
+		sizeLabel->deactivate();
 		sizeXField->deactivate();
 		sizeYField->deactivate();
-		sizeZField->deactivate();	
+		sizeZField->deactivate();
 	}
 	else {
 		sizeXField->value(ftoa(size.x()).c_str());
@@ -121,7 +118,7 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	}
 	
 	// spin (BZW 2.0 objects only)
-	spinLabel = new QuickLabel("Spin", 5, 105);
+	/*spinLabel = new QuickLabel("Spin", 5, 105);
 	spinXField = new Fl_Float_Input(5 + 100, 105, 100, DEFAULT_TEXTSIZE + 6, "rx");
 	spinYField = new Fl_Float_Input(5 + 100 + 120, 105, 100, DEFAULT_TEXTSIZE + 6, "ry");
 	spinZField = new Fl_Float_Input(5 + 100 + 120 + 120, 105, 100, DEFAULT_TEXTSIZE + 6, "rz");
@@ -136,7 +133,7 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 		spinXField->value(ftoa(object->getRotation().x()).c_str());
 		spinYField->value(ftoa(object->getRotation().y()).c_str());
 		spinZField->value(ftoa(object->getRotation().z()).c_str());	
-	}
+	}*/
 	
 	// transformation scroll area
 	transformationLabel = new QuickLabel("Transformations (order matters)", 5, 145);
@@ -206,10 +203,10 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	add(sizeXField);
 	add(sizeYField);
 	add(sizeZField);
-	add(spinLabel);
+	/*add(spinLabel);
 	add(spinXField);
 	add(spinYField);
-	add(spinZField);
+	add(spinZField);*/
 	add(transformationLabel);
 	add(transformationScrollArea);
 	add(addTransformationButton);
@@ -271,9 +268,9 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 	if( object->isKey("rotation") && !object->isKey("spin"))
 		object->update( rotationUpdate );
 		
-	if( object->isKey("spin") ) {
+	/*if( object->isKey("spin") ) {
 		object->setRotation( spinVals );
-	}
+	}*/
 	object->update( transformUpdate );
 	
 	printf("data: \n|%s|\n", object->toString().c_str());

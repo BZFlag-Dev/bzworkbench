@@ -259,16 +259,12 @@ string bz2object::BZWLines( bz2object* obj )
 		ret += "  position " + Point3D( obj->getPosition() ).toString();
 
 	// add rotation key/value to the string if supported
-	if(obj->isKey("rotation") && !obj->isKey("spin"))
-		ret += "  rotation " + string( ftoa(obj->getRotation().z()) ) + "\n";
+	if(obj->isKey("rotation"))
+		ret += "  rotation " + string( ftoa(obj->orientation->getRotation().z()) ) + "\n";
 
 	// add size key/value to the string if supported
 	if(obj->isKey("size"))
 		ret += "  size " + Point3D( obj->getSize() ).toString();
-
-	// add a scale if size isn't supported (this is the case with groups, for example)
-	if( !obj->isKey("size") && obj->isKey("scale") )
-		ret += "  scale " + Point3D( obj->getSize() ).toString();
 
 	// add all transformations to the string if they are supported
 	ret += obj->transformations->toString();
