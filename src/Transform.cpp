@@ -77,12 +77,28 @@ int BZTransform::parse(string& newData) {
 
 // toString
 string BZTransform::toString(void) {
-	string ret = string(name);
-	/*for(vector<float>::iterator i = data.begin(); i != data.end(); i++) {
-		ret += " " + string(ftoa(*i));
-	}*/
+	string ret;
+	for(vector<TransformData>::iterator i = data.begin(); i != data.end(); i++) {
+		if ( (*i).type == ShiftTransform )
+			ret += "  shift " + string( ftoa( (*i).data.x() ) ) + " " + 
+			                    string( ftoa( (*i).data.y() ) ) + " " + 
+								string( ftoa( (*i).data.z() ) ) + "\n";
+		else if ( (*i).type == ScaleTransform )
+			ret += "  scale " + string( ftoa( (*i).data.x() ) ) + " " + 
+			                    string( ftoa( (*i).data.y() ) ) + " " + 
+								string( ftoa( (*i).data.z() ) ) + "\n";
+		else if ( (*i).type == ShearTransform )
+			ret += "  shear " + string( ftoa( (*i).data.x() ) ) + " " + 
+			                    string( ftoa( (*i).data.y() ) ) + " " + 
+								string( ftoa( (*i).data.z() ) ) + "\n";
+		else if ( (*i).type == SpinTransform )
+			ret += "  spin " +  string( ftoa( (*i).data.x() ) ) + " " + 
+			                    string( ftoa( (*i).data.y() ) ) + " " + 
+								string( ftoa( (*i).data.z() ) ) + " " + 
+								string( ftoa( (*i).data.w() ) ) + "\n";
+	}
 
-	return ret + "\n";
+	return ret;
 }
 
 // data getters

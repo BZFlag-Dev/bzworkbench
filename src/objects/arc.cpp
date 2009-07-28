@@ -37,7 +37,6 @@ void arc::setDefaults() {
 	divisions = 16;
 	angle = 360.0f;
 	texsize.set( -8.0f, -8.0f, -8.0f, -8.0f  );
-	boxStyle = false;
 
 	osg::Group* group = new osg::Group();
 	for (int i = 0; i < MaterialCount; i++) {
@@ -148,10 +147,7 @@ void arc::finalize() {
 // toString
 string arc::toString(void) {
 	string ret;
-	if (!boxStyle)
-		ret += "arc\n";
-	else
-		ret += "meshbox\n";
+	ret += "arc\n";
 
 	ret += BZWLines( this );
 
@@ -164,11 +160,10 @@ string arc::toString(void) {
 	}
 
 	// some options shouldn't be included for a meshbox
-	if (!boxStyle)
-		ret += "  divisions " + string(itoa(divisions)) + "\n" +
-			   "  angle " + string(ftoa(angle) ) + "\n" +
-			   "  ratio " + string(ftoa(ratio)) + "\n" +
-			   (flatshading == true ? "  flatshading\n" : "");
+	ret += "  divisions " + string(itoa(divisions)) + "\n" +
+		   "  angle " + string(ftoa(angle) ) + "\n" +
+		   "  ratio " + string(ftoa(ratio)) + "\n" +
+		   (flatshading == true ? "  flatshading\n" : "");
 
 	ret += string("") +
 		   (smoothbounce == true ? "  smoothbounce\n" : "") +

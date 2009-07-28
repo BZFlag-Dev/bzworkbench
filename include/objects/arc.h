@@ -78,7 +78,6 @@ protected:
 	float ratio;
 	int divisions;
 	Point4D texsize;
-	bool boxStyle;
 	osg::Vec3 realSize;
 
 	void updateGeometry();
