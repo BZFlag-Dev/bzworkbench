@@ -74,21 +74,22 @@ bool dynamicColor::parse( std::string& line ) {
 		return false;
 
 	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
 
 	if ( key == "name" ) {
-		name = BZWParser::value( key.c_str(), line.c_str() );
+		name = value;
 	}
 	else if ( key == "red" ) {
-		redCommands.push_back( ColorCommand( line ) );
+		redCommands.push_back( ColorCommand( value ) );
 	}
 	else if ( key == "green" ) {
-		greenCommands.push_back( ColorCommand( line ) ); 
+		greenCommands.push_back( ColorCommand( value ) ); 
 	}
 	else if ( key == "blue" ) {
-		blueCommands.push_back( ColorCommand( line ) );
+		blueCommands.push_back( ColorCommand( value ) );
 	}
 	else if ( key == "alpha" ) {
-		alphaCommands.push_back( ColorCommand( line ) );
+		alphaCommands.push_back( ColorCommand( value ) );
 	}
 	else {
 		throw BZWReadError( this, string( "Unknown key, " ) + key );

@@ -395,7 +395,7 @@ bool Model::_build( std::istream& data ) {
 			}
 		}
 		catch ( BZWReadError err ) { // catch any read errors
-			// TODO: add error stuff
+			// FIXME: add error stuff
 			return false;
 		}
 	}
@@ -634,14 +634,6 @@ string& Model::_toString() {
 		}
 	}
 
-	// materials
-	ret += "\n#--Materials-------------------------------------\n\n";
-	if(this->materials.size() > 0) {
-		for(map< string, material* >::iterator i = this->materials.begin(); i != this->materials.end(); i++) {
-			ret += i->second->toString() + "\n";
-		}
-	}
-
 	// dynamic colors
 	ret += "\n#--Dynamic Colors--------------------------------\n\n";
 	if(this->dynamicColors.size() > 0) {
@@ -654,6 +646,14 @@ string& Model::_toString() {
 	ret += "\n#--Texture Matrices------------------------------\n\n";
 	if(this->textureMatrices.size() > 0) {
 		for(map< string, texturematrix* >::iterator i = this->textureMatrices.begin(); i != this->textureMatrices.end(); i++) {
+			ret += i->second->toString() + "\n";
+		}
+	}
+
+	// materials
+	ret += "\n#--Materials-------------------------------------\n\n";
+	if(this->materials.size() > 0) {
+		for(map< string, material* >::iterator i = this->materials.begin(); i != this->materials.end(); i++) {
 			ret += i->second->toString() + "\n";
 		}
 	}
