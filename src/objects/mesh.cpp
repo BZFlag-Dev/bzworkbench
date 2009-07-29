@@ -131,8 +131,9 @@ bool mesh::parse( std::string& line ) {
 }
 
 void mesh::finalize() {
-	updateGeometry();
+	
 	bz2object::finalize();
+	updateGeometry();
 }
 
 // to string
@@ -197,7 +198,7 @@ string mesh::toString(void) {
 				  (useDrawInfo == true ? "  " + drawInfo.toString() : "") + "\n" +
 				  "end\n";*/
 
-	return string(); // FIXME: correct code
+	return string(); // FIXME: fix saving implementation
 }
 
 // render
@@ -208,59 +209,40 @@ int mesh::render(void) {
 void mesh::updateGeometry() {
 	osg::Group* group = new osg::Group();
 
-	osg::Geode* geode = NULL;
-	osg::Geometry* geometry = NULL;
-	osg::Vec3Array* vertices = NULL;
-	osg::Vec2Array* texcoords = NULL;
-	int arrayPos = 0;
-	material* lastmat = NULL;
-	bool lastNoTexcoords = false;
-	bool first = true;
+	map< material*, osg::Geometry* > geomMap;
 
-	for (vector<MeshFace*>::iterator itr = faces.begin(); itr != faces.end(); itr++) {
-		MeshFace* face = *itr;
+	for ( vector< MeshFace* >::iterator i = faces.begin(); i != faces.end(); i++ ) {
+		MeshFace* face = *i;
 		material* mat = face->getMaterial();
-		bool noTexcoords = false;
-		if (face->getTexcoords().size() == 0)
-			noTexcoords = true;
-
-		// need to make a new geode if the material changes
-		if (first || mat != lastmat || lastNoTexcoords != noTexcoords) {
-			geode = new osg::Geode();
-			geometry = new osg::Geometry();
-			vertices = new osg::Vec3Array();
-
-			if (!noTexcoords) {
-				texcoords = new osg::Vec2Array();
-				geometry->setTexCoordArray( 0, texcoords );
-			}
-
-			group->addChild( geode );
-			geode->addDrawable( geometry );
-			geode->setStateSet( mat );
-			geometry->setVertexArray( vertices );
-
-			arrayPos = 0;
-			first = false;
+		
+		osg::Geometry* geom;
+		if ( geomMap.count( mat ) > 0 ) {
+			geom = geomMap[ mat ];
+		}
+		else {
+			geom = new osg::Geometry();
+			geom->setVertexArray( new osg::Vec3Array() );
+			geom->setDataVariance( osg::Object::DYNAMIC );
+			geomMap[ mat ] = geom;
 		}
 
-		osg::DrawElementsUInt* indices = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_STRIP, 0 );
-
-
-		vector<int> vertIdx = face->getVertices();
-		vector<int> texcoordIdx = face->getTexcoords();
-
-		for (vector<int>::iterator vitr = vertIdx.begin(), titr = texcoordIdx.begin();
-			vitr != vertIdx.end() && titr != texcoordIdx.end(); vitr++, titr++) {
-				vertices->push_back( this->vertices[ *vitr ] );
-				texcoords->push_back( this->texCoords[ *titr ] );
-				indices->push_back( arrayPos++ );
+		osg::Vec3Array* verts = (osg::Vec3Array*)geom->getVertexArray();
+		osg::DrawElementsUInt* drawElem = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_STRIP, 0 );
+		for ( int j = 0; j < face->getVertices().size(); j++ ) {
+			verts->push_back( vertices[ face->getVertices()[ j ] ] );
+			drawElem->push_back( verts->size() - 1 );
 		}
-		geometry->addPrimitiveSet( indices );
 
-		lastmat = mat;
-		lastNoTexcoords = noTexcoords;
+		
+		geom->addPrimitiveSet( drawElem );
 	}
 
-	setThisNode(group);
+	for ( map< material*, osg::Geometry* >::iterator i = geomMap.begin(); i != geomMap.end(); i++ ) {
+		osg::Geode* geode = new osg::Geode();
+		geode->addDrawable( i->second );
+		geode->setStateSet( i->first );
+		group->addChild( geode );
+	}
+
+	setThisNode( group );
 }
