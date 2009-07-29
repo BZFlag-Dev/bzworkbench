@@ -15,7 +15,8 @@
 // constructor
 define::define() : DataEntry("define", "") {
 	objects = vector< osg::ref_ptr<bz2object> >();
-	name = "";	
+	name = "";
+	currentObject = NULL;
 }
 
 // destructor

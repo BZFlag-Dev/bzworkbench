@@ -14,7 +14,7 @@
 
 // default constructor
 mesh::mesh(void) :
-	bz2object("mesh", "<vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo>") {
+	bz2object("mesh", "<name><vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo><drivethrough><shootthrough>") {
 
 	vertices = vector<Point3D>();
 	texCoords = vector<Point2D>();
@@ -24,7 +24,13 @@ mesh::mesh(void) :
 	decorative = false;
 	faces = vector<MeshFace*>();
 	drawInfo = NULL;
-	materialMap = map<string, string>();
+	currentDrawInfo = NULL;
+	currentFace = NULL;
+	currentMaterial = NULL;
+	noclusters = false;
+	smoothbounce = false;
+	drivethrough = false;
+	shootthrough = false;
 }
 
 mesh::~mesh() {
@@ -41,123 +47,87 @@ mesh::~mesh() {
 // getter
 string mesh::get(void) { return toString(); }
 
-// setter
-/*int mesh::update(string& data) {
-	const char* header = getHeader().c_str();
-
-	// get lines
-	vector<string> chunks = BZWParser::getSectionsByHeader(header, data.c_str(), "end");
-
-	// break if there are none
-	if(chunks[0] == BZW_NOT_FOUND) {
-		printf("mesh not found\n");
-		return 0;
-	}
-
-	// break if too many
-	if(!hasOnlyOne(chunks, header))
-		return 0;
-
-	// get the data
-	const char* meshData = chunks[0].c_str();
-
-	vector<string> lines = BZWParser::getLines(header, data.c_str());
-
-	MeshFace* face = NULL;
-	DrawInfo* drawInfo = NULL;
-	string mat;
-	physics* phydrv = NULL;
-	bool smoothbounce = false;
-	bool noClusters = false;
-	bool driveThrough = false;
-	bool shootThrough = false;
-	for (vector<string>::iterator itr = lines.begin(); itr != lines.end(); itr++) {
-		const char* line = (*itr).c_str();
-
-		string key = BZWParser::key(line);
-
-		if ( key == "lod" ) {
-			lodOptions.push_back( BZWParser::value( "lod", line ) );
-		}
-		else if ( key == "endface" ) {
-			if (face == NULL) {
-				printf("mesh::update(): Warning! Extra 'endface' keyword found\n");
-			} else {
-				faces.push_back(face);
-				face = NULL;
-			}
-		}
-		else if ( face ) {
-			face->parse( line );
-		}
-		else if ( key == "face" ) {
-			if (face != NULL) {
-				printf("mesh::update(): Warning! Discarding incomplete mesh face.\n");
-				delete face;
-			}
-			face = new MeshFace( mat, phydrv, noClusters, smoothbounce, driveThrough, shootThrough );
-		}
-		else if ( key == "inside" ) {
-			insidePoints.push_back( Point3D( BZWParser::value( "inside", line ) ) );
-		}
-		else if ( key == "outside" ) {
-			outsidePoints.push_back( Point3D( BZWParser::value( "outside", line ) ) );
-		}
-		else if ( key == "vertex" ) {
-			vertices.push_back( Point3D( BZWParser::value( "vertex", line ) ) );
-		}
-		else if ( key == "normal" ) {
-			normals.push_back( Point3D( BZWParser::value( "normal", line ) ) );
-		}
-		else if ( key == "texcoord" ) {
-			texCoords.push_back( Point2D( BZWParser::value( "texcoord", line ) ) );
-		}
-		else if ( key == "phydrv" ) {
-			string drvname = BZWParser::value( "phydrv", line );
-			physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", drvname.c_str() );
-			if (phys != NULL)
-				phydrv = phys;
-			else
-				printf("mesh::update(): Error! Couldn't find physics driver %s\n", drvname.c_str());
-		}
-		else if ( key == "smoothbounce" ) {
-			smoothbounce = true;
-		}
-		else if ( key == "noclusters" ) {
-			noClusters = true;
-		}
-		else if ( key == "decorative" ) {
-			decorative = true;
-		}
-		else if ( key == "drawinfo" ) {
-			if (drawInfo != NULL) {
-				printf("mesh::update(): Warning! Multiple drawinfo sections, using first.\n");
-			}
-			else {
-				drawInfo = new DrawInfo();
-				if ( !drawInfo->parse( itr ) ) {
-					printf("mesh::update(): Error! Invalid drawInfo.\n");
-					delete drawInfo;
-					return 0;
-				}
-			}
-		}
-		else if ( key == "matref" ) {
-			mat = BZWParser::value( "matref", line );
-		}
-		else {
-			printf("mesh::update(): Warning! Unrecognized key: %s\n", key.c_str());
-		}
-	}
-
-	updateGeometry();
-
-	return 1;
-}*/
-
 // bzw methods
 bool mesh::parse( std::string& line ) {
-	return false;
+	string key = BZWParser::key( line.c_str() );
+
+	if ( currentDrawInfo ) {
+		if ( !currentDrawInfo->parse( line ) ) {
+			drawInfo = currentDrawInfo;
+			currentDrawInfo = NULL;
+		}
+	}
+	else if ( key == "mesh" )
+		return true;
+	else if ( key == "lod" ) {
+		lodOptions.push_back( BZWParser::value( "lod", line.c_str() ) );
+	}
+	else if ( currentFace ) {
+		if ( !currentFace->parse( line ) ) {
+			faces.push_back(currentFace);
+			currentFace = NULL;
+		}
+	}
+	else if ( key == "face" ) {
+		if (currentFace != NULL) {
+			printf("mesh::update(): Warning! Discarding incomplete mesh face.\n");
+			delete currentFace;
+		}
+		currentFace = new MeshFace( currentMaterial, phydrv, noclusters, smoothbounce, drivethrough, shootthrough );
+	}
+	else if ( key == "inside" ) {
+		insidePoints.push_back( Point3D( BZWParser::value( "inside", line.c_str() ) ) );
+	}
+	else if ( key == "outside" ) {
+		outsidePoints.push_back( Point3D( BZWParser::value( "outside", line.c_str() ) ) );
+	}
+	else if ( key == "vertex" ) {
+		vertices.push_back( Point3D( BZWParser::value( "vertex", line.c_str() ) ) );
+	}
+	else if ( key == "normal" ) {
+		normals.push_back( Point3D( BZWParser::value( "normal", line.c_str() ) ) );
+	}
+	else if ( key == "texcoord" ) {
+		texCoords.push_back( Point2D( BZWParser::value( "texcoord", line.c_str() ) ) );
+	}
+	else if ( key == "phydrv" ) {
+		string drvname = BZWParser::value( "phydrv", line.c_str() );
+		physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", drvname.c_str() );
+		if (phys != NULL)
+			phydrv = phys;
+		else
+			throw BZWReadError( this, string( "Couldn't find physics driver, " ) + drvname );
+	}
+	else if ( key == "noclusters" ) {
+		noclusters = true;
+	}
+	else if ( key == "decorative" ) {
+		decorative = true;
+	}
+	else if ( key == "drawinfo" ) {
+		if (drawInfo != NULL) {
+			throw BZWReadError( this, "Multiple drawinfo sections." );
+		}
+		else {
+			currentDrawInfo = new DrawInfo();
+		}
+	}
+	else if ( key == "matref" ) {
+		string matName = BZWParser::value( "matref", line.c_str() );
+		material* mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", matName ) );
+
+		if ( mat )
+			currentMaterial = mat;
+		else
+			throw BZWReadError( this, string( "Couldn't find material, " ) + matName );
+	}
+	else if ( key == "end" ) // need to check if we're at the end of the section
+		return false;
+	else {
+		return bz2object::parse( line );
+	}
+
+	return true;
 }
 
 void mesh::finalize() {

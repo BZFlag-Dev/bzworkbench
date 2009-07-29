@@ -34,14 +34,14 @@ public:
 	MeshFace();
 
 	// constructor with data
-	MeshFace(std::string mat, physics* phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough);
+	MeshFace(material* mat, physics* phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough);
 
 	~MeshFace();
 
 	// getter
 	string get(void);
 
-	bool parse( const char* line );
+	bool parse( std::string& line );
 
 	// toString
 	string toString(void);
@@ -118,12 +118,10 @@ private:
 	 */
 
 	string stringify(vector<int>& values);
-	void makeMaterial();
 	vector<int> vertices;
 	vector<int> normals;
 	vector<int> texcoords;
 	physics* physicsDriver;
-	vector<string> materials;
 	material* mat;
 
 	bool driveThrough;

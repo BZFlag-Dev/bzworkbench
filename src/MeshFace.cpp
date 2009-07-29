@@ -18,24 +18,20 @@ DataEntry("face", "<vertices><normals><texcoords><phydrv><matref><drivethrough><
 	normals = vector<int>();
 	texcoords = vector<int>();
 	physicsDriver = NULL;
-	materials = vector<string>();
 	driveThrough = shootThrough = smoothbounce = false;
 	mat = NULL;
 }
 
 // constructor with data
-MeshFace::MeshFace(string mat, physics* phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough) : DataEntry("face", "<vertices><normals><texcoords><phydrv><matref><drivethrough><shootthrough><passable>") {
+MeshFace::MeshFace(material* mat, physics* phydrv, bool noclusters, bool smoothbounce, bool drivethrough, bool shootthrough) : DataEntry("face", "<vertices><normals><texcoords><phydrv><matref><drivethrough><shootthrough><passable>") {
 	vertices = vector<int>();
 	normals = vector<int>();
 	texcoords = vector<int>();
 	physicsDriver = phydrv;
-	materials = vector<string>();
-	materials.push_back(mat);
 	this->driveThrough = drivethrough;
 	this->shootThrough = shootthrough;
 	this->smoothbounce = smoothbounce;
-	this->mat = NULL;
-	makeMaterial();
+	this->mat = mat;
 
 	//this->update(data);
 }
@@ -47,38 +43,39 @@ MeshFace::~MeshFace() {
 // getter
 string MeshFace::get(void) { return this->toString(); }
 
-bool MeshFace::parse( const char* line ) {
-	string key = BZWParser::key( line );
-	string value = BZWParser::value( key.c_str(), line );
+bool MeshFace::parse( string& line ) {
+	// check if we're at the end of the face
+	if ( line == "endface" )
+		return false;
+
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
 
 	if ( key == "vertices" ) {
 		vertices = BZWParser::getIntList( value.c_str() );
 		if ( vertices.size() < 3 ) {
-			printf("MeshFace::parse(): Faces need at least 3 vertices.\n");
-			return false;
+			throw BZWReadError( this, "Faces need at least 3 vertices." );
 		}
 	}
 	else if ( key == "normals" ) {
 		normals = BZWParser::getIntList( value.c_str() );
 		if ( normals.size() < 3 ) {
-			printf("MeshFace::parse(): Faces need at least 3 normals.\n");
-			return false;
+			throw BZWReadError( this, "Faces need at least 3 normals." );
 		}
 	}
 	else if ( key == "texcoords" ) {
 		texcoords = BZWParser::getIntList( value.c_str() );
 		if ( texcoords.size() < 3 ) {
-			printf("MeshFace::parse(): Faces need at least 3 texcoords.\n");
-			return false;
+			throw BZWReadError( this, "Faces need at least 3 texcoords." );
 		}
 	}
 	else if ( key == "phydrv" ) {
-		string drvname = BZWParser::value( "phydrv", line );
+		string drvname = BZWParser::value( "phydrv", line.c_str() );
 		physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", drvname.c_str() );
 		if (phys != NULL)
 			physicsDriver = phys;
 		else
-			printf("MeshFace::parse(): Error! Couldn't find physics driver %s\n", drvname.c_str());
+			throw BZWReadError( this, string( "Couldn't find physics driver, " ) + drvname );
 	}
 	else if ( key == "noclusters" ) {
 		noClusters = true;
@@ -98,15 +95,13 @@ bool MeshFace::parse( const char* line ) {
 	}
 	else if ( key == "baseteam" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf("MeshFace::parse(): Error! Missing baseteam parameter.\n");
-			return false;
+			throw BZWReadError( this, "Missing baseteam parameter." );
 		}
 		specialData.baseTeam = atoi( value.c_str() );
 	}
 	else if ( key == "linkname" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf("MeshFace::parse(): Error! Missing linkname parameter.\n");
-			return false;
+			throw BZWReadError( this, "Missing linkname parameter." );
 		}
 		specialData.linkName = value;
 	}
@@ -127,55 +122,48 @@ bool MeshFace::parse( const char* line ) {
 	}
 	else if ( key == "linksrccenter" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkSrcCenter index.\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkSrcCenter index." );
 		}
 		specialData.linkSrcGeo.centerIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linksrcsdir" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkSrcSdir index.\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkSrcSdir index." );
 		}
 		specialData.linkSrcGeo.sDirIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linksrctdir" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkSrcTdir index\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkSrcTdir index" );
 		}
 		specialData.linkSrcGeo.tDirIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linksrcpdir" ) {
-		string value = BZWParser::value( "linksrcpdir", line );
+		string value = BZWParser::value( "linksrcpdir", line.c_str() );
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkSrcPdir index\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkSrcPdir index" );
 		}
 		specialData.linkSrcGeo.pDirIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linksrcsscale" ) {
-		string value = BZWParser::value( "linksrcsscale", line );
+		string value = BZWParser::value( "linksrcsscale", line.c_str() );
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkSrcSscale parameter\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkSrcSscale parameter" );
 		}
 		specialData.linkSrcGeo.sScale = atof( value.c_str() );
 		specialData.linkSrcGeo.LinkAutoSscale = false;
 	}
 	else if ( key == "linksrctscale" ) {
-		string value = BZWParser::value( "linksrctscale", line );
+		string value = BZWParser::value( "linksrctscale", line.c_str() );
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkSrcTscale parameter\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkSrcTscale parameter" );
 		}
 		specialData.linkSrcGeo.tScale = atof( value.c_str() );
 		specialData.linkSrcGeo.LinkAutoTscale = false;
 	}
 	else if ( key == "linksrcpscale" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkSrcPscale parameter\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkSrcPscale parameter" );
 		}
 		specialData.linkSrcGeo.pScale = atof( value.c_str() );
 		specialData.linkSrcGeo.LinkAutoPscale = false;
@@ -185,52 +173,45 @@ bool MeshFace::parse( const char* line ) {
 	//
 	else if ( key == "linkdstcenter" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkDstCenter index\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkDstCenter index" );
 		}
 		specialData.linkDstGeo.centerIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linkdstsdir" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkDstSdir index\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkDstSdir index" );
 		}
 		specialData.linkDstGeo.sDirIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linkdsttdir" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkDstTdir index\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkDstTdir index" );
 		}
 		specialData.linkDstGeo.tDirIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linkdstpdir" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkDstPdir index\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkDstPdir index" );
 		}
 		specialData.linkDstGeo.pDirIndex = atoi( value.c_str() );
 	}
 	else if ( key == "linkdstsscale" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkDstSscale parameter\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkDstSscale parameter" );
 		}
 		specialData.linkDstGeo.sScale = atof( value.c_str() );
 		specialData.linkDstGeo.LinkAutoSscale = false;
 	}
 	else if ( key == "linkdsttscale" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkDstTscale parameter\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkDstTscale parameter" );
 		}
 		specialData.linkDstGeo.tScale = atof( value.c_str() );
 		specialData.linkDstGeo.LinkAutoTscale = false;
 	}
 	else if ( key == "linkdstpscale" ) {
 		if ( BZWParser::allWhitespace( value.c_str() ) ) {
-			printf( "MeshFace::update(): Error! Missing linkDstPscale parameter\n" );
-			return false;
+			throw BZWReadError( this, "Missing linkDstPscale parameter" );
 		}
 		specialData.linkDstGeo.pScale = atof( value.c_str() );
 		specialData.linkDstGeo.LinkAutoPscale = false;
@@ -247,13 +228,15 @@ bool MeshFace::parse( const char* line ) {
 	//
 	//  Material
 	//
-	else if (key == "matref") {
-		materials.push_back( value );
-		makeMaterial();
+	else if ( key == "matref" ) {
+		material* mat = (material*)Model::command( MODEL_GET, "material", value );
+		if (mat != NULL)
+			this->mat = mat;
+		else
+			throw BZWReadError( this, string( "Couldn't find material, " ) + value );
 	}
 	else {
-		printf( "MeshFace::update(): Error! unknown mesh face property: %s\n", key.c_str() );
-		return false;
+		throw BZWReadError( this, string( "Unknown key, " ) + key );
 	}
 
 	return true;
@@ -261,8 +244,9 @@ bool MeshFace::parse( const char* line ) {
 
 // toString
 string MeshFace::toString(void) {
+	// FIXME: make this method work
 	// string-ify the material list
-	string matstring = string("");
+	/*string matstring = string("");
 	if(materials.size() > 0) {
 		for(vector<string>::iterator i = materials.begin(); i != materials.end(); i++) {
 			matstring += "    matref " + (*i) + "\n";
@@ -279,7 +263,9 @@ string MeshFace::toString(void) {
 		(physicsDriver != NULL ? "    phydrv " + physicsDriver->getName() + "\n" : "") +
 		(shootThrough == true ? "    shootthrough\n" : "") +
 		(driveThrough == true ? "    drivethrough\n" : "") +
-		"  endface\n";
+		"  endface\n";*/
+
+	return string();
 
 }
 
@@ -298,21 +284,4 @@ string MeshFace::stringify(vector<int>& values) {
 	}
 
 	return ret;
-}
-
-void MeshFace::makeMaterial() {
-	if (this->mat != NULL)
-		mat->unref();
-
-	vector<material*> realmaterials;
-	for (vector<string>::iterator itr = materials.begin(); itr != materials.end(); itr++ ) {
-		material* mat = (material*)Model::command( MODEL_GET, "material", *itr );
-		if (mat != NULL)
-			realmaterials.push_back( mat );
-		else
-			printf("MeshFace::makeMaterial(): Error! Couldn't find material %s\n", (*itr).c_str());
-	}
-
-	this->mat = material::computeFinalMaterial( realmaterials );
-	this->mat->ref();
 }

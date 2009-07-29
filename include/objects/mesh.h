@@ -49,7 +49,6 @@ public:
 	int render(void);
 	
 private:
-
 	// vertices
 	vector<Point3D> vertices;
 	
@@ -65,9 +64,6 @@ private:
 	// outside points
 	vector<Point3D> outsidePoints;
 	
-	// materials (faces map to materials)
-	map<string, string> materialMap;
-	
 	// faces
 	vector<MeshFace*> faces;
 	
@@ -78,6 +74,13 @@ private:
 	DrawInfo* drawInfo;
 
 	void updateGeometry();
+
+	// for parsing bzw
+	MeshFace* currentFace;
+	material* currentMaterial;
+	DrawInfo* currentDrawInfo;
+	physics* phydrv;
+	bool noclusters;
 };
 
 #endif /*MESH_H_*/
