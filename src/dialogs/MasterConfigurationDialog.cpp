@@ -260,13 +260,13 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 	UpdateMessage rotationUpdate( UpdateMessage::SET_ROTATION, &rotation );
 	UpdateMessage transformUpdate( UpdateMessage::SET_TRANSFORMATIONS, &transforms );
 	
-	if( object->isKey("position") || object->isKey("shift") )
+	if( object->isKey("position") )
 		object->update( positionUpdate );
 		
-	if( object->isKey("size") || object->isKey("scale") )
+	if( object->isKey("size") )
 		object->update( sizeUpdate );
 		
-	if( object->isKey("rotation") && !object->isKey("spin"))
+	if( object->isKey("rotation") )
 		object->update( rotationUpdate );
 		
 	/*if( object->isKey("spin") ) {

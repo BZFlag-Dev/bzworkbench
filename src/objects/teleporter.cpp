@@ -16,7 +16,7 @@
 
 // constructor
 teleporter::teleporter() :
-	bz2object("teleporter", "<position><size><rotation><name><border>") {
+	bz2object("teleporter", "<position><size><rotation><spin><shift><shear><scale><name><border>") {
 
 	setDefaults();
 

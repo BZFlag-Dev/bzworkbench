@@ -112,6 +112,11 @@ class bz2object : public Renderable, public DataEntry
 		}
 		virtual void setRotation( const osg::Vec3& rot ) { setRotation( 0, 0, rot.z() ); }
 
+		virtual const osg::Vec3& getRotation() { return orientation->getRotation(); }
+
+		// override Renderable's setRotationZ() method
+		virtual void setRotationZ( float r ) { orientation->setRotationZ( r ); }
+
 		// data setters (makes MasterConfigurationDialog code easier)
 		void setPhyDrv( physics* phydrv, std::string slot = "" ) { physicsSlots[ slot ].phydrv = phydrv; }
 		void setTransforms( osg::ref_ptr<BZTransform> _transformations ) { this->transformations = _transformations; }
