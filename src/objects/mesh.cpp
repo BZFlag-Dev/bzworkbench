@@ -16,11 +16,6 @@
 mesh::mesh(void) :
 	bz2object("mesh", "<name><vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo><drivethrough><shootthrough>") {
 
-	vertices = vector<Point3D>();
-	texCoords = vector<Point2D>();
-	normals = vector<Point3D>();
-	insidePoints = vector<Point3D>();
-	outsidePoints = vector<Point3D>();
 	decorative = false;
 	faces = vector<MeshFace*>();
 	drawInfo = NULL;
@@ -82,7 +77,10 @@ bool mesh::parse( std::string& line ) {
 		outsidePoints.push_back( Point3D( BZWParser::value( "outside", line.c_str() ) ) );
 	}
 	else if ( key == "vertex" ) {
-		vertices.push_back( Point3D( BZWParser::value( "vertex", line.c_str() ) ) );
+		string val = BZWParser::value( "vertex", line.c_str() );
+		Point3D pt( val.c_str() );
+
+		vertices.push_back( pt );
 	}
 	else if ( key == "normal" ) {
 		normals.push_back( Point3D( BZWParser::value( "normal", line.c_str() ) ) );
@@ -240,6 +238,7 @@ void mesh::updateGeometry() {
 	for ( map< material*, osg::Geometry* >::iterator i = geomMap.begin(); i != geomMap.end(); i++ ) {
 		osg::Geode* geode = new osg::Geode();
 		geode->addDrawable( i->second );
+		geode->setDataVariance( osg::Object::DYNAMIC );
 		geode->setStateSet( i->first );
 		group->addChild( geode );
 	}

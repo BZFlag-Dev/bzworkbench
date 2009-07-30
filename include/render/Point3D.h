@@ -33,15 +33,15 @@ class Point3D : public osg::Vec3
 	Point3D(double _x, double _y, double _z) : osg::Vec3( _x, _y, _z ) { }
 	
 	Point3D( osg::Vec3 pt ) : osg::Vec3( pt ) { }
-	
+
 	Point3D(const char* description) {
 	  vector<string> points = BZWParser::getLineElements(description);
 	  
 	  // only initialize from the string if there are at least 3 elements
 	  if(points.size() >= 3) {
-			set( atof( points[0].c_str() ),
-			     atof( points[1].c_str() ),
-			     atof( points[2].c_str() ));
+		  _v[0] = atof( points[0].c_str() );
+		  _v[1] = atof( points[1].c_str() );
+		  _v[2] = atof( points[2].c_str() );
 	  } else {
 	    set(0,0,0);
 	  }

@@ -24,6 +24,8 @@
 
 #include <map>
 
+#include <osg/Vec3>
+
 class mesh : public bz2object {
 	
 public:
@@ -50,22 +52,22 @@ public:
 	
 private:
 	// vertices
-	vector<Point3D> vertices;
+	std::vector<Point3D> vertices;
 	
 	// texture coordinates
-	vector<Point2D> texCoords;
+	std::vector<Point2D> texCoords;
 	
 	// normals
-	vector<Point3D> normals;
+	std::vector<Point3D> normals;
 	
 	// inside points
-	vector<Point3D> insidePoints;
+	std::vector<Point3D> insidePoints;
 	
 	// outside points
-	vector<Point3D> outsidePoints;
+	std::vector<Point3D> outsidePoints;
 	
 	// faces
-	vector<MeshFace*> faces;
+	std::vector<MeshFace*> faces;
 	
 	std::vector<std::string> lodOptions;
 	bool decorative;
