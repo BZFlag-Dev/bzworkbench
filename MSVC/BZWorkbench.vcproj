@@ -142,7 +142,7 @@
 				AdditionalDependencies="fltk.lib fltkgl.lib fltkimages.lib fltkpng.lib fltkz.lib opengl32.lib wsock32.lib comctl32.lib osg.lib osgGA.lib osgViewer.lib osgDB.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(OSG_ROOT)\lib;$(FLTK_ROOT)\lib"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

@@ -147,7 +147,7 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../MSVC/release"
 				ModuleDefinitionFile="Win32CommonControls.def"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
