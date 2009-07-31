@@ -26,6 +26,9 @@
 
 #include <osg/Vec3>
 
+struct MeshVertex;
+struct TriIndices;
+
 class mesh : public bz2object {
 	
 public:
@@ -83,6 +86,9 @@ private:
 	DrawInfo* currentDrawInfo;
 	physics* phydrv;
 	bool noclusters;
+
+	void triangulateFace(const std::vector<MeshVertex>& verts,
+		     std::vector<TriIndices>& tris);
 };
 
 #endif /*MESH_H_*/
