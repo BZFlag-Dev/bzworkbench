@@ -230,16 +230,48 @@ void mesh::updateGeometry() {
 		else {
 			geom = new osg::Geometry();
 			geom->setVertexArray( new osg::Vec3Array() );
+			geom->setNormalArray( new osg::Vec3Array() );
+			geom->setTexCoordArray( 0, new osg::Vec2Array() );
 			geomMap[ mat ] = geom;
 		}
 
 		// get the vertices for the current face
 		vector<int> vertIndices = face->getVertices();
-		vector<MeshVertex> faceVertices( vertIndices.size() );
-		for ( vector<int>::iterator j = vertIndices.begin(); j != vertIndices.end(); j++ ) {
-			MeshVertex v;
-			v.vertex = vertices[ *j ];
-			faceVertices.push_back( v );
+		vector<int> normalIndices = face->getNormals();
+		vector<int> texcoordIndices = face->getTexcoords();
+		bool hasNormals = false, hasTexcoords = false;
+
+		// check if there are normals and texcoords and if there are the right amount
+		if ( normalIndices.size() > 0 ) {
+			if ( normalIndices.size() == vertIndices.size() )
+				hasNormals = true;
+			else
+				throw BZWReadError( this, "Number of normals doesn't match number of vertices." );
+		}
+
+		if ( texcoordIndices.size() > 0 ) {
+			if ( texcoordIndices.size() == vertIndices.size() )
+				hasTexcoords = true;
+			else
+				throw BZWReadError( this, "Number of normals doesn't match number of vertices." );
+		}
+
+		vector<MeshVertex> faceVertices;
+		vector<int>::iterator v = vertIndices.begin();
+		vector<int>::iterator n = normalIndices.begin();
+		vector<int>::iterator t = texcoordIndices.begin();
+		for ( ; v != vertIndices.end(); v++ ) {
+			MeshVertex vtx;
+			vtx.vertex = vertices[ *v ];
+			if ( hasNormals ) {
+				vtx.normal = normals[ *n ];
+				n++;
+			}
+			if ( hasTexcoords ) {
+				vtx.texcoord = texCoords[ *t ];
+				t++;
+			}
+			faceVertices.push_back( vtx );
 		}
 
 		// triangulate the face
@@ -248,13 +280,21 @@ void mesh::updateGeometry() {
 
 		// add the vertices to the face
 		osg::Vec3Array* verts = (osg::Vec3Array*)geom->getVertexArray();
+		osg::Vec3Array* normals = (osg::Vec3Array*)geom->getNormalArray();
+		osg::Vec2Array* texcoords = (osg::Vec2Array*)geom->getTexCoordArray( 0 );
 		osg::DrawElementsUInt* drawElem = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLES, 0 );
 		for ( vector<TriIndices>::iterator j = indices.begin(); j != indices.end(); j++ ) {
 			verts->push_back( faceVertices[ (*j).indices[0] ].vertex );
+			if ( hasNormals ) normals->push_back( faceVertices[ (*j).indices[0] ].normal );
+			if ( hasTexcoords ) texcoords->push_back( faceVertices[ (*j).indices[0] ].texcoord );
 			drawElem->push_back( verts->size() - 1 );
 			verts->push_back( faceVertices[ (*j).indices[1] ].vertex );
+			if ( hasNormals ) normals->push_back( faceVertices[ (*j).indices[1] ].normal );
+			if ( hasTexcoords ) texcoords->push_back( faceVertices[ (*j).indices[1] ].texcoord );
 			drawElem->push_back( verts->size() - 1 );
 			verts->push_back( faceVertices[ (*j).indices[2] ].vertex );
+			if ( hasNormals ) normals->push_back( faceVertices[ (*j).indices[2] ].normal );
+			if ( hasTexcoords ) texcoords->push_back( faceVertices[ (*j).indices[2] ].texcoord );
 			drawElem->push_back( verts->size() - 1 );
 		}
 
@@ -271,65 +311,6 @@ void mesh::updateGeometry() {
 
 	setThisNode( group );
 }
-
-/*bool mesh::checkConvexAndCoplanar( std::vector<osg::Vec3>& verts ) {
-	float maxCrossSqr = 0.0f;
-	osg::Vec3 bestCross;
-	int bestSet[3] = { -1, -1, -1 }
-
-	// find the best vertices for making the plane
-	int i, j, k;
-	for ( i = 0; i < verts.size() - 2; i++ ) {
-		for ( j = i; j < verts.size() - 1; j++ ) {
-			for ( k = j; k < verts.size(); k++ ) {
-				const osg::Vec3 edge1 = verts[k] - verts[i];
-				const osg::Vec3 edge2 = verts[i] - verts[j];
-				const osg::Vec3 cross = edge1 ^ edge2;
-				const float lengthSq = cross.length2();
-				if ( lengthSq > maxCrossSqr ) {
-					maxCrossSqr = lengthSq;
-					bestSet[0] = i;
-					bestSet[1] = j;
-					bestSet[2] = k;
-					bestCross = cross;
-				}
-			}
-		}
-	}
-
-	if ( maxCrossSqr < +1.0e-20f ) {
-		throw BZWReadError( this, "Invalid mesh face" );
-	}
-
-	// make the plane
-	float scale = 1.0f / sqrtf( maxCrossSqr );
-	const osg::Vec3 vert = vertices[ bestSet[ 1 ] ];
-	osg::Vec4 plane; 
-	plane[0] = bestCross.x() * scale; 
-	plane[1] = bestCross.y() * scale;
-	plane[2] = bestCross.z() * scale; 
-	plane[3] = -( osg::Vec3( plane[0], plane[1], plane[2] ) * vert );
-
-	// see if the whole face is convex
-	for (int v = 0; v < verts.size(); v++ ) {
-		osg::Vec3 a, b, c;
-		a = verts[(v + 1) % verts.size() ] - verts[ v % verts.size() ];
-		b = verts[ (v + 2) % verts.size() ] - verts[ (v + 1) % verts.size() ];
-		c = a ^ b;
-		const float d = c * osg::Vec3( plane[0], plane[1], plane[2] );
-
-		if ( d <= 0.0f ) {
-			// non-convex
-			return false;
-		}
-	}
-
-	// see if the vertices are coplanar
-	for ( int v = 0; v < verts.size(); v++ ) {
-		const float cross = vertices[ v ] * osg::Vec3( plane[0], plane[1], plane[2] );
-
-	}
-}*/
 
 
 /*
