@@ -211,11 +211,11 @@ string material::toString(void) {
 
 	return string("material\n") +
 				  (name.length() == 0 ? string("# name") : "  name " + name) + "\n" +
-				  (dynCol != NULL ? string("  dyncol ") + dynCol->getName() : string("  dyncol -1")) + "\n" +
+				  (dynCol != NULL ? string("  dyncol ") + dynCol->getName() : string("")) + "\n" +
 				  (noTextures == true ? "  notextures\n" : "") +
 				  (noShadow == true ? "  noshadow\n" : "") +
 				  (noCulling == true ? "  noculling\n" : "") +
-				  (noSorting == true ? "  nosort\n" : "") +
+				  (noSorting == true ? "  nosorting\n" : "") +
 				  (noLighting == true ? "  nolighting\n" : "") +
 				  (noRadar == true ? "  noradar\n" : "") +
 				  (groupAlpha == true ? "  groupalpha\n" : "") +

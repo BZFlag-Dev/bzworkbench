@@ -33,6 +33,7 @@ mesh::mesh(void) :
 	currentFace = NULL;
 	currentMaterial = NULL;
 	noclusters = false;
+	phydrv = NULL;
 	smoothbounce = false;
 	drivethrough = false;
 	shootthrough = false;
@@ -147,7 +148,7 @@ void mesh::finalize() {
 // to string
 string mesh::toString(void) {
 	// string-ify the vertices, normals, texcoords, inside points, outside points, and faces
-	/*string vertexString(""), normalString(""), texcoordString(""), insideString(""), outsideString(""), faceString("");
+	string vertexString(""), normalString(""), texcoordString(""), insideString(""), outsideString(""), faceString("");
 
 	if(vertices.size() > 0) {
 		for(vector<Point3D>::iterator i = vertices.begin(); i != vertices.end(); i++) {
@@ -156,13 +157,13 @@ string mesh::toString(void) {
 	}
 
 	if(normals.size() > 0) {
-		for(vector<Vector3D>::iterator i = normals.begin(); i != normals.end(); i++) {
+		for(vector<Point3D>::iterator i = normals.begin(); i != normals.end(); i++) {
 			normalString += "  normal " + i->toString();
 		}
 	}
 
 	if(texCoords.size() > 0) {
-		for(vector<TexCoord2D>::iterator i = texCoords.begin(); i != texCoords.end(); i++) {
+		for(vector<Point2D>::iterator i = texCoords.begin(); i != texCoords.end(); i++) {
 			texcoordString += "  texcoord " + i->toString() + "\n";
 		}
 	}
@@ -170,15 +171,8 @@ string mesh::toString(void) {
 	// special instance:
 	// make sure to keep the order of faces and materials constant
 	if(faces.size() > 0) {
-		string currMaterial = "";
-		for(vector<MeshFace>::iterator i = faces.begin(); i != faces.end(); i++) {
-			// see if we came across a new material
-			if(currMaterial != materialMap[ i->toString() ]) {
-				// if so, set the current material and append the matref to the faceString
-				currMaterial = materialMap[ i->toString() ];
-				faceString += "  matref " + currMaterial + "\n";
-			}
-			faceString += "  " + i->toString();
+		for(vector<MeshFace*>::iterator i = faces.begin(); i != faces.end(); i++) {
+			faceString += (*i)->toString();
 		}
 	}
 
@@ -195,18 +189,14 @@ string mesh::toString(void) {
 	}
 
 	return string("mesh\n") +
-				  (noClusters == true ? "  noclusters\n" : "") +
-				  (smoothBounce == true ? "  smoothbounce\n" : "") +
 				  insideString +
 				  outsideString +
 				  vertexString +
 				  normalString +
 				  texcoordString +
 				  faceString +
-				  (useDrawInfo == true ? "  " + drawInfo.toString() : "") + "\n" +
-				  "end\n";*/
-
-	return string(); // FIXME: fix saving implementation
+				  (drawInfo != NULL ? "  " + drawInfo->toString() : "") + "\n" +
+				  "end\n";
 }
 
 // render

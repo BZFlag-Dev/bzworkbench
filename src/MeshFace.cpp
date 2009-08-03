@@ -244,29 +244,18 @@ bool MeshFace::parse( string& line ) {
 
 // toString
 string MeshFace::toString(void) {
-	// FIXME: make this method work
-	// string-ify the material list
-	/*string matstring = string("");
-	if(materials.size() > 0) {
-		for(vector<string>::iterator i = materials.begin(); i != materials.end(); i++) {
-			matstring += "    matref " + (*i) + "\n";
-		}
-	}
+	// FIXME: some data is read in but not written out
+	string ret("face\n");
+	ret += (vertices.size() > 0 ? "    vertices " + stringify(vertices) + "\n" : "");
+	ret += (texcoords.size() > 0 ? "    texcoords " + stringify(texcoords) + "\n" : "");
+	ret += (normals.size() > 0 ? "    normals " + stringify(normals) + "\n" : "");
+	ret += (mat != NULL ? "    matref " + mat->getName() + "\n" : "");
+	ret += (physicsDriver != NULL ? "    phydrv " + physicsDriver->getName() + "\n" : "");
+	ret += (shootThrough == true ? "    shootthrough\n" : "");
+	ret += (driveThrough == true ? "    drivethrough\n" : "");
+	ret += "  endface\n";
 
-	// FIXME: special data is read in but not written out
-
-	return string("face\n") +
-		(vertices.size() > 0 ? "    vertices " + stringify(vertices) + "\n" : "") +
-		(texcoords.size() > 0 ? "    texcoords " + stringify(texcoords) + "\n" : "") +
-		(normals.size() > 0 ? "    normals " + stringify(normals) + "\n" : "") +
-		matstring +
-		(physicsDriver != NULL ? "    phydrv " + physicsDriver->getName() + "\n" : "") +
-		(shootThrough == true ? "    shootthrough\n" : "") +
-		(driveThrough == true ? "    drivethrough\n" : "") +
-		"  endface\n";*/
-
-	return string();
-
+	return ret;
 }
 
 // render
