@@ -37,7 +37,7 @@ MeshFace::MeshFace(material* mat, physics* phydrv, bool noclusters, bool smoothb
 }
 
 MeshFace::~MeshFace() {
-	mat->unref();
+
 }
 
 // getter

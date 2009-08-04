@@ -39,16 +39,6 @@ mesh::mesh(void) :
 	shootthrough = false;
 }
 
-mesh::~mesh() {
-	// clean up
-	if (drawInfo != NULL)
-		delete drawInfo;
-
-	for (vector<MeshFace*>::iterator itr = faces.begin(); itr != faces.end(); itr++) {
-		if ( *itr != NULL )
-			delete *itr;
-	}
-}
 
 // getter
 string mesh::get(void) { return toString(); }

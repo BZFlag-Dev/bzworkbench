@@ -64,7 +64,7 @@ int BZTransform::parse(string& newData) {
 
 	// get the numbers (don't start with elements.begin(), because this is what name is)
 	osg::Vec4 vec;
-	for(int i = 1; i < elements.size() && i <= 4; i++) {
+	for(unsigned int i = 1; i < elements.size() && i <= 4; i++) {
 		vec[ i - 1 ] = atof( elements[ i ].c_str() );
 	}
 

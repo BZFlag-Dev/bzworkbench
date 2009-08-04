@@ -140,7 +140,7 @@ void BoxConfigurationDialog::saveFace( int face )
 	texsizeY[face] = texsizeYInput->value();
 	texoffsetX[face] = texoffsetXInput->value();
 	texoffsetY[face] = texoffsetYInput->value();
-	drivethrough[face] = drivethroughButton->value();
-	shootthrough[face] = shootthroughButton->value();
-	ricochet[face] = ricochetButton->value();
+	drivethrough[face] = drivethroughButton->value() == 1 ? true : false;
+	shootthrough[face] = shootthroughButton->value() == 1 ? true : false;
+	ricochet[face] = ricochetButton->value() == 1 ? true : false;
 }

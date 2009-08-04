@@ -36,7 +36,6 @@ public:
 	// constructor
 	mesh(void);
 
-	~mesh();
 	
 	static DataEntry* init() { return new mesh(); }
 	

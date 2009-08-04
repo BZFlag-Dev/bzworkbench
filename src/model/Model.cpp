@@ -235,7 +235,7 @@ DataEntry* Model::_command(const string& _command, const string& object, const s
 bool Model::build( std::istream& data ) { return modRef->_build(data); }
 
 bool Model::_build( std::istream& data ) {
-	clear();
+	_newWorld();
 
 	string buff, header;
 	int lineCount = 0;
@@ -977,7 +977,7 @@ bool Model::_copySelection() {
 // paste the objectBuffer to the scene
 bool Model::pasteSelection() { return modRef->_pasteSelection(); }
 bool Model::_pasteSelection() {
-	/*if( this->objectBuffer.size() <= 0)
+	if( this->objectBuffer.size() <= 0)
 		return false;
 
 
@@ -986,14 +986,12 @@ bool Model::_pasteSelection() {
 	// paste objects into the scene
 	// create new instances; don't pass references
 	for( vector< osg::ref_ptr<bz2object> >::iterator i = this->objectBuffer.begin(); i != this->objectBuffer.end(); i++) {
-		bz2object* obj = dynamic_cast< bz2object* > (this->_buildObject( (*i)->getHeader().c_str() ));
+		bz2object* obj = SceneBuilder::cloneBZObject( i->get() );
 		if(!obj) {
 			printf("error! could not create new instance of \"%s\"\n", (*i)->getHeader().c_str() );
 			continue;
 		}
 
-		string _data = (*i)->toString();
-		obj->update( _data );
 		obj->setPos( obj->getPos() + osg::Vec3(10.0, 10.0, 0.0) );
 
 		this->_addObject( obj );
@@ -1002,8 +1000,7 @@ bool Model::_pasteSelection() {
 
 	this->notifyObservers(NULL);
 
-	return true;*/
-	return false;
+	return true;
 }
 
 // delete a selection
@@ -1032,18 +1029,14 @@ bool Model::_deleteSelection() {
 // make a new world
 bool Model::newWorld() { return modRef->_newWorld(); }
 bool Model::_newWorld() {
-	// add a default new "options" object
-	options* newOptions = new options();
-
-	// add a default new "world" object
-	world* _newWorld = new world();
-
 	// clear previous objects
 	clear();
 
 	// set new world data
-	this->optionsData = newOptions;
-	this->worldData = _newWorld;
+	this->optionsData = new options();
+	this->worldData = new world();
+	this->waterLevelData = new waterLevel();
+	this->infoData = new info();
 
 	return true;
 }
@@ -1436,25 +1429,60 @@ void Model::_ungroupObjects( group* g ) {
 }
 
 void Model::clear() {
-	// clear out the previous objects
+	// clear materials
+	for (map< string, material* >::iterator i = materials.begin(); i != materials.end(); i++ ) {
+		i->second->unref();
+	}
 	this->materials.clear();
+
+	// clear physics drivers
+	for (map< string, physics* >::iterator i = phys.begin(); i != phys.end(); i++ ) {
+		i->second->unref();
+	}
 	this->phys.clear();
+
+	// clear dynamic colors
+	for (map< string, dynamicColor* >::iterator i = dynamicColors.begin(); i != dynamicColors.end(); i++ ) {
+		if ( i->second != NULL )
+			delete i->second;
+	}
 	this->dynamicColors.clear();
+
+	// clear teleporter links
+	for (map< string, Tlink* >::iterator i = links.begin(); i != links.end(); i++ ) {
+		i->second->unref();
+	}
 	this->links.clear();
+
+	// clear texture matrices
+	for (map< string, texturematrix* >::iterator i = textureMatrices.begin(); i != textureMatrices.end(); i++ ) {
+		if ( i->second != NULL )
+			delete i->second;
+	}
 	this->textureMatrices.clear();
+
+	// clear out the previous objects
 	this->_unselectAll();
-	if( this->objects.size() > 0 ) {
-		objRefList::iterator itr = this->objects.begin();
-		while( itr != this->objects.end() ) {
-
-			ObserverMessage obs( ObserverMessage::REMOVE_OBJECT, itr->get() );
-			notifyObservers( &obs );
-
-			this->objects.erase( itr );
-			itr = this->objects.begin();
-
-		}
+	for (objRefList::iterator i = objects.begin(); i != objects.end(); i++ ) {
+		ObserverMessage obs( ObserverMessage::REMOVE_OBJECT, i->get() );
+		notifyObservers( &obs );
 	}
 	this->objects.clear();
 	this->notifyObservers( NULL );
+
+	if (worldData != NULL)
+		delete worldData;
+	worldData = NULL;
+
+	if (optionsData != NULL)
+		delete optionsData;
+	optionsData = NULL;
+
+	if (waterLevelData != NULL)
+		delete waterLevelData;
+	waterLevelData = NULL;
+
+	if (infoData != NULL)
+		delete infoData;
+	infoData = NULL;
 }
