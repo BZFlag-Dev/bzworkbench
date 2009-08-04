@@ -137,6 +137,8 @@ public:
 	static string makeUniqueName( const char* name ) {
 		return string(name) + "_" + string(itoa(nameCount++));
 	}
+
+	static bz2object* cloneBZObject( bz2object* );
 	
 private:
 	

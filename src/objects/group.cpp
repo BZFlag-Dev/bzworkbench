@@ -14,7 +14,7 @@
 
 // constructor
 group::group() : 
-	bz2object("group", "<shift><shear><scale><spin><team><tint><drivethrough><shootthrough><phydrv><matref>") {
+	bz2object("group", "<name><shift><shear><scale><spin><team><tint><drivethrough><shootthrough><phydrv><matref>") {
 	this->team = 0;
 	this->def = NULL;
 	this->tintColor = RGBA(1, 1, 1, 1);
@@ -24,6 +24,7 @@ group::group() :
 	this->container = new Renderable();
 	this->bzw1_containers = map< osg::ref_ptr< bz2object >, osg::ref_ptr< Renderable > >();
 	this->geoRing = NULL;
+	this->setDataVariance( osg::Object::DYNAMIC );
 }
 
 // getter
@@ -279,7 +280,7 @@ void group::updateObjects() {
 // set the associated definition
 void group::setDefine( define* def ) {
 	this->def = def;
-	this->setName( def->getName() ); 
+	//this->setName( def->getName() ); 
 	
 	// reload the children
 	this->computeChildren();
@@ -307,7 +308,6 @@ void group::computeChildren() {
 	
 	// if the def is valid, add the objects
 	if( def != NULL ) {
-		def = def;
 		// get the objects
 		vector< osg::ref_ptr< bz2object > > objects = this->def->getObjects();
 		// put each object inside a PositionAttitudeTransform
@@ -333,14 +333,23 @@ void group::computeChildren() {
 			// (i.e. apply a SHIFT transformation
 			for( vector< osg::ref_ptr< bz2object > >::iterator i = objects.begin(); i != objects.end(); i++ ) {
 				// if this is a bzw2 object, then just add it to the container
-				if( (*i)->isKey("spin") || (*i)->isKey("shift") || (*i)->isKey("scale") || (*i)->isKey("shear") )
+				if( (*i)->isKey("spin") || (*i)->isKey("shift") || (*i)->isKey("scale") || (*i)->isKey("shear") ) {
+					// make a clone of the object
+					bz2object* obj = SceneBuilder::cloneBZObject( i->get() );
+
 					// add the object to the container
-					this->container->addChild( i->get() );
+					this->container->addChild( obj );
+
+					// set the position of this object relative to the center of the group
+					obj->setPos( obj->getPos() - position );
+
+					printf(" added %s\n", (*i)->getName().c_str() );
+				}
 					
 				// otherwise, create a bzw1 container (i.e. a transformation node that has the inverse
 				// transformation of the container, because bzw1 objects do NOT share all of the group's transformations.
 				// This is for cosmetic purposes only.
-				else {
+				/*else {
 					// make a new node
 					Renderable* r = new Renderable( i->get() );
 					// name it as such
@@ -354,18 +363,12 @@ void group::computeChildren() {
 					
 					// add the bzw1 container to the main container.
 					this->container->addChild( r );
-				}
-				
-				// set the position of this object relative to the center of the group
-				i->get()->setPos( i->get()->getPos() - position );
-				
-				printf(" added %s\n", (*i)->getName().c_str() );
+				}*/
 			}
 		}
 	}
 	
-	if( !this->containsNode( this->container.get() ) )
-		this->addChild( container.get() );
+	setThisNode( container.get() );
 }
 
 // propogate messages to child objects when appropriate

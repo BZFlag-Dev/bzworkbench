@@ -52,6 +52,8 @@ public:
 	
 	// render
 	int render(void);
+
+
 	
 private:
 	// vertices

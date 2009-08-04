@@ -335,3 +335,25 @@ void SceneBuilder::markUnselectedAndRestoreStateSet( bz2object* theNode ) {
 		SceneBuilder::markUnselected( theNode );
 }
 
+bz2object* SceneBuilder::cloneBZObject( bz2object* obj ) {
+	std::string str = obj->toString();	
+
+	vector< string > lines = BZWParser::getLines( "", str.c_str() );
+
+	bz2object* newObj = dynamic_cast< bz2object* >( Model::buildObject( obj->getHeader().c_str() ) );
+
+	if ( newObj != NULL ) {
+		for ( vector< string >::iterator i = lines.begin(); i != lines.end(); i++ ) {
+			std::string line = BZWParser::cutWhiteSpace( *i );
+			
+			if ( line == "" )
+				continue;
+
+			newObj->parse( line );
+		}
+
+		newObj->finalize();
+	}
+
+	return newObj;
+}

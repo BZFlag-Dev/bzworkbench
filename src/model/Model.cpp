@@ -376,6 +376,7 @@ bool Model::_build( std::istream& data ) {
 			}
 			else if( header == "define" ) {
 				defineObj = (define*)this->cmap["define"]();
+				defineObj->parse(buff);
 			}
 			else if( header == "link" ) {
 				linkObj = (Tlink*)this->cmap["link"]();

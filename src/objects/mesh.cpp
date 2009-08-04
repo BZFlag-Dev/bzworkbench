@@ -41,13 +41,13 @@ mesh::mesh(void) :
 
 mesh::~mesh() {
 	// clean up
-	/*if (drawInfo != NULL)
+	if (drawInfo != NULL)
 		delete drawInfo;
 
 	for (vector<MeshFace*>::iterator itr = faces.begin(); itr != faces.end(); itr++) {
 		if ( *itr != NULL )
 			delete *itr;
-	}*/
+	}
 }
 
 // getter
@@ -220,8 +220,6 @@ void mesh::updateGeometry() {
 		else {
 			geom = new osg::Geometry();
 			geom->setVertexArray( new osg::Vec3Array() );
-			geom->setNormalArray( new osg::Vec3Array() );
-			geom->setTexCoordArray( 0, new osg::Vec2Array() );
 			geomMap[ mat ] = geom;
 		}
 
@@ -231,17 +229,38 @@ void mesh::updateGeometry() {
 		vector<int> texcoordIndices = face->getTexcoords();
 		bool hasNormals = false, hasTexcoords = false;
 
+		// get the arrays
+		osg::Vec3Array* verts = (osg::Vec3Array*)geom->getVertexArray();
+		osg::Vec3Array* norms = (osg::Vec3Array*)geom->getNormalArray();
+		osg::Vec2Array* tcoords = NULL;
+		if ( geom->getNumTexCoordArrays() > 0 )
+			tcoords = (osg::Vec2Array*)geom->getTexCoordArray( 0 );
+
 		// check if there are normals and texcoords and if there are the right amount
 		if ( normalIndices.size() > 0 ) {
-			if ( normalIndices.size() == vertIndices.size() )
+			if ( normalIndices.size() == vertIndices.size() ) {
 				hasNormals = true;
+
+				// if there isn't a texcoord array make one
+				if ( norms == NULL ) {
+					norms = new osg::Vec3Array();
+					geom->setNormalArray( norms );
+				}
+			}
 			else
 				throw BZWReadError( this, "Number of normals doesn't match number of vertices." );
 		}
 
 		if ( texcoordIndices.size() > 0 ) {
-			if ( texcoordIndices.size() == vertIndices.size() )
+			if ( texcoordIndices.size() == vertIndices.size() ) {
 				hasTexcoords = true;
+				
+				// if there isn't a texcoord array make one
+				if ( tcoords == NULL ) {
+					tcoords = new osg::Vec2Array();
+					geom->setTexCoordArray( 0, tcoords );
+				}
+			}
 			else
 				throw BZWReadError( this, "Number of normals doesn't match number of vertices." );
 		}
@@ -269,22 +288,19 @@ void mesh::updateGeometry() {
 		triangulateFace( faceVertices, indices );
 
 		// add the vertices to the face
-		osg::Vec3Array* verts = (osg::Vec3Array*)geom->getVertexArray();
-		osg::Vec3Array* normals = (osg::Vec3Array*)geom->getNormalArray();
-		osg::Vec2Array* texcoords = (osg::Vec2Array*)geom->getTexCoordArray( 0 );
 		osg::DrawElementsUInt* drawElem = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLES, 0 );
 		for ( vector<TriIndices>::iterator j = indices.begin(); j != indices.end(); j++ ) {
 			verts->push_back( faceVertices[ (*j).indices[0] ].vertex );
-			if ( hasNormals ) normals->push_back( faceVertices[ (*j).indices[0] ].normal );
-			if ( hasTexcoords ) texcoords->push_back( faceVertices[ (*j).indices[0] ].texcoord );
+			if ( hasNormals ) norms->push_back( faceVertices[ (*j).indices[0] ].normal );
+			if ( hasTexcoords ) tcoords->push_back( faceVertices[ (*j).indices[0] ].texcoord );
 			drawElem->push_back( verts->size() - 1 );
 			verts->push_back( faceVertices[ (*j).indices[1] ].vertex );
-			if ( hasNormals ) normals->push_back( faceVertices[ (*j).indices[1] ].normal );
-			if ( hasTexcoords ) texcoords->push_back( faceVertices[ (*j).indices[1] ].texcoord );
+			if ( hasNormals ) norms->push_back( faceVertices[ (*j).indices[1] ].normal );
+			if ( hasTexcoords ) tcoords->push_back( faceVertices[ (*j).indices[1] ].texcoord );
 			drawElem->push_back( verts->size() - 1 );
 			verts->push_back( faceVertices[ (*j).indices[2] ].vertex );
-			if ( hasNormals ) normals->push_back( faceVertices[ (*j).indices[2] ].normal );
-			if ( hasTexcoords ) texcoords->push_back( faceVertices[ (*j).indices[2] ].texcoord );
+			if ( hasNormals ) norms->push_back( faceVertices[ (*j).indices[2] ].normal );
+			if ( hasTexcoords ) tcoords->push_back( faceVertices[ (*j).indices[2] ].texcoord );
 			drawElem->push_back( verts->size() - 1 );
 		}
 

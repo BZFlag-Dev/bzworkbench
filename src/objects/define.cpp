@@ -41,6 +41,9 @@ bool define::parse( std::string& line ) {
 			currentObject = NULL;
 		}
 	}
+	else if ( BZWParser::key( line.c_str() ) == "define" ) {
+		name = BZWParser::value( "define", line.c_str() );
+	}
 	else {
 		string header = BZWParser::key( line.c_str() );
 
