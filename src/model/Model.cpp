@@ -52,12 +52,6 @@ Model::Model() : Observable()
 	this->optionsData = new options();
 	this->waterLevelData = new waterLevel();
 	this->infoData = new info();
-	this->phys = map< string, physics* >();
-	this->dynamicColors = map< string, dynamicColor* >();
-	this->materials = map< string, material* >();
-	this->links = map< string, Tlink* >();
-	this->textureMatrices = map< string, texturematrix* >();
-	this->groups = map< string, define* >();
 
 	// make a default material
 	this->defaultMaterial = new material();
@@ -87,12 +81,6 @@ Model::Model(const char* _supportedObjects, const char* _objectHierarchy, const 
 	this->optionsData = new options();
 	this->waterLevelData = new waterLevel();
 	this->infoData = new info();
-	this->phys = map< string, physics* >();
-	this->dynamicColors = map< string, dynamicColor* >();
-	this->materials = map< string, material* >();
-	this->links = map< string, Tlink* >();
-	this->textureMatrices = map< string, texturematrix* >();
-	this->groups = map< string, define* >();
 
 	// make a default material
 	this->defaultMaterial = new material();
@@ -131,31 +119,10 @@ Model::~Model()
 	if(infoData)
 		delete infoData;
 
-	if(phys.size() > 0)
-		for(map<string, physics*>::iterator i = phys.begin(); i != phys.end(); ++i)
-			if((i->second)) {
-				delete i->second;
-				i->second = NULL;
-			}
-
-	if(materials.size() > 0)
-		for(map<string, material*>::iterator i = materials.begin(); i != materials.end(); ++i)
-			if((i->second)) {
-				delete i->second;
-				i->second = NULL;
-			}
-
 	if(objects.size() > 0)
 		for(Model::objRefList::iterator i = objects.begin(); i != objects.end(); ++i)
 			if((i->get())) {
 				*i = NULL;	// this will deref the object, calling a destructor
-			}
-
-	if(links.size() > 0)
-		for(map<string, Tlink*>::iterator i = links.begin(); i != links.end(); ++i)
-			if((i->second)) {
-				delete i->second;
-				i->second = NULL;
 			}
 
 	if(groups.size() > 0)
@@ -630,7 +597,7 @@ string& Model::_toString() {
 	// physics drivers
 	ret += "\n#--Physics Drivers-------------------------------\n\n";
 	if(this->phys.size() > 0) {
-		for(map< string, physics* >::iterator i = this->phys.begin(); i != this->phys.end(); i++) {
+		for(map< string, osg::ref_ptr< physics > >::iterator i = this->phys.begin(); i != this->phys.end(); i++) {
 			ret += i->second->toString() + "\n";
 		}
 	}
@@ -654,7 +621,7 @@ string& Model::_toString() {
 	// materials
 	ret += "\n#--Materials-------------------------------------\n\n";
 	if(this->materials.size() > 0) {
-		for(map< string, material* >::iterator i = this->materials.begin(); i != this->materials.end(); i++) {
+		for(map< string, osg::ref_ptr< material > >::iterator i = this->materials.begin(); i != this->materials.end(); i++) {
 			ret += i->second->toString() + "\n";
 		}
 	}
@@ -678,7 +645,7 @@ string& Model::_toString() {
 	// links
 	ret += "\n#--Teleporter Links------------------------------\n\n";
 	if(this->links.size() > 0) {
-		for(map< string, Tlink* >::iterator i = this->links.begin(); i != this->links.end(); i++) {
+		for(map< string, osg::ref_ptr< Tlink > >::iterator i = this->links.begin(); i != this->links.end(); i++) {
 			ret += i->second->toString() + "\n";
 		}
 	}
@@ -696,11 +663,11 @@ string& Model::_toString() {
 
 // BZWB-specific API
 Model::objRefList& 				Model::getObjects() 		{ return modRef->_getObjects(); }
-map< string, material* >& 		Model::getMaterials() 		{ return modRef->_getMaterials(); }
+map< string, osg::ref_ptr< material > >& 		Model::getMaterials() 		{ return modRef->_getMaterials(); }
 map< string, texturematrix* >&	Model::getTextureMatrices() { return modRef->_getTextureMatrices(); }
 std::map< std::string, dynamicColor* >& Model::getDynamicColors() { return modRef->_getDynamicColors(); }
-map< string, physics* >& 		Model::getPhysicsDrivers() 	{ return modRef->_getPhysicsDrivers(); }
-map< string, Tlink* >&		 	Model::getTeleporterLinks() { return modRef->_getTeleporterLinks(); }
+map< string, osg::ref_ptr< physics > >& 		Model::getPhysicsDrivers() 	{ return modRef->_getPhysicsDrivers(); }
+map< string, osg::ref_ptr< Tlink > >&		 	Model::getTeleporterLinks() { return modRef->_getTeleporterLinks(); }
 map< string, define* >&			Model::getGroups() 			{ return modRef->_getGroups(); }
 void					Model::addObject( bz2object* obj ) { modRef->_addObject( obj ); }
 void					Model::removeObject( bz2object* obj ) { modRef->_removeObject( obj ); }
@@ -744,7 +711,7 @@ void Model::_removeMaterial( material* mat ) {
 	if (materials.size() <= 0)
 		return;
 
-	map< string, material* >::iterator i;
+	map< string, osg::ref_ptr< material > >::iterator i;
 	for ( i = materials.begin(); i != materials.end(); i++ ) {
 		if ( i->second == mat ) {
 
@@ -755,14 +722,13 @@ void Model::_removeMaterial( material* mat ) {
 			}
 
 			// make sure the material is removed from other materials too
-			for ( map< string, material* >::iterator j = materials.begin(); j != materials.end(); j++ ) {
+			for ( map< string, osg::ref_ptr< material > >::iterator j = materials.begin(); j != materials.end(); j++ ) {
 				if ( j->second != mat ) {
 					j->second->removeMaterial( mat );
 				}
 			}
 
 			materials.erase( i );
-			mat->unref();
 			break;
 		}
 	}
@@ -772,7 +738,7 @@ void Model::_removePhysicsDriver( physics* phydrv ) {
 	if (phys.size() <= 0)
 		return;
 
-	map< string, physics* >::iterator i;
+	map< string, osg::ref_ptr< physics > >::iterator i;
 	for ( i = phys.begin(); i != phys.end(); i++ ) {
 		if ( i->second == phydrv ) {
 
@@ -783,7 +749,6 @@ void Model::_removePhysicsDriver( physics* phydrv ) {
 			}
 
 			phys.erase( i );
-			phydrv->unref();
 			break;
 		}
 	}
@@ -798,7 +763,7 @@ void Model::_removeTextureMatrix( texturematrix* texmat ) {
 		if ( i->second == texmat ) {
 
 			// make sure the texture matrix is removed from any materials
-			for ( map< string, material* >::iterator j = materials.begin(); j != materials.end(); j++ ) {
+			for ( map< string, osg::ref_ptr< material > >::iterator j = materials.begin(); j != materials.end(); j++ ) {
 				for (int k = 0; k < j->second->getTextureCount(); k++ ) {
 					if (j->second->getTextureMatrix( k ) == texmat) {
 						j->second->setTextureMatrix( NULL );
@@ -822,7 +787,7 @@ void Model::_removeDynamicColor( dynamicColor* dyncol ) {
 		if ( i->second == dyncol ) {
 
 			// make sure the dynamic color is removed from any materials
-			for ( map< string, material* >::iterator j = materials.begin(); j != materials.end(); j++ ) {
+			for ( map< string, osg::ref_ptr< material > >::iterator j = materials.begin(); j != materials.end(); j++ ) {
 				if (j->second->getDynamicColor() == dyncol) {
 					j->second->setDynamicColor( NULL );
 				}
@@ -1086,7 +1051,7 @@ bool Model::linkTeleporters( teleporter* from, teleporter* to ) {
 bool Model::_linkTeleporters( teleporter* from, teleporter* to ) {
 	// make sure that we don't already have a link
 	if( this->links.size() > 0 ) {
-		for( map< string, Tlink* >::iterator i = this->links.begin(); i != this->links.end(); i++ ) {
+		for( map< string, osg::ref_ptr< Tlink > >::iterator i = this->links.begin(); i != this->links.end(); i++ ) {
 			if( (i->second->getTo() == from && i->second->getFrom() == to) ||
 				(i->second->getTo() == to && i->second->getFrom() == from) )
 					return false;
@@ -1131,9 +1096,9 @@ ConfigurationDialog* Model::_configureObject( DataEntry* d ) {
 bool Model::renameMaterial( std::string oldName, std::string newName ) { return modRef->_renameMaterial( oldName, newName ); }
 bool Model::_renameMaterial( std::string oldName, std::string newName ) {
 	// first check for conflicts and find the material
-	map< string, material* >::iterator matIter;
+	map< string, osg::ref_ptr< material > >::iterator matIter;
 	material* mat = NULL;
-	for ( map< string, material* >::iterator i = materials.begin(); i != materials.end(); i++ ) {
+	for ( map< string, osg::ref_ptr< material > >::iterator i = materials.begin(); i != materials.end(); i++ ) {
 		if ( i->first == newName ) {
 			printf( "Model::_renameMaterial(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
 			return false;
@@ -1239,9 +1204,9 @@ bool Model::_renameTextureMatrix( std::string oldName, std::string newName ) {
 bool Model::renamePhysicsDriver( std::string oldName, std::string newName ) { return modRef->_renamePhysicsDriver( oldName, newName ); }
 bool Model::_renamePhysicsDriver( std::string oldName, std::string newName ) {
 	// first check for conflicts and find the material
-	map< string, physics* >::iterator matIter;
+	map< string, osg::ref_ptr< physics > >::iterator matIter;
 	physics* mat = NULL;
-	for ( map< string, physics* >::iterator i = phys.begin(); i != phys.end(); i++ ) {
+	for ( map< string, osg::ref_ptr< physics > >::iterator i = phys.begin(); i != phys.end(); i++ ) {
 		if ( i->first == newName ) {
 			printf( "Model::_renamePhysicsDriver(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
 			return false;
@@ -1275,9 +1240,9 @@ bool Model::_renamePhysicsDriver( std::string oldName, std::string newName ) {
 bool Model::renameTeleporterLink( std::string oldName, std::string newName ) { return modRef->_renameTeleporterLink( oldName, newName ); }
 bool Model::_renameTeleporterLink( std::string oldName, std::string newName ) {
 	// first check for conflicts and find the material
-	map< string, Tlink* >::iterator matIter;
+	map< string, osg::ref_ptr< Tlink > >::iterator matIter;
 	Tlink* mat = NULL;
-	for ( map< string, Tlink* >::iterator i = links.begin(); i != links.end(); i++ ) {
+	for ( map< string, osg::ref_ptr< Tlink > >::iterator i = links.begin(); i != links.end(); i++ ) {
 		if ( i->first == newName ) {
 			printf( "Model::_renameTeleporterLink(): Error! Cannot change %s to %s due to naming conflict.\n", oldName.c_str(), newName.c_str() );
 			return false;
@@ -1430,15 +1395,9 @@ void Model::_ungroupObjects( group* g ) {
 
 void Model::clear() {
 	// clear materials
-	for (map< string, material* >::iterator i = materials.begin(); i != materials.end(); i++ ) {
-		i->second->unref();
-	}
 	this->materials.clear();
 
 	// clear physics drivers
-	for (map< string, physics* >::iterator i = phys.begin(); i != phys.end(); i++ ) {
-		i->second->unref();
-	}
 	this->phys.clear();
 
 	// clear dynamic colors
@@ -1449,9 +1408,6 @@ void Model::clear() {
 	this->dynamicColors.clear();
 
 	// clear teleporter links
-	for (map< string, Tlink* >::iterator i = links.begin(); i != links.end(); i++ ) {
-		i->second->unref();
-	}
 	this->links.clear();
 
 	// clear texture matrices

@@ -83,9 +83,9 @@ MaterialEditor::MaterialEditor( Model* model ) :
 void MaterialEditor::refreshMaterialList() {
 	materialBrowser->clear();
 
-	std::map<string, material*> materials = model->_getMaterials();
+	std::map<string, osg::ref_ptr< material > > materials = model->_getMaterials();
 
-	std::map<string, material*>::const_iterator i;
+	std::map<string, osg::ref_ptr< material > >::const_iterator i;
 	for ( i = materials.begin(); i != materials.end(); i++ ) {
 		materialBrowser->add( i->first.c_str() );
 	}
@@ -144,10 +144,10 @@ void MaterialEditor::MaterialRemoveCallback_real( Fl_Widget* w ) {
 	if ( name == NULL )
 		return;
 
-	map< string, material* > materials = model->_getMaterials();
+	map< string, osg::ref_ptr< material > > materials = model->_getMaterials();
 
 	if ( materials.count( string( name ) ) ) {
-		material* mat = materials[ string( name ) ];
+		material* mat = materials[ string( name ) ].get();
 
 		model->_removeMaterial( mat );
 	}

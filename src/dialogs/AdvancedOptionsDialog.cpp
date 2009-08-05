@@ -114,9 +114,9 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 	materialRefs = vector<string>();
 	materialRefs.push_back( MaterialWidget_NONE );
 	
-	map< string, material* > materialMap = Model::getMaterials();
+	map< string, osg::ref_ptr< material > > materialMap = Model::getMaterials();
 	if( materialMap.size() > 0 ) {
-		for( map< string, material* >::iterator i = materialMap.begin(); i != materialMap.end(); i++ ) {
+		for( map< string, osg::ref_ptr< material > >::iterator i = materialMap.begin(); i != materialMap.end(); i++ ) {
 			materialRefs.push_back( i->first );
 		}
 	}
@@ -136,8 +136,8 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 		phydrvMenu = new Fl_Choice( 5 + x, 215 + y, DEFAULT_WIDTH - 40, DEFAULT_TEXTSIZE + 6 );
 		phydrvMenu->add( "(none)" );
 		phydrvMenu->value( 0 );
-		map< string, physics*> phydrvs = Model::getPhysicsDrivers();
-		for (map< string, physics*>::iterator i = phydrvs.begin(); i != phydrvs.end(); i++ ) {
+		map< string, osg::ref_ptr< physics > > phydrvs = Model::getPhysicsDrivers();
+		for (map< string, osg::ref_ptr< physics > >::iterator i = phydrvs.begin(); i != phydrvs.end(); i++ ) {
 			int idx = phydrvMenu->add( i->first.c_str() );
 			if ( phys == i->second ) {
 				phydrvMenu->value( idx );

@@ -50,9 +50,9 @@ PhysicsEditor::PhysicsEditor( Model* model ) :
 void PhysicsEditor::refreshPhysicsList() {
 	physicsBrowser->clear();
 
-	std::map<string, physics*> phydrvs = model->_getPhysicsDrivers();
+	std::map<string, osg::ref_ptr< physics > > phydrvs = model->_getPhysicsDrivers();
 
-	std::map<string, physics*>::const_iterator i;
+	std::map<string, osg::ref_ptr< physics > >::const_iterator i;
 	for ( i = phydrvs.begin(); i != phydrvs.end(); i++ ) {
 		physicsBrowser->add( i->first.c_str() );
 	}
@@ -89,10 +89,10 @@ void PhysicsEditor::PhysicsRemoveCallback_real( Fl_Widget* w ) {
 	if ( name == NULL )
 		return;
 
-	map< string, physics* > phydrvs = model->_getPhysicsDrivers();
+	map< string, osg::ref_ptr< physics > > phydrvs = model->_getPhysicsDrivers();
 
 	if ( phydrvs.count( string( name ) ) ) {
-		physics* mat = phydrvs[ string( name ) ];
+		physics* mat = phydrvs[ string( name ) ].get();
 
 		model->_removePhysicsDriver( mat );
 	}

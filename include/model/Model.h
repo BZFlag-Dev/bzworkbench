@@ -94,11 +94,11 @@ public:
 	static options* getOptionsData();
 	static info* getInfoData();
 	static objRefList& getObjects();
-	static std::map< std::string, material* >& getMaterials();
+	static std::map< std::string, osg::ref_ptr< material > >& getMaterials();
 	static std::map< std::string, texturematrix* >& getTextureMatrices();
 	static std::map< std::string, dynamicColor* >& getDynamicColors();
-	static std::map< std::string, physics* >& getPhysicsDrivers();
-	static std::map< std::string, Tlink* >& getTeleporterLinks();
+	static std::map< std::string, osg::ref_ptr< physics > >& getPhysicsDrivers();
+	static std::map< std::string, osg::ref_ptr< Tlink > >& getTeleporterLinks();
 	static std::map< std::string, define* >& getGroups();
 
 	static void addObject( bz2object* obj );
@@ -137,11 +137,11 @@ public:
 	waterLevel* _getWaterLevelData() { return waterLevelData; }
 	info* _getInfoData() { return infoData; }
 	objRefList& _getObjects() { return this->objects; }
-	std::map< std::string, material* >& _getMaterials() { return this->materials; }
+	std::map< std::string, osg::ref_ptr< material > >& _getMaterials() { return this->materials; }
 	std::map< std::string, texturematrix* >& _getTextureMatrices() { return this->textureMatrices; }
 	std::map< std::string, dynamicColor* >& _getDynamicColors() { return this->dynamicColors; }
-	std::map< std::string, physics* >& _getPhysicsDrivers() { return this->phys; }
-	std::map< std::string, Tlink* >& _getTeleporterLinks() { return this->links; }
+	std::map< std::string, osg::ref_ptr< physics > >& _getPhysicsDrivers() { return this->phys; }
+	std::map< std::string, osg::ref_ptr< Tlink > >& _getTeleporterLinks() { return this->links; }
 	std::map< std::string, define* >& _getGroups() { return this->groups; }
 
 	void _addObject( bz2object* obj );
@@ -235,10 +235,10 @@ private:
 	info* infoData;
 
 // physics (map refname to object )
-	std::map< std::string, physics* > phys;
+	std::map< std::string, osg::ref_ptr< physics > > phys;
 
 // materials (map refname to object )
-	std::map< std::string, material* > materials;
+	std::map< std::string, osg::ref_ptr< material > > materials;
 	osg::ref_ptr< material > defaultMaterial; 		// default material
 
 // group definitions (map refname to object)
@@ -248,7 +248,7 @@ private:
 	std::map< std::string, dynamicColor* > dynamicColors;
 
 // links (map refname to the object )
-	std::map< std::string, Tlink* > links;
+	std::map< std::string, osg::ref_ptr< Tlink > > links;
 
 // texture matrices (map refname to the object itself)
 	std::map< std::string, texturematrix* > textureMatrices;

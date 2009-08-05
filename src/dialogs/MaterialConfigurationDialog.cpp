@@ -30,8 +30,8 @@ MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
 		matrefBrowser->add( (*i).c_str() );
 	}
 	matrefChoice = new Fl_Choice( 195, 55, 100, DEFAULT_TEXTSIZE + 6 );
-	map<string, material*> materials = Model::getMaterials();
-	for ( map<string, material*>::const_iterator i = materials.begin(); i != materials.end(); i++ ) {
+	map<string, osg::ref_ptr< material > > materials = Model::getMaterials();
+	for ( map<string, osg::ref_ptr< material > >::const_iterator i = materials.begin(); i != materials.end(); i++ ) {
 		if ( i->second != theMat ) {
 			matrefChoice->add( i->first.c_str() );
 		}
