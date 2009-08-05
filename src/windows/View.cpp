@@ -91,7 +91,8 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
    this->eventHandlers = new EventHandlerCollection( this );
 
    // add the selectHandler
-   this->eventHandlers->addEventHandler( selectHandler::getName().c_str(), new selectHandler( this, cameraManipulator ) );
+   selHandler = new selectHandler( this, cameraManipulator );
+   this->eventHandlers->addEventHandler( selectHandler::getName().c_str(), selHandler );
 
    // add the scene picker event handler
    this->addEventHandler(eventHandlers);

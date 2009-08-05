@@ -109,6 +109,9 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
         // get the selection reference
         Selection* getSelectionNode() { return selection; }
 
+		// get the selection handler
+		selectHandler* getSelectHandler() { return selHandler; }
+
         // get the MainWindow parent, if possible
         MainWindow* requestMainWindow() { return mw; }
 
@@ -154,6 +157,9 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
 
 		// pointer to the trackball matrix manipulator
 		osg::ref_ptr< osgGA::TrackballManipulator > cameraManipulatorRef;
+
+		// reference to select handler
+		selectHandler* selHandler;
 
 	private:
 

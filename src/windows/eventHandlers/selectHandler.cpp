@@ -585,3 +585,7 @@ bool selectHandler::shearSelector( View* viewer, const osgGA::GUIEventAdapter& e
 bool selectHandler::shiftSelector( View* viewer, const osgGA::GUIEventAdapter& ea) {
 	return false;
 }
+
+void selectHandler::clearLastSelected() {
+	lastSelected = NULL;
+}

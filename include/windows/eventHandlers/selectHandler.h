@@ -66,6 +66,9 @@ public:
     // shift the selector (i.e. if the appropriate key is pressed)
     bool shiftSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
 
+	// sets the lastSelected variable to NULL (should be called if an bz2object is deleted)
+	void clearLastSelected();
+
 private:
     // the last Renderable to be selected
     Renderable* lastSelected;

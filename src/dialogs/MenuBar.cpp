@@ -343,6 +343,7 @@ void MenuBar::duplicate_real(Fl_Widget* w) {
 
 // handle deletion
 void MenuBar::delete_real(Fl_Widget* w) {
+	parent->getView()->getSelectHandler()->clearLastSelected();
 	parent->getModel()->_deleteSelection();
 	value(0);
 }
