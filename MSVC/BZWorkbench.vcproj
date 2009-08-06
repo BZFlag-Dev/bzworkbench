@@ -246,6 +246,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\dialogs\DefineEditor.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\dialogs\DynamicColorConfigurationDialog.cpp"
 					>
 				</File>
@@ -259,6 +263,10 @@
 				</File>
 				<File
 					RelativePath="..\src\dialogs\Fl_Tweak.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\GroupConfigurationDialog.cpp"
 					>
 				</File>
 				<File
@@ -291,6 +299,10 @@
 				</File>
 				<File
 					RelativePath="..\src\dialogs\PyramidConfigurationDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\dialogs\RenameDialog.cpp"
 					>
 				</File>
 				<File
@@ -788,6 +800,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\dialogs\DefineEditor.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dialogs\DynamicColorConfigurationDialog.h"
 					>
 				</File>
@@ -801,6 +817,10 @@
 				</File>
 				<File
 					RelativePath="..\include\dialogs\Fl_Tweak.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\GroupConfigurationDialog.h"
 					>
 				</File>
 				<File
@@ -833,6 +853,10 @@
 				</File>
 				<File
 					RelativePath="..\include\dialogs\PyramidConfigurationDialog.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\dialogs\RenameDialog.h"
 					>
 				</File>
 				<File

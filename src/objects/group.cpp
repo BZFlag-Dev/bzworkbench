@@ -123,6 +123,10 @@ void group::finalize() {
 
 // toString
 string group::toString(void) {
+	// don't bother saving if not associated with a define
+	if ( def == NULL )
+		return string();
+
 	osg::Vec3 p = this->getPos();
 	string tintString = string(""), teamString = string("");
 	if(tintColor.r() > 0 && tintColor.g() > 0 && tintColor.b() > 0 && tintColor.a() > 0)
@@ -134,7 +138,7 @@ string group::toString(void) {
 	// the rotation values into "spin" lines
 	this->setRotation( container->getRotation() );
 	
-	string ret = string("group ") + this->getName() + "\n" +
+	string ret = string("group ") + this->def->getName() + "\n" +
 				  tintString + 
 				  teamString +
 				  (drivethrough == true ? "  drivethrough\n" : "") +

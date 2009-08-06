@@ -177,6 +177,11 @@ public:
 		m->addZoneCallback_real(w);
 	}
 
+	static void addGroupCallback(Fl_Widget* w, void* data) {
+		MenuBar* m = (MenuBar*)data;
+		m->addGroupCallback_real(w);
+	}
+
 	static void importObjectCallback(Fl_Widget* w, void* data) {
 		MenuBar* m = (MenuBar*)data;
 		m->importObjectCallback_real(w);
@@ -205,6 +210,11 @@ public:
 	static void groupCallback(Fl_Widget* w, void* data) {
 		MenuBar* m = (MenuBar*)data;
 		m->groupCallback_real(w);
+	}
+
+	static void defineCallback(Fl_Widget* w, void* data) {
+		MenuBar* m = (MenuBar*)data;
+		m->defineCallback_real(w);
 	}
 
 	static void hideCallback(Fl_Widget* w, void* data) {
@@ -286,6 +296,7 @@ private:
 	void addMeshCallback_real(Fl_Widget* w);
 	void addConeCallback_real(Fl_Widget* w);
 	void addZoneCallback_real(Fl_Widget* w);
+	void addGroupCallback_real(Fl_Widget* w);
 	void importObjectCallback_real(Fl_Widget* w);
 	void addPurpleBaseCallback_real(Fl_Widget* w);
 	void addRedBaseCallback_real(Fl_Widget* w);
@@ -293,6 +304,7 @@ private:
 	void addBlueBaseCallback_real(Fl_Widget* w);
 
 	void groupCallback_real(Fl_Widget* w);
+	void defineCallback_real(Fl_Widget* w);
 	void hideCallback_real(Fl_Widget* w);
 	void saveSelectionCallback_real(Fl_Widget* w);
 	void configureWorldCallback_real(Fl_Widget* w);

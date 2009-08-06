@@ -102,6 +102,12 @@ public:
 	}
 	
 private:
+	// object name label
+	QuickLabel* nameLabel;
+
+	// object name input
+	Fl_Input* nameInput;
+
 	// object position label
 	QuickLabel* positionLabel;
 	

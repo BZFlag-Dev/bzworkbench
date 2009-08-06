@@ -37,6 +37,7 @@
 #include "dialogs/ZoneConfigurationDialog.h"
 #include "dialogs/BaseConfigurationDialog.h"
 #include "dialogs/WeaponConfigurationDialog.h"
+#include "dialogs/GroupConfigurationDialog.h"
 
 #include "render/Point3D.h"
 #include "render/RGBA.h"
@@ -88,7 +89,7 @@ void buildModelDatabase() {
 	Model::registerObject("box", NULL, "end", box::init, BoxConfigurationDialog::init);
 	Model::registerObject("cone", NULL, "end", cone::init, ConeConfigurationDialog::init);
 	Model::registerObject("dynamicColor", NULL, "end", dynamicColor::init);
-	Model::registerObject("group", NULL, "end", group::init);
+	Model::registerObject("group", NULL, "end", group::init, GroupConfigurationDialog::init);
 	Model::registerObject("link", NULL, "end", Tlink::init);
 	Model::registerObject("material", NULL, "end", material::init);
 	Model::registerObject("mesh", "<mesh:<face><drawinfo>><drawinfo:<lod>><lod:<matref>>", "end", mesh::init);

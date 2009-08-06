@@ -33,7 +33,7 @@ bz2object::bz2object(const char* name, const char* keys):
 	pslot.phydrv = NULL;
 	physicsSlots[""] = pslot;
 	setSelected( false );
-	setName( "(unknown bz2object)" );
+	setName( SceneBuilder::makeUniqueName( getHeader().c_str() ) );
 
 	savedStateSet = NULL;
 	drivethrough = false;

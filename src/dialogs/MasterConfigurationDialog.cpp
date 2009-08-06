@@ -28,6 +28,9 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	
 	// get information from the object that can be put into the widgets
 	string objectStr = object->get();
+
+	// read name
+	string name = object->getName();
 	
 	// read position
 	Point3D position = Point3D(object->getPos());
@@ -64,15 +67,26 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	
 	// initialize widgets
 	
+	// name
+	nameLabel = new QuickLabel( "Name", 5, 15 );
+	nameInput = new Fl_Input( 120, 15, 500, DEFAULT_TEXTSIZE + 6 );
+
+	if ( object->isKey( "name" ) ) {
+		nameInput->value( name.c_str() );
+	}
+	else {
+		nameInput->deactivate();
+	}
+
 	// position
 	if( object->isKey("position") )
-		positionLabel = new QuickLabel("Position", 5, 15);
+		positionLabel = new QuickLabel("Position", 5, 45);
 	else if( object->isKey("shift") )	// "shift" can emulate "position"
-		positionLabel = new QuickLabel("Shift", 5, 15);
+		positionLabel = new QuickLabel("Shift", 5, 45);
 		
-	positionXField = new Fl_Float_Input(5 + 100, 15, 100, DEFAULT_TEXTSIZE + 6, "X");
-	positionYField = new Fl_Float_Input(5 + 100 + 120, 15, 100, DEFAULT_TEXTSIZE + 6, "Y");
-	positionZField = new Fl_Float_Input(5 + 100 + 120 + 120, 15, 100, DEFAULT_TEXTSIZE + 6, "Z");
+	positionXField = new Fl_Float_Input(5 + 100, 45, 100, DEFAULT_TEXTSIZE + 6, "X");
+	positionYField = new Fl_Float_Input(5 + 100 + 120, 45, 100, DEFAULT_TEXTSIZE + 6, "Y");
+	positionZField = new Fl_Float_Input(5 + 100 + 120 + 120, 45, 100, DEFAULT_TEXTSIZE + 6, "Z");
 	
 	if(!(object->isKey("position") || object->isKey("shift")) ) {
 		positionXField->deactivate();
@@ -86,8 +100,8 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	}
 	
 	// rotation
-	rotationLabel = new QuickLabel("Rotation", 5, 45);
-	rotationField = new Fl_Float_Input(5 + 100, 45, 100, DEFAULT_TEXTSIZE + 6, "degrees");
+	rotationLabel = new QuickLabel("Rotation", 5, 75);
+	rotationField = new Fl_Float_Input(5 + 100, 75, 100, DEFAULT_TEXTSIZE + 6, "degrees");
 	rotationField->align(FL_ALIGN_RIGHT);
 	
 	if(!object->isKey("rotation")) {
@@ -99,11 +113,11 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	}
 	
 	// size
-	sizeLabel = new QuickLabel("Size", 5, 75);
+	sizeLabel = new QuickLabel("Size", 5, 105);
 
-	sizeXField = new Fl_Float_Input(5 + 100, 75, 100, DEFAULT_TEXTSIZE + 6, "dx");
-	sizeYField = new Fl_Float_Input(5 + 100 + 120, 75, 100, DEFAULT_TEXTSIZE + 6, "dy");
-	sizeZField = new Fl_Float_Input(5 + 100 + 120 + 120, 75, 100, DEFAULT_TEXTSIZE + 6, "dz");
+	sizeXField = new Fl_Float_Input(5 + 100, 105, 100, DEFAULT_TEXTSIZE + 6, "dx");
+	sizeYField = new Fl_Float_Input(5 + 100 + 120, 105, 100, DEFAULT_TEXTSIZE + 6, "dy");
+	sizeZField = new Fl_Float_Input(5 + 100 + 120 + 120, 105, 100, DEFAULT_TEXTSIZE + 6, "dz");
 
 	if( !object->isKey("size") ) {
 		sizeLabel->deactivate();
@@ -193,6 +207,8 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	setCancelEventHandler(CancelButtonCallback, this);
 	
 	// add widgets
+	add(nameLabel);
+	add(nameInput);
 	add(positionLabel);
 	add(positionXField);
 	add(positionYField);
@@ -252,7 +268,10 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 		}
 	}
 	
-	
+	// set name
+	if ( object->isKey( "name" ) && !( object->getHeader() == "group" ) ) {
+		object->setName( string( nameInput->value() ) );
+	}
 	
 	// call updates
 	UpdateMessage positionUpdate( UpdateMessage::SET_POSITION, &position );

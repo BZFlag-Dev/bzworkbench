@@ -151,6 +151,7 @@ public:
 	void _removePhysicsDriver( physics* phydrv );
 	void _removeTextureMatrix( texturematrix* texmat );
 	void _removeDynamicColor( dynamicColor* dyncol );
+	void _removeGroup( define* def );
 	void _setSelected( bz2object* obj );
 	void _setUnselected( bz2object* obj );
 	void _selectAll();

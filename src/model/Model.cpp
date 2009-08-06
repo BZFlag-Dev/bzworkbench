@@ -800,6 +800,30 @@ void Model::_removeDynamicColor( dynamicColor* dyncol ) {
 	}
 }
 
+void Model::_removeGroup( define* def ) {
+	if (groups.size() <= 0)
+		return;
+
+	map< string, define* >::iterator i;
+	for ( i = groups.begin(); i != groups.end(); i++ ) {
+		if ( i->second == def ) {
+
+			// make sure the define is removed from groups
+			for ( objRefList::iterator j = objects.begin(); j != objects.end(); j++ ) {
+				group* grp = dynamic_cast< group* >( j->get() );
+
+				if ( grp != NULL && grp->getDefine() == def) {
+					_removeObject( grp );
+				}
+			}
+
+			groups.erase( i );
+			delete def;
+			break;
+		}
+	}
+}
+
 // set an object as selected and update it
 void Model::_setSelected( bz2object* obj ) {
 	if( selectedObjects.size() < 0 )

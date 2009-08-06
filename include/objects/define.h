@@ -43,7 +43,7 @@ public:
 	vector< osg::ref_ptr< bz2object > >& getObjects() { return this->objects; }
 	
 	// setters
-	void setName( const string& _name ) { this->name = _name; }
+	void setName( const string& _name );
 	void setObjects( vector< osg::ref_ptr< bz2object > >& _objects ) { this->objects = _objects; }
 	
 private:

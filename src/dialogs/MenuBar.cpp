@@ -13,14 +13,18 @@
 #include "dialogs/MenuBar.h"
 #include "dialogs/MaterialEditor.h"
 #include "dialogs/PhysicsEditor.h"
+#include "dialogs/DefineEditor.h"
+#include "dialogs/RenameDialog.h"
 #include "model/Model.h"
 #include "commonControls.h"
 
 #include "objects/base.h"
 #include "objects/group.h"
 #include "objects/teleporter.h"
+#include "objects/define.h"
 
 #include "dialogs/InfoConfigurationDialog.h"
+#include "dialogs/GroupConfigurationDialog.h"
 
 void MenuBar::buildMenu(void) {
 
@@ -28,17 +32,17 @@ void MenuBar::buildMenu(void) {
 		add("File/New...", FL_CTRL + 'n', new_world, this);
 		add("File/Open...", FL_CTRL + 'o', open_world, this);
 		add("File/Save", FL_CTRL + 's', save_world, this);
-		add("File/Save As...", 0, save_world_as, this);
-		add("File/Save Selection...", 0, save_selection, this, FL_MENU_DIVIDER);
+		add("File/Save As...", 0, save_world_as, this, FL_MENU_DIVIDER);
+		//add("File/Save Selection...", 0, save_selection, this, FL_MENU_DIVIDER);
 		add("File/Exit", 0, exit_bzwb, this);
 
 	add("Edit", 0, 0, 0, FL_SUBMENU);
-		add("Edit/Undo", FL_CTRL + 'z', undo, this);
-		add("Edit/Redo", FL_CTRL + 'y', redo, this, FL_MENU_DIVIDER);
+		//add("Edit/Undo", FL_CTRL + 'z', undo, this);
+		//add("Edit/Redo", FL_CTRL + 'y', redo, this, FL_MENU_DIVIDER);
 		add("Edit/Cut", FL_CTRL + 'x', cut, this);
 		add("Edit/Copy", FL_CTRL + 'c', copy, this);
 		add("Edit/Paste", FL_CTRL + 'v', paste, this);
-		add("Edit/Paste Saved Selection...", 0, paste_saved_selection, this);
+		//add("Edit/Paste Saved Selection...", 0, paste_saved_selection, this);
 		add("Edit/Duplicate", FL_CTRL + 'd', duplicate, this);
 		add("Edit/Delete", FL_Delete, delete_callback, this, FL_MENU_DIVIDER);
 		add("Edit/Select All", FL_CTRL + 'a', select_all, this);
@@ -55,6 +59,7 @@ void MenuBar::buildMenu(void) {
 		add("Objects/Add mesh", FL_CTRL+'m', addMeshCallback, this);
 		add("Objects/Add cone", 0, addConeCallback, this);
 		add("Objects/Add zone", 0, addZoneCallback, this);
+		add("Objects/Add group", 0, addGroupCallback, this);
 		add("Objects/Add base", 0, 0, 0, FL_SUBMENU | FL_MENU_DIVIDER);
 			add("Objects/Add base/Add Purple Base", 0, addPurpleBaseCallback, this);
 			add("Objects/Add base/Add Red Base", 0, addRedBaseCallback, this);
@@ -64,8 +69,8 @@ void MenuBar::buildMenu(void) {
 	add("Scene", 0, 0, 0, FL_SUBMENU );
 		add("Scene/Import object...", 0, importObjectCallback, this, FL_MENU_DIVIDER);
 
-		add("Scene/(Un)Group Selection", FL_CTRL+'g', groupCallback, this);
-		add("Scene/(Un)Hide Selection", FL_CTRL+'h', hideCallback, this, FL_MENU_DIVIDER);
+		add("Scene/Make Define From Selection", FL_CTRL+'g', groupCallback, this);
+		add("Scene/Define Editor...", 0, defineCallback, this, FL_MENU_DIVIDER);
 
 		add("Scene/Configure World...", 0, configureWorldCallback, this);
 		add("Scene/Configure Object...", FL_CTRL+'o', configureObjectCallback, this);
@@ -283,6 +288,30 @@ void MenuBar::addZoneCallback_real(Fl_Widget* w) {
 	value(0);
 }
 
+// add a group
+void MenuBar::addGroupCallback_real(Fl_Widget* w) {
+	// first make sure there is at least one define
+	if ( parent->getModel()->getGroups().size() <= 0 ) {
+		parent->error( "Must have at least one define to make a group!" );
+		return;
+	}
+
+	group* grp = dynamic_cast< group* >( makeObject( "group" ) );
+
+	if ( grp != NULL ) {
+		// should configure the group since it will be selected after creation
+		GroupConfigurationDialog* gcd = new GroupConfigurationDialog( grp );
+
+		gcd->show();
+
+		while ( gcd->shown() ) { Fl::wait(); }
+
+		delete gcd;
+	}
+
+	value(0);
+}
+
 // import an object
 void MenuBar::importObjectCallback_real(Fl_Widget* w) {
 	printf("imported an object\n");
@@ -356,13 +385,41 @@ void MenuBar::groupCallback_real(Fl_Widget* w) {
 	if( objects.size() < 0 )
 		return;
 
-	// only do an un-group if the only object selected is a group
-	if( objects.size() == 1 && objects[0]->getHeader() == "group" ) {
-		parent->getModel()->_ungroupObjects( dynamic_cast< group* > (objects[0].get()) );
+	// make a define and add it to the model
+	define* def = new define();
+	parent->getModel()->_getGroups()[ def->getName() ] = def;
+
+	// clone and add selected objects to define
+	vector< osg::ref_ptr< bz2object > > newObjs;
+	for ( Model::objRefList::iterator i = objects.begin(); i != objects.end(); i++ ) {
+		newObjs.push_back( SceneBuilder::cloneBZObject( (*i).get() ) );
 	}
-	else {
-		parent->getModel()->_groupObjects( objects );
+	def->setObjects( newObjs );
+
+	// make a rename dialog and show it
+	RenameDialog* dialog = new RenameDialog();
+	dialog->setName( def->getName() );
+	dialog->show();
+
+	// wait until it is closed
+	while( dialog->shown() ) { Fl::wait(); }
+
+	if ( !dialog->getCancelled() ) {
+		def->setName( dialog->getName() );
 	}
+
+	delete dialog;
+
+	value(0);
+}
+
+void MenuBar::defineCallback_real(Fl_Widget* w) {
+	// configure the new world
+	DefineEditor* wod = new DefineEditor( parent->getModel() );
+	wod->show();
+
+	// wait for configuration to end
+	while( wod->shown() ) { Fl::wait(); }
 
 	value(0);
 }
@@ -503,8 +560,6 @@ bz2object* MenuBar::makeObject( const char* objectName ) {
 
 	if(!newObj)
 		return NULL;
-
-	newObj->setName( SceneBuilder::makeUniqueName( objectName ) );
 
 	// add the object to the model
 	parent->getModel()->_unselectAll();

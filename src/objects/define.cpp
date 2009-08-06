@@ -15,7 +15,7 @@
 // constructor
 define::define() : DataEntry("define", "") {
 	objects = vector< osg::ref_ptr<bz2object> >();
-	name = "";
+	name = SceneBuilder::makeUniqueName("define");
 	currentObject = NULL;
 }
 
@@ -78,4 +78,10 @@ string define::toString(void) {
 	}
 	
 	return "define " + name + "\n" + objString + "enddef\n";
+}
+
+void define::setName( const string& _name ) { 
+	if ( Model::renameGroup( name, _name ) ) {
+		this->name = _name; 
+	}
 }
