@@ -193,6 +193,10 @@ public:
 	static bool hasInitializer( DataEntry* d );
 	static bool hasConfigurationDialog( DataEntry* d );
 
+	// methods for getting the last error encountered while reading a bzw file
+	BZWReadError getLastError();
+	int getLastErrorLineNumber();
+
 	// methods to manipulate the aforementioned strings
 	static bool addObjectSupport(const char* name);
 	bool _addObjectSupport(const char* name);
@@ -226,8 +230,16 @@ public:
 	bool _hasInitializer( DataEntry* d ) { return ( cmap.count( d->getHeader() ) == 0 || cmap[ std::string(d->getHeader()) ] == NULL ) ? false : true; }
 	bool _hasConfigurationDialog( DataEntry* d ) { return ( configMap.count( d->getHeader() ) == 0 || configMap[ std::string(d->getHeader()) ] == NULL ) ? false : true; }
 
+	// methods for getting the last error encountered while reading a bzw file
+	BZWReadError _getLastError();
+	int _getLastErrorLineNumber();
+
 
 private:
+
+// error exception and line
+	BZWReadError error;
+	int errorLine;
 
 // world options
 	world* worldData;

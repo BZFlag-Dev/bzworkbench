@@ -46,8 +46,11 @@ using namespace std;
 
 Model* Model::modRef;
 
-Model::Model() : Observable()
+Model::Model() : Observable(),
+		error( NULL, "" )
 {
+
+	this->errorLine = -1;
 	this->worldData = new world();
 	this->optionsData = new options();
 	this->waterLevelData = new waterLevel();
@@ -76,7 +79,11 @@ Model::Model() : Observable()
 }
 
 // constructor that takes information about which objects to support
-Model::Model(const char* _supportedObjects, const char* _objectHierarchy, const char* _objectTerminators) : Observable() {
+Model::Model(const char* _supportedObjects, const char* _objectHierarchy, const char* _objectTerminators) : 
+	Observable(),
+	error( NULL, "" ) 
+{
+	this->errorLine = -1;
 	this->worldData = new world();
 	this->optionsData = new options();
 	this->waterLevelData = new waterLevel();
@@ -363,7 +370,8 @@ bool Model::_build( std::istream& data ) {
 			}
 		}
 		catch ( BZWReadError err ) { // catch any read errors
-			// FIXME: add error stuff
+			error = err;
+			errorLine = lineCount;
 			return false;
 		}
 	}
@@ -1465,4 +1473,20 @@ void Model::clear() {
 	if (infoData != NULL)
 		delete infoData;
 	infoData = NULL;
+}
+
+BZWReadError Model::getLastError() {
+	return modRef->_getLastError();
+}
+
+int Model::getLastErrorLineNumber() {
+	return modRef->_getLastErrorLineNumber();
+}
+
+BZWReadError Model::_getLastError() {
+	return error;
+}
+
+int Model::_getLastErrorLineNumber() {
+	return errorLine;
 }
