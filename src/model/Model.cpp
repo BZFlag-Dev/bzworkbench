@@ -175,17 +175,17 @@ DataEntry* Model::_command(const string& _command, const string& object, const s
 
 		// handle physics drivers
 		else if( object == "phydrv" ) {
-			return ( this->phys.count( name ) > 0 ? this->phys[name] : NULL );
+			return ( this->phys.count( name ) > 0 ? this->phys[name].get() : NULL );
 		}
 
 		// handle materials
 		else if( object == "material" ) {
-			return (this->materials.count( name ) > 0 ? this->materials[name] : NULL );
+			return (this->materials.count( name ) > 0 ? this->materials[name].get() : NULL );
 		}
 
 		// handle teleporter links
 		else if( object == "link" ) {
-			return (this->links.count( name ) > 0 ? this->links[name] : NULL );
+			return (this->links.count( name ) > 0 ? this->links[name].get() : NULL );
 		}
 
 		// handle definitions
@@ -897,7 +897,7 @@ void Model::_selectAll() {
 
 	Model::objRefList objs = Model::getObjects();
 	for ( Model::objRefList::iterator i = objs.begin(); i != objs.end(); i++ ) {
-		setSelected( *i );
+		setSelected( (*i).get() );
 	}
 }
 
@@ -1047,7 +1047,7 @@ void Model::_assignMaterial( const string& matref, bz2object* obj ) {
 
 	// do we have this material?
 	if( this->materials.count( matref ) > 0 )
-		mat = this->materials[matref];	// then load it from our mapping
+		mat = this->materials[matref].get();	// then load it from our mapping
 	else
 		mat = this->defaultMaterial.get();	// otherwise, use the default material
 
@@ -1137,7 +1137,7 @@ bool Model::_renameMaterial( std::string oldName, std::string newName ) {
 		}
 		else if ( i->first == oldName ) {
 			matIter = i;
-			mat = i->second;
+			mat = i->second.get();
 		}
 	}
 
@@ -1245,7 +1245,7 @@ bool Model::_renamePhysicsDriver( std::string oldName, std::string newName ) {
 		}
 		else if ( i->first == oldName ) {
 			matIter = i;
-			mat = i->second;
+			mat = i->second.get();
 		}
 	}
 
@@ -1281,7 +1281,7 @@ bool Model::_renameTeleporterLink( std::string oldName, std::string newName ) {
 		}
 		else if ( i->first == oldName ) {
 			matIter = i;
-			mat = i->second;
+			mat = i->second.get();
 		}
 	}
 

@@ -211,8 +211,8 @@ void zone::updateGeometry() {
 	// create unit box
 	osg::ref_ptr< osg::Geode > boxGeode = new osg::Geode();
 	osg::ref_ptr< osg::Box > box = new osg::Box( osg::Vec3( 0, 0, 0.5f ), 2, 2, 1 );
-	osg::ref_ptr< osg::ShapeDrawable > boxDrawable = new osg::ShapeDrawable( box );
-	boxGeode->addDrawable( boxDrawable );
+	osg::ref_ptr< osg::ShapeDrawable > boxDrawable = new osg::ShapeDrawable( box.get() );
+	boxGeode->addDrawable( boxDrawable.get() );
 
 	// make material
 	boxDrawable->setColor( osg::Vec4( 0, 0, 1, 1 ) );
@@ -221,5 +221,5 @@ void zone::updateGeometry() {
 	polyMode->setMode( osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE );
 	stateset->setAttribute( polyMode.get(), osg::StateAttribute::ON);
 
-	setThisNode( boxGeode );
+	setThisNode( boxGeode.get() );
 }

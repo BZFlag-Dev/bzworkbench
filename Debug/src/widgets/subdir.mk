@@ -14,17 +14,6 @@ CPP_SRCS += \
 ../src/widgets/TexcoordWidget.cpp \
 ../src/widgets/TransformWidget.cpp 
 
-OBJS += \
-./src/widgets/ColorCommandWidget.o \
-./src/widgets/Console.o \
-./src/widgets/Fl_ImageButton.o \
-./src/widgets/MaterialWidget.o \
-./src/widgets/Point3DWidget.o \
-./src/widgets/QuickLabel.o \
-./src/widgets/RGBAWidget.o \
-./src/widgets/TexcoordWidget.o \
-./src/widgets/TransformWidget.o 
-
 CPP_DEPS += \
 ./src/widgets/ColorCommandWidget.d \
 ./src/widgets/Console.d \
@@ -35,6 +24,17 @@ CPP_DEPS += \
 ./src/widgets/RGBAWidget.d \
 ./src/widgets/TexcoordWidget.d \
 ./src/widgets/TransformWidget.d 
+
+OBJS += \
+./src/widgets/ColorCommandWidget.o \
+./src/widgets/Console.o \
+./src/widgets/Fl_ImageButton.o \
+./src/widgets/MaterialWidget.o \
+./src/widgets/Point3DWidget.o \
+./src/widgets/QuickLabel.o \
+./src/widgets/RGBAWidget.o \
+./src/widgets/TexcoordWidget.o \
+./src/widgets/TransformWidget.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -16,8 +16,6 @@ CPP_SRCS += \
 ../src/objects/link.cpp \
 ../src/objects/material.cpp \
 ../src/objects/mesh.cpp \
-../src/objects/meshbox.cpp \
-../src/objects/meshpyr.cpp \
 ../src/objects/options.cpp \
 ../src/objects/physics.cpp \
 ../src/objects/pyramid.cpp \
@@ -29,33 +27,6 @@ CPP_SRCS += \
 ../src/objects/weapon.cpp \
 ../src/objects/world.cpp \
 ../src/objects/zone.cpp 
-
-OBJS += \
-./src/objects/arc.o \
-./src/objects/base.o \
-./src/objects/box.o \
-./src/objects/bz2object.o \
-./src/objects/cone.o \
-./src/objects/define.o \
-./src/objects/dynamicColor.o \
-./src/objects/group.o \
-./src/objects/info.o \
-./src/objects/link.o \
-./src/objects/material.o \
-./src/objects/mesh.o \
-./src/objects/meshbox.o \
-./src/objects/meshpyr.o \
-./src/objects/options.o \
-./src/objects/physics.o \
-./src/objects/pyramid.o \
-./src/objects/sphere.o \
-./src/objects/teleporter.o \
-./src/objects/tetra.o \
-./src/objects/texturematrix.o \
-./src/objects/waterLevel.o \
-./src/objects/weapon.o \
-./src/objects/world.o \
-./src/objects/zone.o 
 
 CPP_DEPS += \
 ./src/objects/arc.d \
@@ -70,8 +41,6 @@ CPP_DEPS += \
 ./src/objects/link.d \
 ./src/objects/material.d \
 ./src/objects/mesh.d \
-./src/objects/meshbox.d \
-./src/objects/meshpyr.d \
 ./src/objects/options.d \
 ./src/objects/physics.d \
 ./src/objects/pyramid.d \
@@ -83,6 +52,31 @@ CPP_DEPS += \
 ./src/objects/weapon.d \
 ./src/objects/world.d \
 ./src/objects/zone.d 
+
+OBJS += \
+./src/objects/arc.o \
+./src/objects/base.o \
+./src/objects/box.o \
+./src/objects/bz2object.o \
+./src/objects/cone.o \
+./src/objects/define.o \
+./src/objects/dynamicColor.o \
+./src/objects/group.o \
+./src/objects/info.o \
+./src/objects/link.o \
+./src/objects/material.o \
+./src/objects/mesh.o \
+./src/objects/options.o \
+./src/objects/physics.o \
+./src/objects/pyramid.o \
+./src/objects/sphere.o \
+./src/objects/teleporter.o \
+./src/objects/tetra.o \
+./src/objects/texturematrix.o \
+./src/objects/waterLevel.o \
+./src/objects/weapon.o \
+./src/objects/world.o \
+./src/objects/zone.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes

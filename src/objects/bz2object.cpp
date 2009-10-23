@@ -24,8 +24,8 @@ bz2object::bz2object(const char* name, const char* keys):
 
 	transformations = new BZTransform();
 	orientation = new Renderable();
-	addChild( transformations );
-	transformations->addChild( orientation );
+	addChild( transformations.get() );
+	transformations->addChild( orientation.get() );
 	MaterialSlot mslot;
 	mslot.defaultMaterial = NULL;
 	materialSlots[""] = mslot;
@@ -52,8 +52,8 @@ bz2object::bz2object(const char* name, const char* keys, osg::Node* node ):
 
 	transformations = new BZTransform();
 	orientation = new Renderable();
-	addChild( transformations );
-	transformations->addChild( orientation );
+	addChild( transformations.get() );
+	transformations->addChild( orientation.get() );
 	MaterialSlot mslot;
 	mslot.defaultMaterial = NULL;
 	materialSlots[""] = mslot;

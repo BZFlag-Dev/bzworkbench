@@ -34,7 +34,7 @@ AdvancedOptionsDialog::AdvancedOptionsDialog( bz2object* _obj ) :
 		bool usephys = false;
 		for ( vector<string>::iterator j = physicsSlots.begin(); j != physicsSlots.end(); j++ ) {
 			if ( *j == *i ) {
-				phys = _obj->getPhyDrv( *j );
+				phys = _obj->getPhyDrv( *j ).get();
 				usephys = true;
 			}
 		}

@@ -6,11 +6,11 @@
 CPP_SRCS += \
 ../src/windows/eventHandlers/selectHandler.cpp 
 
-OBJS += \
-./src/windows/eventHandlers/selectHandler.o 
-
 CPP_DEPS += \
 ./src/windows/eventHandlers/selectHandler.d 
+
+OBJS += \
+./src/windows/eventHandlers/selectHandler.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
