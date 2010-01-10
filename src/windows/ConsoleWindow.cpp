@@ -10,6 +10,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <stdio.h>
 #include "windows/ConsoleWindow.h"
 
 Console* ConsoleWindow::console = NULL;
