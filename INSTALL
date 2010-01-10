@@ -9,6 +9,8 @@ the following library and source dependencies:
 	(*)	OpenSceneGraph 2.8
 	(*)	OpenGL 1.4
 
+On Fedora Linux a "yum install fltk-devel OpenSceneGraph-devel"
+command will install the needed packages and their dependencies.
 
 To run BZWorkbench, you should either copy, move, or symlink the 
 bzworkbench binary to the root of the source tree.  Otherwise, it will 
@@ -16,4 +18,4 @@ crash (i.e. it expects to find certain files relative to the root of the
 source tree, rather than relative to the Debug directory).  Given that 
 this project is still in its infancy, there is no "make install" command.
 
-See the Readme.MSWindows for information on building on windows.
+See the Readme.MSWindows for information on building on Windows.
