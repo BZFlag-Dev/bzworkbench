@@ -26,6 +26,7 @@ Daniel Remenak (dtremenak)
 
 Bernt Hansen (bthansen)
   2007
+  Build system tweak
 
 Christopher Sean Morrison (brlcad)
   2007, 2010
@@ -33,6 +34,7 @@ Christopher Sean Morrison (brlcad)
 
 Scott Wichser (blast007)
   2007-2009
+  Build system cleanup, Windows build fixes
 
 Jeffery Myers (JeffM2501)
   2007, 2009
@@ -40,15 +42,19 @@ Jeffery Myers (JeffM2501)
 
 Joshua Bodine (macsforme)
   2008
+  Copyright update
 
 William Hahne (will07c5)
   2009
+  GSoC 2009 student, numerous enhancements
 
 Dave (trepan)
   2009
+  Build system maintenance
 
 Jeff Makey (bullet_catcher)
   2009-2010
+  Compilation and repository maintenance
 
 
 Graphics
