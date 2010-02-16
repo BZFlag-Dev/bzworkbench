@@ -97,6 +97,13 @@ bool bz2object::parse( std::string& line ) {
 		orientation->setPosition( Point3D( value.c_str() ) );
 		return true;
 	}
+	
+	// if this is a group and has a position, convert position to a shift
+	else if ( this->getHeader() == "group" &&  key == "position" && !isKey( "position" ) && isKey( "shift" ) ) {
+		line = TextUtils::replace_all(line, "position", "shift");
+		this->transformations->parse( line );
+		return true;
+	}
 
 	// get the rotation
 	else if ( key == "rotation" && isKey( "rotation" ) ) {
