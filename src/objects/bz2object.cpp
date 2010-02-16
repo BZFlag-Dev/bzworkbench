@@ -461,7 +461,6 @@ vector<string> bz2object::physicsSlotNames() {
 // recompute the material
 void bz2object::refreshMaterial()
 {
-	int index = 0;
 	for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
 		osg::StateSet* mat = i->second.defaultMaterial;
 		if ( i->second.materials.size() > 0 ) {
