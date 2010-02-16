@@ -660,7 +660,7 @@ vector<string> BZWParser::getLineElements(const char* data, int count) {
 			break;
 
 		string::size_type spaceIndex;
-		for ( int i = 0; i < line.length(); i++ )
+		for ( unsigned int i = 0; i < line.length(); i++ )
 			if ( TextUtils::isWhitespace( line[ i ] ) ) {
 				spaceIndex = i;
 				break;
