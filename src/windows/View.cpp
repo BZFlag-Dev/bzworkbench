@@ -11,7 +11,7 @@
  */
 
 #include "windows/View.h"
-
+#include "dialogs/MenuBar.h"
 #include "objects/waterLevel.h"
 
 const double View::DEFAULT_ZOOM = 75.0;
@@ -154,43 +154,66 @@ int View::handle(int event) {
 	modifiers[ FL_META ] = (( shiftState & FL_META ) != 0);
 	modifiers[ FL_ALT ] = (( shiftState & FL_ALT ) != 0);
 
-	keydown = Fl::event_key();
-	buttondown = Fl::event_button();
+	e_key = Fl::event_key();
+	e_button = Fl::event_button();
+	unsigned int e_x = Fl::event_x();
+	unsigned int e_y = Fl::event_y();
+	
+	// make Cntrl-Left Mouse Button = Right Mouse Button
+	if( Fl::event_ctrl() && e_button == FL_LEFT_MOUSE){
+		e_button = FL_RIGHT_MOUSE;
+	}
+	// make Alt-Left Mouse Button = Middle Mouse Button
+	if( Fl::event_alt() && e_button == FL_LEFT_MOUSE){
+		e_button = FL_MIDDLE_MOUSE;
+	}
+	//printf("Event (view): event: %d ctrl:%d alt:%d button:%d x:%d y:%d\n", event, Fl::event_ctrl(), Fl::event_alt(), e_button, e_x, e_x );
 
     // set up the 3D cursor by the key
-    selection->setStateByKey( keydown );
+    selection->setStateByKey( e_key );
 
 	// forward FLTK events to OSG
 	switch(event){
         case FL_PUSH:
         	// handle single mouse clicks
         	if(Fl::event_clicks() == 0) {
-        		getEventQueue()->mouseButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+        		getEventQueue()->mouseButtonPress(e_x, e_y, e_button );
         	}
         	// handle double clicks
             else {
-            	getEventQueue()->mouseDoubleButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+            	getEventQueue()->mouseDoubleButtonPress(e_x, e_y, e_button );
             	Fl::event_is_click(0);
             }
-
             redraw();
             return 1;
-
         case FL_DRAG: {
-        	getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
+        	getEventQueue()->mouseMotion(e_x, e_y);
         	updateSelection();
 			return 1;
         }
         case FL_RELEASE:
-            getEventQueue()->mouseButtonRelease(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+            getEventQueue()->mouseButtonRelease(e_x, e_y, e_button );
         	redraw();
 			return 1;
         case FL_KEYDOWN:
-        	getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
+        	getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)e_key);
             redraw();
             return 1;
         case FL_KEYUP:
-            getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
+            getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)e_key);
+			//make backspace act as a delete key, users with non-extended keyboards may not have the standard delete key
+			if(Fl::event_key() == FL_BackSpace){
+				// call menu delete
+				mw->getMenuBar()->delete_callback(mw->getMenuBar(), mw->getMenuBar());
+			}
+			// release mouse on Control key up
+			if(Fl::event_key() == FL_Control_L || Fl::event_key() == FL_Control_R ){
+				getEventQueue()->mouseButtonRelease( e_x, e_y, FL_RIGHT_MOUSE );
+			}
+			// release mouse on Alternate key up
+			if(Fl::event_key() == FL_Alt_L || Fl::event_key() == FL_Alt_R){
+				getEventQueue()->mouseButtonRelease( e_x, e_y, FL_MIDDLE_MOUSE );
+			}
             redraw();
             return 1;
         default:

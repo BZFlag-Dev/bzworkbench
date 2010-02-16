@@ -85,6 +85,9 @@ public:
 
 	// get the model
 	Model* getModel() { return this->model; }
+	
+	// get the menubar
+	MenuBar* getMenuBar() { return this->menuBar; }
 
 	// configure an object
 	void configure( bz2object* obj );

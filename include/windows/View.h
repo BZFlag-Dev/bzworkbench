@@ -98,10 +98,10 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
         bool isPressed( int value );
 
         // get the current pressed key
-        unsigned char getKey() { return keydown; }
+        unsigned char getKey() { return e_key; }
 
         // get the current pressed button
-        unsigned int getButton() { return buttondown; }
+        unsigned int getButton() { return e_button; }
 
         // get the model reference
         const Model* getModelRef() { return model; }
@@ -149,11 +149,11 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
 		// maps FLTK key values to bools
 		map< int, bool > modifiers;
 
-		// the currently-pressed key
-		unsigned char keydown;
+		// current event key
+		unsigned char e_key;
 
-		// the currently pressed mouse button
-		unsigned int buttondown;
+		// current event mouse button
+		unsigned int e_button;
 
 		// pointer to the trackball matrix manipulator
 		osg::ref_ptr< osgGA::TrackballManipulator > cameraManipulatorRef;
