@@ -1,29 +1,61 @@
-Jude Nelson (judecn@gmail.com)
------------
-Creater and maintainer of BZWorkbench
+BZWorkbench Contributors
+========================
+
+BZWorkbench (aka BZWB) has been developed by numerous contributors
+over several years.  Included below are the known individuals that
+have helped with the development, maintenance, and management of BZWB.
+
+Developers
+----------
+
+BZFlag Developers (various)
+  Mentorship and maintenance, see BZFlag AUTHORS file
+
+Dave Trowbridge (davidtrowbridge)
+  2007
+  GSoC mentoring and guidance
+
+Jude Nelson (judecn)
+  judecn@gmail.com
+  2007-2008
+  Original developer of BZWorkbench, GSoC 2007.
+
+Daniel Remenak (dtremenak)
+  2007, 2009
+  Creator of MSVC project files, GSoC mentorship, and maintenance
+
+Bernt Hansen (bthansen)
+  2007
+
+Christopher Sean Morrison (brlcad)
+  2007, 2010
+  Maintenance, build system, and patches
+
+Scott Wichser (blast007)
+  2007-2009
+
+Jeffery Myers (JeffM2501)
+  2007, 2009
+  Mentorship and maintenance
+
+Joshua Bodine (macsforme)
+  2008
+
+William Hahne (will07c5)
+  2009
+
+Dave (trepan)
+  2009
+
+Jeff Makey (bullet_catcher)
+  2009-2010
 
 
-BZFlag Development Team
-www.bzflag.org
-Sean Christopher Morrison,
-Daniel Remenak,
-Jeffery Myers,
-David Trowbridge,
-et al.
------------------------
-Creators and maintainers of TextUtils.cxx, and all .png graphics that ship 
-with BZWorkbench.
+Graphics
+--------
 
-
-Daniel Remenak
---------------
-Creator and maintainer of MSVC project files.
-
+BZFlag Developers (various)
+Many of BZWB's graphics resources come from the BZFlag client.
 
 Andrew Wilcox
--------------
-Creator of the BZWorkbench icon
-
-**************************************
-If I left you out, PLEASE LET ME KNOW!
-**************************************
+BZWorkbench application icon
