@@ -26,8 +26,7 @@ enum TransformType {
   ShiftTransform = 0,
   ScaleTransform = 1,
   ShearTransform = 2,
-  SpinTransform  = 3,
-  LastTransform
+  SpinTransform  = 3
 };
 
 struct TransformData {
