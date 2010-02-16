@@ -59,3 +59,12 @@ Many of BZWB's graphics resources come from the BZFlag client.
 
 Andrew Wilcox
 BZWorkbench application icon
+
+
+Code Contributors
+-----------------
+
+Runic (runic)
+  2010
+  Bug fixes, world input parsing, event management.
+
