@@ -165,11 +165,11 @@ int View::handle(int event) {
         case FL_PUSH:
         	// handle single mouse clicks
         	if(Fl::event_clicks() == 0) {
-        		_gw->getEventQueue()->mouseButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+        		getEventQueue()->mouseButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
         	}
         	// handle double clicks
             else {
-            	_gw->getEventQueue()->mouseDoubleButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+            	getEventQueue()->mouseDoubleButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
             	Fl::event_is_click(0);
             }
 
@@ -177,20 +177,20 @@ int View::handle(int event) {
             return 1;
 
         case FL_DRAG: {
-        	_gw->getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
+        	getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
         	updateSelection();
 			return 1;
         }
         case FL_RELEASE:
-            _gw->getEventQueue()->mouseButtonRelease(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+            getEventQueue()->mouseButtonRelease(Fl::event_x(), Fl::event_y(), Fl::event_button() );
         	redraw();
 			return 1;
         case FL_KEYDOWN:
-        	_gw->getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
+        	getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             redraw();
             return 1;
         case FL_KEYUP:
-            _gw->getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
+            getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             redraw();
             return 1;
         default:
