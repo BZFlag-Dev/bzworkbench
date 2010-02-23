@@ -46,7 +46,8 @@ string mesh::get(void) { return toString(); }
 // bzw methods
 bool mesh::parse( std::string& line ) {
 	string key = BZWParser::key( line.c_str() );
-
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
 	if ( currentDrawInfo ) {
 		if ( !currentDrawInfo->parse( line ) ) {
 			drawInfo = currentDrawInfo;
@@ -56,7 +57,7 @@ bool mesh::parse( std::string& line ) {
 	else if ( key == "mesh" )
 		return true;
 	else if ( key == "lod" ) {
-		lodOptions.push_back( BZWParser::value( "lod", line.c_str() ) );
+		lodOptions.push_back( value );
 	}
 	else if ( currentFace ) {
 		if ( !currentFace->parse( line ) ) {
@@ -72,30 +73,26 @@ bool mesh::parse( std::string& line ) {
 		currentFace = new MeshFace( currentMaterial, phydrv, noclusters, smoothbounce, drivethrough, shootthrough );
 	}
 	else if ( key == "inside" ) {
-		insidePoints.push_back( Point3D( BZWParser::value( "inside", line.c_str() ) ) );
+		insidePoints.push_back( Point3D( value.c_str() ) );
 	}
 	else if ( key == "outside" ) {
-		outsidePoints.push_back( Point3D( BZWParser::value( "outside", line.c_str() ) ) );
+		outsidePoints.push_back( Point3D( value.c_str() ) );
 	}
 	else if ( key == "vertex" ) {
-		string val = BZWParser::value( "vertex", line.c_str() );
-		Point3D pt( val.c_str() );
-
-		vertices.push_back( pt );
+		vertices.push_back( Point3D( value.c_str() ) );
 	}
 	else if ( key == "normal" ) {
-		normals.push_back( Point3D( BZWParser::value( "normal", line.c_str() ) ) );
+		normals.push_back( Point3D( value.c_str() ) );
 	}
 	else if ( key == "texcoord" ) {
-		texCoords.push_back( Point2D( BZWParser::value( "texcoord", line.c_str() ) ) );
+		texCoords.push_back( Point2D( value.c_str() ) );
 	}
 	else if ( key == "phydrv" ) {
-		string drvname = BZWParser::value( "phydrv", line.c_str() );
-		physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", drvname.c_str() );
+		physics* phys = (physics*)Model::command( MODEL_GET, "phydrv", value.c_str() );
 		if (phys != NULL)
 			phydrv = phys;
 		else
-			throw BZWReadError( this, string( "Couldn't find physics driver, " ) + drvname );
+			throw BZWReadError( this, string( "Couldn't find physics driver, " ) + value );
 	}
 	else if ( key == "noclusters" ) {
 		noclusters = true;
@@ -112,13 +109,12 @@ bool mesh::parse( std::string& line ) {
 		}
 	}
 	else if ( key == "matref" ) {
-		string matName = BZWParser::value( "matref", line.c_str() );
-		material* mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", matName ) );
+		material* mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", value ) );
 
 		if ( mat )
 			currentMaterial = mat;
 		else
-			throw BZWReadError( this, string( "Couldn't find material, " ) + matName );
+			throw BZWReadError( this, string( "Couldn't find material, " ) + value );
 	}
 	else if ( key == "end" ) // need to check if we're at the end of the section
 		return false;
@@ -231,7 +227,7 @@ void mesh::updateGeometry() {
 			if ( normalIndices.size() == vertIndices.size() ) {
 				hasNormals = true;
 
-				// if there isn't a texcoord array make one
+				// if there isn't a normals array make one
 				if ( norms == NULL ) {
 					norms = new osg::Vec3Array();
 					geom->setNormalArray( norms );
@@ -245,14 +241,14 @@ void mesh::updateGeometry() {
 			if ( texcoordIndices.size() == vertIndices.size() ) {
 				hasTexcoords = true;
 				
-				// if there isn't a texcoord array make one
+				// if there isn't a texcoords array make one
 				if ( tcoords == NULL ) {
 					tcoords = new osg::Vec2Array();
 					geom->setTexCoordArray( 0, tcoords );
 				}
 			}
 			else
-				throw BZWReadError( this, "Number of normals doesn't match number of vertices." );
+				throw BZWReadError( this, "Number of textcoords doesn't match number of vertices." );
 		}
 
 		vector<MeshVertex> faceVertices;
