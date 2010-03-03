@@ -73,7 +73,6 @@ void box::setDefaults() {
 	setPos( osg::Vec3(0.0, 0.0, 0.0) );
 	setSize( osg::Vec3( 10.0, 10.0, 10.0 ) );
 
-	SceneBuilder::markUnselected( this );
 }
 
 // getter

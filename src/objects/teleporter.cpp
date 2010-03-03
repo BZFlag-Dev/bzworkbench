@@ -41,7 +41,6 @@ void teleporter::setDefaults() {
 
 	setSize( scale );
 
-	SceneBuilder::markUnselected( this );
 }
 
 // getter
