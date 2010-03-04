@@ -154,7 +154,7 @@ bool pyramid::parse( std::string& line ) {
 				ricochets[i] = true;
 			}
 			else {
-				throw BZWReadError( this, string( "Unknown key, " ) + key + " " + realKey );
+				break;
 			}
 
 			return true;
