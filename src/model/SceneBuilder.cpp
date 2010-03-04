@@ -174,7 +174,7 @@ void SceneBuilder::assignTexture( const char* _textureName, osg::Node* node, uns
 }
 
 // assign a material to a node
-void SceneBuilder::assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Vec4 specular, osg::Vec4 emissive, float shininess, float alpha, osg::Node* node, osg::StateAttribute::Values val ) {
+void SceneBuilder::assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Vec4 specular, osg::Vec4 emissive, float shininess, float alphaThreshold, osg::Node* node, osg::StateAttribute::Values val ) {
 	osg::Material* mat = new osg::Material();
 
 	// set ambient lighting
@@ -192,11 +192,21 @@ void SceneBuilder::assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Ve
 	// set shininess
 	mat->setShininess( osg::Material::FRONT, shininess );
 
+	// using setAlpha or setTransparency 
+	// overrides the alpha values for ambient, diffuse, specular, emissive
+	// only apply if alphas are higher then threshold
 	// set transparency
-	mat->setAlpha( osg::Material::FRONT, alpha );
+	if( ambient.w() > alphaThreshold 
+		|| diffuse.w() > alphaThreshold 
+		|| specular.w() > alphaThreshold
+		|| emissive.w() > alphaThreshold )
+			mat->setAlpha( osg::Material::FRONT, alphaThreshold );
 
 	// get the state set from the node
 	osg::StateSet* stateSet = node->getOrCreateStateSet();
+	
+	stateSet->setMode(GL_BLEND, osg::StateAttribute::ON );
+	stateSet->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
 
 	// assign the material
 	stateSet->setAttribute( mat, val);
@@ -307,7 +317,7 @@ void SceneBuilder::markSelectedAndPreserveStateSet( bz2object* theNode ) {
 								   osg::Vec4( 0.0, 0.0, 0.0, 1.0 ),
 								   osg::Vec4( 0.0, 1.0, 0.0, 1.0 ),
 								   0.0,
-								   1.0,
+								   0.5,
 								   theNode,
 								   osg::StateAttribute::OVERRIDE );
 
