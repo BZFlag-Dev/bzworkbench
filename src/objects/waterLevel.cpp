@@ -15,7 +15,7 @@
 #include "objects/material.h"
 
 waterLevel::waterLevel() : DataEntry("waterLevel", "<name><height><matref>") {
-	name = string("");
+	name = string("water");
 	waterMaterial = NULL;
 	height = -1.0f;
 }
@@ -61,13 +61,17 @@ void waterLevel::finalize() {
 
 // toString method
 string waterLevel::toString(void) {
-	string waterLevelStr = string(ftoa(height));
+	string waterLevelHeightStr = string("  height " + ftoa(height) + "\n" );
+	string waterLevelMatStr = string("");
+	if(waterMaterial != NULL){
+		waterLevelMatStr = string("  matref " + waterMaterial->getName() + "\n" );
+	}
 		
 	return string(string("waterLevel\n") +
 						 "  name " + name + "\n" +
-						 "  height " + waterLevelStr + "\n" +
-						 waterMaterial->getName() +
-						 getUnusedText() + 
+						 waterLevelHeightStr +
+						 waterLevelMatStr +
+						 getUnusedText() + "\n" +
 						 "end\n");
 }
 
