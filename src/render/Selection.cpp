@@ -84,13 +84,13 @@ osg::ref_ptr< Renderable > Selection::buildAxes( osg::Vec3 localOrigin ) {
 	z_shaft = new osg::Cylinder( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH / 2.0 ), Selection::SHAFT_RADIUS, Selection::SHAFT_LENGTH );
 	
 	// create the tips
-	x_tip = new osg::Cone( localOrigin + osg::Vec3( Selection::SHAFT_LENGTH, 0, 0 ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
+	x_tip = new osg::Cone( localOrigin + osg::Vec3( Selection::SHAFT_LENGTH + Selection::TIP_LENGTH/4, 0, 0 ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
 	x_tip->setRotation( osg::Quat( osg::DegreesToRadians( 90.0 ), osg::Vec3( 0.0, 1.0, 0.0 ) ) );
 	
-	y_tip = new osg::Cone( localOrigin + osg::Vec3( 0, Selection::SHAFT_LENGTH, 0 ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
+	y_tip = new osg::Cone( localOrigin + osg::Vec3( 0, Selection::SHAFT_LENGTH + Selection::TIP_LENGTH/4, 0 ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
 	y_tip->setRotation( osg::Quat( osg::DegreesToRadians( -90.0 ), osg::Vec3( 1.0, 0.0, 0.0 ) ) );
 	
-	z_tip = new osg::Cone( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
+	z_tip = new osg::Cone( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH + Selection::TIP_LENGTH/4 ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
 	// z_tip->setRotation( osg::Quat( osg::DegreesToRadians( 90.0 ), osg::Vec3( 1.0, 0.0, 0.0 ) ) );
 	
 	// make drawables
@@ -121,37 +121,37 @@ osg::ref_ptr< Renderable > Selection::buildAxes( osg::Vec3 localOrigin ) {
 	
 	// colorize the geodes
 	// x axis is green
-	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 1.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 1.0, 0.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 1.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 1.0, 0.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  xGeode );
 								  
 	// y axis is red
-	SceneBuilder::assignMaterial( osg::Vec4f( 1.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 1.0, 0.0, 0.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 1.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 1.0, 0.0, 0.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  yGeode );
 	
 	// z axis is blue			  
-	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  zGeode );
 	
 	// center is white
 	SceneBuilder::assignMaterial( osg::Vec4f( 1.0, 1.0, 1.0, 1.0 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
 								  osg::Vec4f( 1.0, 1.0, 1.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
 								  0.0f,
 								  1.0f,
 								  centerGeode );
@@ -174,8 +174,12 @@ osg::ref_ptr< Renderable > Selection::buildAxes( osg::Vec3 localOrigin ) {
 	osg::StateSet* states = axesGroup->getOrCreateStateSet();
 	
 	// disable depth testing
-	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF );
+	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
 	states->setMode(GL_CULL_FACE, osg::StateAttribute::ON );
+	states->setMode(GL_BLEND, osg::StateAttribute::ON );
+	
+	// render after Opaque bin:0 and transparent bin:10
+	states->setRenderBinDetails( 11, "RenderBin");
 	
 	axesGroup->setStateSet( states );
 	
@@ -216,30 +220,30 @@ osg::ref_ptr< Renderable > Selection::buildLocalAxes( osg::Vec3 localOrigin ) {
 	
 	// colorize the geodes
 	// x axis is green
-	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 1.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 1.0, 0.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 1.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 1.0, 0.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  xGeode );
 								  
 	// y axis is red
-	SceneBuilder::assignMaterial( osg::Vec4f( 1.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 1.0, 0.0, 0.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 1.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 1.0, 0.0, 0.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  yGeode );
 	
 	// z axis is blue			  
-	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  zGeode );
 	
 	xGeode->setName( string(Selection_X_AXIS_NODE_NAME) + "|local" );
@@ -257,8 +261,12 @@ osg::ref_ptr< Renderable > Selection::buildLocalAxes( osg::Vec3 localOrigin ) {
 	osg::StateSet* states = axesGroup->getOrCreateStateSet();
 	
 	// disable depth testing
-	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF );
+	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
 	states->setMode(GL_CULL_FACE, osg::StateAttribute::ON );
+	states->setMode(GL_BLEND, osg::StateAttribute::ON );
+	
+	// render after Opaque bin:0 and transparent bin:10
+	states->setRenderBinDetails( 11, "RenderBin");
 	
 	axesGroup->setStateSet( states );
 	
@@ -289,11 +297,11 @@ osg::ref_ptr< Renderable > Selection::buildScaler( osg::Vec3 localOrigin ) {
 	z_shaft = new osg::Cylinder( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH / 2.0 ), Selection::SHAFT_RADIUS, Selection::SHAFT_LENGTH );
 	
 	// create the tips
-	x_tip = new osg::Box( localOrigin + osg::Vec3( Selection::SHAFT_LENGTH, 0, 0 ), Selection::TIP_LENGTH, Selection::TIP_LENGTH, Selection::TIP_LENGTH );
+	x_tip = new osg::Box( localOrigin + osg::Vec3( Selection::SHAFT_LENGTH + Selection::TIP_LENGTH/4, 0, 0 ), Selection::TIP_LENGTH/2, Selection::TIP_LENGTH/2, Selection::TIP_LENGTH/2 );
 	
-	y_tip = new osg::Box( localOrigin + osg::Vec3( 0, Selection::SHAFT_LENGTH, 0 ), Selection::TIP_LENGTH, Selection::TIP_LENGTH, Selection::TIP_LENGTH );
+	y_tip = new osg::Box( localOrigin + osg::Vec3( 0, Selection::SHAFT_LENGTH + Selection::TIP_LENGTH/4, 0 ), Selection::TIP_LENGTH/2, Selection::TIP_LENGTH/2, Selection::TIP_LENGTH/2 );
 	
-	z_tip = new osg::Box( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH ), Selection::TIP_LENGTH, Selection::TIP_LENGTH, Selection::TIP_LENGTH );
+	z_tip = new osg::Box( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH + Selection::TIP_LENGTH/4 ), Selection::TIP_LENGTH/2, Selection::TIP_LENGTH/2, Selection::TIP_LENGTH/2 );
 	
 	// make drawables
 	osg::ShapeDrawable  *centerD	= new osg::ShapeDrawable( center.get() ),
@@ -323,30 +331,30 @@ osg::ref_ptr< Renderable > Selection::buildScaler( osg::Vec3 localOrigin ) {
 	
 	// colorize the geodes
 	// x axis is green
-	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 1.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 1.0, 0.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 1.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 1.0, 0.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  xGeode );
 								  
 	// y axis is red
-	SceneBuilder::assignMaterial( osg::Vec4f( 1.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 1.0, 0.0, 0.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 1.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 1.0, 0.0, 0.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  yGeode );
 	
 	// z axis is blue			  
-	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  zGeode );
 	
 	// center is white
@@ -376,8 +384,12 @@ osg::ref_ptr< Renderable > Selection::buildScaler( osg::Vec3 localOrigin ) {
 	osg::StateSet* states = axesGroup->getOrCreateStateSet();
 	
 	// disable depth testing
-	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF );
+	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
 	states->setMode(GL_CULL_FACE, osg::StateAttribute::ON );
+	states->setMode(GL_BLEND, osg::StateAttribute::ON );
+	
+	// render after Opaque bin:0 and transparent bin:10
+	states->setRenderBinDetails( 11, "RenderBin");
 	
 	axesGroup->setStateSet( states );
 	
@@ -417,7 +429,7 @@ osg::ref_ptr< Renderable > Selection::buildRotator( osg::Vec3 localOrigin ) {
 	y_tip = new osg::Cone( localOrigin + osg::Vec3( 0, Selection::SHAFT_LENGTH, 0 ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
 	y_tip->setRotation( osg::Quat( osg::DegreesToRadians( -90.0 ), osg::Vec3( 1.0, 0.0, 0.0 ) ) );*/
 	
-	z_tip = new osg::Cone( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
+	z_tip = new osg::Cone( localOrigin + osg::Vec3( 0, 0, Selection::SHAFT_LENGTH + Selection::TIP_LENGTH/4 ), Selection::TIP_RADIUS, Selection::TIP_LENGTH );
 	
 	// create the disks
 	/*x_spin = new osg::Cylinder( localOrigin + osg::Vec3( 3 * Selection::SHAFT_LENGTH / 4.0, 0, 0), Selection::TIP_RADIUS * 2.0, Selection::TIP_LENGTH / 8.0 );
@@ -506,12 +518,12 @@ osg::ref_ptr< Renderable > Selection::buildRotator( osg::Vec3 localOrigin ) {
 								  yGeode );*/
 	
 	// z axis is blue			  
-	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
-								  osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
+								  osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
 								  osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0f,
-								  1.0f,
+								  0.5f,
 								  zGeode );
 	
 	// center is white
@@ -541,8 +553,12 @@ osg::ref_ptr< Renderable > Selection::buildRotator( osg::Vec3 localOrigin ) {
 	osg::StateSet* states = axesGroup->getOrCreateStateSet();
 	
 	// disable depth testing
-	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF );
+	states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
 	states->setMode(GL_CULL_FACE, osg::StateAttribute::ON );
+	states->setMode(GL_BLEND, osg::StateAttribute::ON );
+	
+	// render after Opaque bin:0 and transparent bin:10
+	states->setRenderBinDetails( 11, "RenderBin");
 	
 	axesGroup->setStateSet( states );
 	
