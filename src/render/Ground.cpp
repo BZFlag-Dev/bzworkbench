@@ -57,19 +57,18 @@ Ground::Ground( float size, float waterLevel ) : Renderable("ground") {
    // make the grid
    grid = buildGrid( size, 10.0f );
 
-   // make the grid a gray-ish color
+   // make the grid a gray-ish color - FIXME: check what bzflag uses
    SceneBuilder::assignMaterial( osg::Vec4( 0.05, 0.05, 0.05, 0.2 ),
-   								 osg::Vec4( 0.2, 0.2, 0.2, 1.0 ),
+   								 osg::Vec4( 0.2, 0.2, 0.2, 0.75 ),
    								 osg::Vec4( 0.0, 0.0, 0.0, 0.0 ),
    								 osg::Vec4( 0.0, 0.0, 0.0, 0.0 ),
    								 0.0f,
-   								 1.0f,
+   								 0.75f,
    								 grid.get(),
    								 osg::StateAttribute::OVERRIDE );
 
-   // disable Z-buffering (since the BZFlag client doesn't clip against the ground)
-	osg::StateSet* states = groundGeode->getOrCreateStateSet();
-    states->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF );
+   // add the grid
+   addChild( grid.get() );
 
    // see if we need to build a water level
    if( waterLevel >= 0.0 ) {
@@ -95,28 +94,21 @@ Ground::Ground( float size, float waterLevel ) : Renderable("ground") {
 	   waterTexCoords->push_back( osg::Vec2(0.0, size / 5.0) );
 
 	   // make the member ground geode
-	   osg::Geode* waterGeode = SceneBuilder::buildGeode( "water", waterPoints, waterIndexes, waterTexCoords, "share/world/water.png" );
-
-	   // enable GL_BLEND for translucency
-	   osg::StateSet* stateSet = waterGeode->getOrCreateStateSet();
-	   stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+	   osg::Geode* waterGeode = SceneBuilder::buildGeode( "water", waterPoints, waterIndexes, waterTexCoords, "water" );
 
 
-	   // make the water translucent
-	   SceneBuilder::assignMaterial(   osg::Vec4( 1.0, 1.0, 1.0, 0.2 ),
-									   osg::Vec4( 1.0, 1.0, 1.0, 0.2 ),
-									   osg::Vec4( 0.0, 0.0, 0.0, 0.2 ),
-									   osg::Vec4( 1.0, 1.0, 1.0, 0.2 ),
+	   // make the water translucent - FIXME: check what bzflag uses
+	   SceneBuilder::assignMaterial(   osg::Vec4( 1.0, 1.0, 1.0, 0.75 ),
+									   osg::Vec4( 1.0, 1.0, 1.0, 0.75 ),
+									   osg::Vec4( 0.0, 0.0, 0.0, 0.75 ),
+									   osg::Vec4( 1.0, 1.0, 1.0, 0.75 ),
 									   0.0,
-									   1.0,
+									   0.75,
 									   waterGeode );
 	   // add it
 	   addChild( waterGeode );
 
    }
-
-   // add the grid
-   addChild( grid.get() );
 
 }
 
