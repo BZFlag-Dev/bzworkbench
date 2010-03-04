@@ -121,6 +121,16 @@ osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
 
 	if( filename != NULL ) {
 		osg::Texture2D* texture = NULL;
+		
+		//see if texture file exists and use a default "missing texture" if it doesn't
+		FILE * cFile;
+		cFile = fopen ( (searchPath + filename + ".png").c_str() ,"r");
+		if (cFile!=NULL) {
+			// file exists in http_cache, then close it cause we don't need it.
+			fclose (cFile);
+		}else{
+			filename = "not_found";
+		}
 
 		osg::Image* image = osgDB::readImageFile( (searchPath + filename + ".png").c_str() );
 
@@ -217,7 +227,9 @@ void SceneBuilder::assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Ve
 
 // assign a BZWB material to a bz2object
 void SceneBuilder::assignBZMaterial( osg::StateSet* bzmat, osg::Node* obj ) {
-	obj->setStateSet( bzmat );
+	if(bzmat != NULL && obj != NULL){
+		obj->setStateSet( bzmat );
+	}
 }
 
 // get the material from a node
