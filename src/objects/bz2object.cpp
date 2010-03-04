@@ -190,9 +190,17 @@ bool bz2object::parse( std::string& line ) {
 
 	if ( isKey( "matref" ) ) {
 		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
-
+			//printf("MaterialSlot first: %s\n", i->first.c_str());
+			// check for matching alias
+			bool aliasMatch = false;
+			for ( vector< std::string >::iterator a = i->second.alias.begin(); a != i->second.alias.end(); a++ ) {
+				//printf("MaterialSlot second alias: %s\n", (*a).c_str());
+				if ( key == *a ) {
+					aliasMatch = true;
+				}
+			}
 			// first check if it is a per face matref
-			if ( key == i->first ) {
+			if ( key == i->first || aliasMatch ) {
 				string realKey = BZWParser::key( value.c_str() );
 
 				if ( realKey == "matref" ) {
