@@ -116,6 +116,9 @@ bool getStdFileSave ( trStandardFileSave &data)
 {
 	OPENFILENAME	ofn;
 
+	char cwd[MAX_PATH];
+	_getcwd(cwd,MAX_PATH);
+
 	memset(&ofn,0,sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = theAppWindow;
@@ -174,6 +177,7 @@ bool getStdFileSave ( trStandardFileSave &data)
 	{
 		data.filename = ofn.lpstrFile;
 	}
+	_chdir(cwd);
 
 	return good;
 }
