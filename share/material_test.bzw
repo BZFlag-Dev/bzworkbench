@@ -24,6 +24,7 @@ end
 waterLevel
   name water
   height 4.000000
+
 end
 
 #--Physics Drivers-------------------------------
@@ -47,7 +48,6 @@ material
   emission 1.000000 1.000000 1.000000 0.000000
   shininess 0.000000
   alphathresh 0.500000
-  addtexture 
 end
 
 material
@@ -60,7 +60,6 @@ material
   emission 1.000000 1.000000 1.000000 0.000000
   shininess 0.000000
   alphathresh 0.500000
-  addtexture 
 end
 
 material
@@ -73,17 +72,16 @@ material
   emission 1.000000 1.000000 1.000000 1.000000
   shininess 0.000000
   alphathresh 0.000000
-  addtexture 
 end
 
 material
   name material_52
 
   notextures
-  ambient 1.000000 0.000000 0.000000 1.000000
-  diffuse 1.000000 0.000000 0.000000 1.000000
-  specular 0.000000 0.000000 0.000000 0.000000
-  emission 0.000000 0.000000 0.000000 0.000000
+  ambient 1.000000 0.000000 0.000000 0.500000
+  diffuse 1.000000 0.000000 0.000000 0.500000
+  specular 0.000000 0.000000 0.000000 0.500000
+  emission 0.000000 0.000000 0.000000 0.500000
   shininess 0.000000
   alphathresh 1.000000
   addtexture wall

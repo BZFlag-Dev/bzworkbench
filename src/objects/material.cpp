@@ -66,22 +66,23 @@ bool material::parse( std::string& line ) {
 		reset();
 	}
 	else if ( key == "dyncol" ) { // get the dynamic color
-		dynamicColor* d = dynamic_cast<dynamicColor*>( Model::command( MODEL_GET, "dynamicColor", value ) );
-
-		if ( d != NULL ) {
-			dynCol = d;
-		}
-		else {
-			throw BZWReadError( this, string( "Couldn't find dynamic color, " ) + value );
+		if(strcmp(value.c_str(), "-1") != 0){ // or not - should we do something for a default?
+			dynamicColor* d = dynamic_cast<dynamicColor*>( Model::command( MODEL_GET, "dynamicColor", value ) );
+			if ( d != NULL )
+				dynCol = d;
+			else
+				throw BZWReadError( this, string( "Couldn't find dynamic color, " ) + value );
 		}
 	}
 	else if ( key == "texmat" ) { // get the texture matrix
-		string value = BZWParser::value( "texmat", line.c_str() );
-		texturematrix* texmat = (texturematrix*)Model::command( MODEL_GET, "texturematrix", value);
-		if ( texmat != NULL)
-			setTextureMatrix( texmat );
-		else
-			throw BZWReadError( this, string( "Could not find texmat, " ) + value );
+		//string value = BZWParser::value( "texmat", line.c_str() );
+		if(strcmp(value.c_str(), "-1") != 0){ // or not - should we do something for a default?
+			texturematrix* texmat = (texturematrix*)Model::command( MODEL_GET, "texturematrix", value);
+			if ( texmat != NULL)
+				setTextureMatrix( texmat );
+			else
+				throw BZWReadError( this, string( "Could not find texmat, " ) + value );
+		}
 	}
 	else if ( key == "color" || key == "diffuse" ) { // get the diffuse colors
 		setDiffuse( RGBA( value.c_str() ) );
@@ -169,8 +170,10 @@ string material::toString(void) {
 	if( textures.size() > 0) {
 		for(vector< TextureInfo >::iterator i = textures.begin(); i != textures.end(); i++) {
 			TextureInfo info = *i;
-
-			texString += "  addtexture " + info.name + "\n" +
+			if( info.name.compare("") != 0 ){
+				texString += "  addtexture " + info.name + "\n";
+			}
+			texString += 
 				(info.matrix != NULL ? string("") + "  texmat " + info.matrix->getName() + "\n" : "") +
 				(info.noColor == true ? "  notexcolor\n" : "") +
 				(info.noAlpha == true ? "  notexalpha\n" : "") +
