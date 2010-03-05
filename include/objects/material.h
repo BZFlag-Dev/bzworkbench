@@ -18,7 +18,7 @@
 #include "model/BZWParser.h"
 #include "model/Model.h"
 
-#include <string>
+#include <string.h>
 #include <vector>
 #include <list>
 
