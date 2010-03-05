@@ -9,6 +9,8 @@
 #include <commctrl.h>
 #include <commoncontrols.h>
 
+#include <direct.h>
+
 #include <vector>
 #include <string>
 
@@ -37,6 +39,9 @@ typedef struct
 bool getStdFileOpen ( trStandardFileOpen &data )
 {
 	OPENFILENAME	ofn;
+
+	char cwd[MAX_PATH];
+	_getcwd(cwd,MAX_PATH);
 
 	memset(&ofn,0,sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
@@ -103,6 +108,7 @@ bool getStdFileOpen ( trStandardFileOpen &data )
 		//CDERR_DIALOGFAILURE
 	}
 
+	_chdir(cwd);
 	return good;
 }
 
