@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
 	// init the SceneBuilder
 	SceneBuilder::init();
 
-	printf("model addr: %x\n", model);
+	printf("model addr: %p\n", (void *)model);
 
 	// load the main window
 	MainWindow* mw = new MainWindow(model);
