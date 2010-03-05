@@ -24,7 +24,7 @@ struct MeshVertex {
 
 // default constructor
 mesh::mesh(void) :
-	bz2object("mesh", "<name><vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo><drivethrough><shootthrough>") {
+	bz2object("mesh", "<name><vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo><drivethrough><shootthrough><passable>") {
 
 	decorative = false;
 	faces = vector<MeshFace*>();

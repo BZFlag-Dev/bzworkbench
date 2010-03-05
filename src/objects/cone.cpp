@@ -29,7 +29,7 @@ const char* cone::sideNames[MaterialCount] = {
 
 // default constructor
 cone::cone() :
-	bz2object("cone", "<position><rotation><size><angle><flatshading><name><texsize><flipz><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref>") {
+	bz2object("cone", "<position><rotation><size><angle><flatshading><name><texsize><flipz><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref><drivethrough><shootthrough><passable>") {
 	setDefaults();
 }
 

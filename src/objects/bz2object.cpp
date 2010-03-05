@@ -136,6 +136,12 @@ bool bz2object::parse( std::string& line ) {
 		texoffset = Point2D( value.c_str() );
 		return true;
 	}
+	
+	else if ( key == "passable"  && isKey( "passable" ) ) {
+		drivethrough = true;
+		shootthrough = true;
+		return true;
+	}
 
 	else if ( key == "drivethrough" && isKey( "drivethrough" ) ) {
 		drivethrough = true;
@@ -284,6 +290,18 @@ string bz2object::BZWLines( bz2object* obj )
 		if ( obj->getSize() != osg::Vec3( 0, 0, 0 ) )
 			ret += "  size " + Point3D( obj->getSize() ).toString();
 
+	// add obstacle key/value(s) to the string if supported
+	if(obj->isKey("passable") || obj->isKey("drivethrough") || obj->isKey("shootthrough") ){
+		if ( obj->drivethrough && obj->shootthrough && obj->isKey("passable") ){
+			ret += "  passable\n";
+		}else{
+			if ( obj->drivethrough && obj->isKey("drivethrough") )
+				ret += "  drivethrough\n";
+			if ( obj->shootthrough && obj->isKey("shootthrough") )
+				ret += "  shootthrough\n";
+		}
+	}
+	
 	// add all transformations to the string if they are supported
 	ret += obj->transformations->toString();
 

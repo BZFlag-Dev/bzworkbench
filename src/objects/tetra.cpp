@@ -13,7 +13,7 @@
 #include "objects/tetra.h"
 
 // no arg constructor
-tetra::tetra() : bz2object("tetra", "<name><vertex><scale><shift><shear><spin><matref>") {
+tetra::tetra() : bz2object("tetra", "<name><vertex><scale><shift><shear><spin><matref><drivethrough><shootthrough><passable>") {
 	for(int i = 0; i < 4; i++)
 		vertexes[i] = Point3D(0.0f, 0.0f, 0.0f);
 }

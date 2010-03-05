@@ -14,7 +14,7 @@
 
 // constructor
 group::group() : 
-	bz2object("group", "<name><shift><shear><scale><spin><team><tint><drivethrough><shootthrough><phydrv><matref>") {
+	bz2object("group", "<name><shift><shear><scale><spin><team><tint><drivethrough><shootthrough><passable><phydrv><matref>") {
 	this->team = 0;
 	this->def = NULL;
 	this->tintColor = RGBA(1, 1, 1, 1);

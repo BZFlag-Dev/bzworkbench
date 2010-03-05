@@ -19,7 +19,7 @@
 const char* sphere::sideNames[MaterialCount] = { "edge", "bottom" };
 
 sphere::sphere() :
-bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref><hemisphere>" ) {
+bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref><hemisphere><drivethrough><shootthrough><passable>" ) {
 	setDefaults();
 }
 

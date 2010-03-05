@@ -22,7 +22,7 @@ const char* pyramid::faceNames[FaceCount] = {
   "bottom"
 };
 
-pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin><matref><phydrv>") {
+pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin><matref><phydrv><drivethrough><shootthrough><passable>") {
 	setDefaults();
 }
 

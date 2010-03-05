@@ -27,7 +27,7 @@ const char* arc::sideNames[MaterialCount] = {
 
 // default constructor
 arc::arc() :
-	bz2object("arc", "<position><rotation><size><flatshading><angle><ratio><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref>") {
+	bz2object("arc", "<position><rotation><size><flatshading><angle><ratio><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref><drivethrough><shootthrough><passable>") {
 	setDefaults();
 }
 
