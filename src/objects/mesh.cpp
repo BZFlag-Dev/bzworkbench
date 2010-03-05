@@ -289,15 +289,23 @@ void mesh::updateGeometry() {
 			if ( hasTexcoords ) tcoords->push_back( faceVertices[ (*j).indices[2] ].texcoord );
 			drawElem->push_back( verts->size() - 1 );
 		}
-
-		
+   
 		geom->addPrimitiveSet( drawElem );
 	}
 
 	for ( map< material*, osg::Geometry* >::iterator i = geomMap.begin(); i != geomMap.end(); i++ ) {
 		osg::Geode* geode = new osg::Geode();
+		material* mat = i->first;
+		if(mat == NULL){
+			// set default material of face to be invisible if there isn't one defined yet
+			mat = new material();
+			mat->setAmbient( osg::Vec4( 1.0, 1.0, 1.0, 0.0) );
+			mat->setDiffuse( osg::Vec4( 1.0, 1.0, 1.0, 0.0) );
+			mat->setSpecular( osg::Vec4( 0.0, 0.0, 0.0, 0.0) );
+			mat->setEmissive( osg::Vec4( 1.0, 1.0, 1.0, 0.0) );
+		}
 		geode->addDrawable( i->second );
-		geode->setStateSet( i->first );
+		geode->setStateSet( mat );
 		group->addChild( geode );
 	}
 
