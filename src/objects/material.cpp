@@ -30,6 +30,9 @@ material::material() :
 	noTextures = true;
 	noRadar = noShadow = noCulling = noLighting = noSorting = groupAlpha = occluder = false;
 	alphaThreshold = 1.0f;
+	
+	setMode(GL_BLEND, osg::StateAttribute::ON);
+	setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
 
 	// allocate a material
 	osg::Material* finalMaterial = new osg::Material();
@@ -347,7 +350,7 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 			  specular = osg::Vec4( 0, 0, 0, 0),
 			  emissive = osg::Vec4( 0, 0, 0, 0);
 	float shiny = 0.0;
-
+	float alphaThreshold = 1.0;
 	string tex;
 	bool foundTexture = false;
 
@@ -381,6 +384,8 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 
 				shiny = mat->getShininess( osg::Material::FRONT );
 			}
+			
+			alphaThreshold = (*i)->getAlphaThreshold();
 
 			// get the texture
 			if (!foundTexture && (*i)->getTextureCount() > 0) {
@@ -393,12 +398,22 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 	// build the material
 	material* mat = new material();
 
-	mat->setAmbient( ambient );
-	mat->setDiffuse( diffuse );
-	mat->setSpecular( specular );
-	mat->setEmissive( emissive );
-	mat->setShininess( shiny );
+	osg::Material* finalMaterial = new osg::Material();
 
+	finalMaterial->setAmbient( osg::Material::FRONT, ambient );
+	finalMaterial->setDiffuse( osg::Material::FRONT, diffuse );
+	finalMaterial->setSpecular( osg::Material::FRONT, specular );
+	finalMaterial->setEmission( osg::Material::FRONT, emissive );
+	finalMaterial->setShininess( osg::Material::FRONT, shiny );
+	
+	if( ambient.w() > alphaThreshold 
+	   || diffuse.w() > alphaThreshold 
+	   || specular.w() > alphaThreshold
+	   || emissive.w() > alphaThreshold )
+		finalMaterial->setAlpha( osg::Material::FRONT, alphaThreshold );
+	
+	mat->setAttribute( finalMaterial, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+	
 	if( foundTexture ) {
 		mat->setTexture( tex );
 	}
@@ -414,6 +429,7 @@ void material::computeFinalMaterial() {
 		emissive = osg::Vec4( 0, 0, 0, 0);
 
 	float shiny = 0.0;
+	float alphaThreshold = 1.0;
 
 	if( materials.size() > 0 ) {
 
@@ -441,6 +457,9 @@ void material::computeFinalMaterial() {
 
 				shiny = mat->getShininess();
 			}
+			
+			alphaThreshold = (*i)->getAlphaThreshold();
+			
 		}
 
 		osg::Material* finalMaterial = new osg::Material();
@@ -450,6 +469,12 @@ void material::computeFinalMaterial() {
 		finalMaterial->setSpecular( osg::Material::FRONT, specular );
 		finalMaterial->setEmission( osg::Material::FRONT, emissive );
 		finalMaterial->setShininess( osg::Material::FRONT, shiny );
+		
+		if( ambient.w() > alphaThreshold 
+			|| diffuse.w() > alphaThreshold 
+			|| specular.w() > alphaThreshold
+			|| emissive.w() > alphaThreshold )
+				finalMaterial->setAlpha( osg::Material::FRONT, alphaThreshold );
 
 		setAttribute( finalMaterial, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 	}
@@ -458,7 +483,7 @@ void material::computeFinalMaterial() {
 // compute the final texture
 // simple: BZFlag only pays attention to the first texture declared
 void material::computeFinalTexture() {
-	if( textures.size() > 0 ) {
+	if( textures.size() > 0 && textures[ 0 ].name.compare("") != 0) {
 		osg::Texture2D* finalTexture = SceneBuilder::buildTexture2D( textures[ 0 ].name.c_str() );
 
 		if ( finalTexture ) {
