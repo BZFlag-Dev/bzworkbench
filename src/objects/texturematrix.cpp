@@ -107,7 +107,9 @@ int texturematrix::render(void) {
 }
 
 void texturematrix::setName( const string& _name ) {
-	if (Model::renameTextureMatrix( getName(), _name )) {
-		this->name = _name;
+	if (_name != getName()){
+		if (Model::renameTextureMatrix( getName(), _name )) {
+			this->name = _name;
+		}
 	}
 }

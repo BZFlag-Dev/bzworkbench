@@ -280,8 +280,10 @@ void material::setSphereMap( bool value ) {
 }
 
 void material::setName( const string& _name ) {
-	if ( Model::renameMaterial( getName(), _name ) ) {
-		name = _name;
+	if (_name != getName()){
+		if ( Model::renameMaterial( getName(), _name ) ) {
+			name = _name;
+		}
 	}
 }
 

@@ -125,7 +125,9 @@ int dynamicColor::render(void) {
 }
 
 void dynamicColor::setName( const string& _name ) {
-	if ( Model::renameDynamicColor( getName(), _name ) ) {
-		this->name = _name;
+	if (_name != getName()){
+		if ( Model::renameDynamicColor( getName(), _name ) ) {
+			this->name = _name;
+		}
 	}
 }

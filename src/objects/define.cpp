@@ -80,8 +80,10 @@ string define::toString(void) {
 	return "define " + name + "\n" + objString + "enddef\n";
 }
 
-void define::setName( const string& _name ) { 
-	if ( Model::renameGroup( name, _name ) ) {
-		this->name = _name; 
+void define::setName( const string& _name ) {
+	if (_name != getName()){
+		if ( Model::renameGroup( name, _name ) ) {
+			this->name = _name; 
+		}
 	}
 }

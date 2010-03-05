@@ -103,7 +103,9 @@ int physics::render(void) {
 }
 
 void physics::setName( const std::string& _name ) {
-	if ( Model::renamePhysicsDriver( getName(), _name ) ) {
-		name = _name;
+	if (_name != getName()){
+		if ( Model::renamePhysicsDriver( getName(), _name ) ) {
+			name = _name;
+		}
 	}
 }
