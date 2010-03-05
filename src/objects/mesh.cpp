@@ -133,8 +133,8 @@ void mesh::finalize() {
 
 // to string
 string mesh::toString(void) {
-	// string-ify the vertices, normals, texcoords, inside points, outside points, and faces
-	string vertexString(""), normalString(""), texcoordString(""), insideString(""), outsideString(""), faceString("");
+	// string-ify the vertices, normals, texcoords, inside points, outside points, passibility and faces
+	string vertexString(""), normalString(""), texcoordString(""), insideString(""), outsideString(""),passabilityString(""), faceString("");
 
 	if(vertices.size() > 0) {
 		for(vector<Point3D>::iterator i = vertices.begin(); i != vertices.end(); i++) {
@@ -173,6 +173,15 @@ string mesh::toString(void) {
 			outsideString += "  outside " + i->toString();
 		}
 	}
+	
+	if(drivethrough && shootthrough) {
+		passabilityString = "  passable\n";
+	}else{
+		if(drivethrough)
+			passabilityString = "  drivethrough\n";
+		if(shootthrough)
+			passabilityString = "  shootthrough\n";
+	}
 
 	return string("mesh\n") +
 				  insideString +
@@ -180,6 +189,7 @@ string mesh::toString(void) {
 				  vertexString +
 				  normalString +
 				  texcoordString +
+				  passabilityString +
 				  faceString +
 				  (drawInfo != NULL ? "  " + drawInfo->toString() : "") + "\n" +
 				  "end\n";
