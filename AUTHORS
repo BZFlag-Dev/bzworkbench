@@ -56,10 +56,10 @@ Jeff Makey (bullet_catcher)
   2009-2010
   Compilation and repository maintenance
 
-Runic (runic)
+Matthew White (runic)
   2010
-  Bug fixes, world input parsing, event management.
-
+  Bug fixes, world i/o, event and render enhancements, 
+  xcode project, remote textures
 
 Graphics
 --------
