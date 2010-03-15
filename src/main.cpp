@@ -13,6 +13,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __APPLE__ 
+#include <sys/param.h>
+#include <mach-o/dyld.h>
+#endif /* APPLE */
+
 #include "defines.h"
 #include "dialogs/Fl_Dialog.h"
 #include "widgets/QuickLabel.h"
@@ -115,6 +120,40 @@ void buildModelDatabase() {
 }
 
 int main(int argc, char** argv) {
+	
+	#ifdef __APPLE__ 
+	// set current working directory to be the parent directory of the bundled application
+	// only need to do this if built as a bundled application so we check the executable's path
+	size_t pathSize = MAXPATHLEN * 2;
+	char* rPath = (char*)malloc(pathSize);
+	char* execPath = (char*)malloc(pathSize);
+	int err = _NSGetExecutablePath(execPath, (uint32_t*)&pathSize );
+	if (err) {
+		puts("Application Path lookup failed!");
+	}else{
+		realpath(execPath, rPath);
+		printf("Application Path: %s\n", rPath);
+	}
+	
+	//FIXME - do not hard code app & executable names
+	string ibPath = "BzWorkbench.app/Contents/MacOS/BzWorkbench";
+	
+	if(strlen(rPath) > ibPath.length()){
+		if( string(rPath).compare( string(rPath).length()-ibPath.length(),ibPath.length(),ibPath,0,ibPath.length() ) ){
+			// remove "bzworkbench.app/Contents/MacOS/bzworkbench"
+			std::string fixedPath = TextUtils::replace_all( rPath, ibPath, "");
+	
+			// set the current working directory
+			err = chdir((const char *)fixedPath.c_str());
+			// maybe we should bail out here if there is an error
+			if (err) puts("Changing Current Working Directory failed!");
+		}
+	}
+	
+	free(rPath);
+	free(execPath);
+	
+	#endif /* APPLE */
 
 	// init the model
 	Model* model = new Model();
@@ -140,6 +179,9 @@ int main(int argc, char** argv) {
 	// load any plugins
 	the_mainWindow = mw;
 	initPlugins();
+	
+	// load a default model
+	//bool success = BZWParser::loadFile( "./share/material_test.bzw" );
 
 	// run the program
 	return Fl::run();
