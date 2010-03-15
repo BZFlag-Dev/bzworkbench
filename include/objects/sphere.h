@@ -14,8 +14,8 @@
 #define SPHERE_H_
 
 #include "bz2object.h"
-
-#include "render/Point2D.h"
+ 
+//#include "render/Point2D.h" - not needed here - is included in bz2object.h
 
 class sphere : public bz2object {
 public:
