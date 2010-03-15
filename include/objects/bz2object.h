@@ -13,7 +13,7 @@
 #ifndef BZ2OBJECT_H_
 #define BZ2OBJECT_H_
 
-#include "DataEntry.h"
+//#include "DataEntry.h" - not needed - is included in Tranform.h
 #include "render/Renderable.h"
 #include "render/Point3D.h"
 #include "render/Point2D.h"
