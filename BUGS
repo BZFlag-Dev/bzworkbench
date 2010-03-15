@@ -1,0 +1,14 @@
+BzWorkbench Bug List
+
+This is in no way a complete list of bugs:
+
+FIXME - loading in a smaller world and then loading in a world that is 
+larger in size the ground does not resize onscreen to the correct larger size. open world 
+config and bumping the size will fix the ground rendering.
+
+FIXME - when saving material references, need to make sure materials that 
+reference other materials are saved below those it references - sort material saves
+
+CRASH - open H2O-R1.bzw, select a group (was a group containing a mesh), 
+copy the group, create a new map and then paste goes bomb!
+
