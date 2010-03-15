@@ -10,6 +10,17 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <curl/curl.h>
+#include <curl/types.h>
+#include <curl/easy.h>
+
+#ifdef _WIN32
+	#include <direct.h>
+#else
+	#include <sys/stat.h>
+#endif
+#include <iostream>;
+
 #include "model/SceneBuilder.h"
 #include "windows/View.h"
 #include "model/Primitives.h"
@@ -112,27 +123,118 @@ osg::Geode* SceneBuilder::buildGeode( const char* _nodeName, osg::Geometry* geom
 	return geode;
 }
 
+// used by curl function in SceneBuilder::buildTexture2D
+size_t write_curl_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    size_t written;
+    written = fwrite(ptr, size, nmemb, stream);
+    return written;
+}
+
+
+
 /**
  * Build a Texture2D from a file; return NULL if not found
- */
+ */	
+
+// FIXME - buildTexture2D function is called too much and waste memory
+// should store a list of textures an reference those 
+// load each textures only once
 
 osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
 	string searchPath("share/textures/");
+	string temp_name( filename );	
 
-	if( filename != NULL ) {
+	//---- download and cache remote texture
+	// see if filename starts with "http://"
+	string protocol("http://");
+	if( temp_name.compare(0, protocol.length(), TextUtils::tolower(protocol), 0, protocol.length()) == 0 ){
+		// swap "http://" for "bzwb_cache/" in filename to fix the path
+		temp_name = "bzwb_cache/" + temp_name.substr(protocol.length(),temp_name.length()-protocol.length());
+		//strip off .png from end if it exists since it is added below
+		string last4 = TextUtils::tolower(temp_name.substr(temp_name.length()-4,4));
+		if( last4.compare(".png") == 0 ){
+			temp_name = temp_name.substr(0,temp_name.length()-4);
+		}
+		// check for texture in bzwb_cache
+		// FIXME: should compare modification dates of the file in cache and the one online, not just if it exists locally 
+		FILE * cFile;
+		cFile = fopen ( ( searchPath + temp_name + ".png" ).c_str(), "r");
+		if( cFile!=NULL ) {
+			// file exists in http_cache, then close it cause we don't need it.
+			printf ( "Using Cached Texture: %s\n", ( searchPath + temp_name + ".png" ).c_str() );
+			fclose ( cFile );
+		}else{
+			// file does not exist in http_cache:
+			// get texture's parent directory path and create directories
+			string pDirPath = string("");
+			std::vector<std::string> tks = TextUtils::tokenize( string( searchPath + temp_name ), "/", 20, false);
+			for ( std::vector<std::string>::iterator i = tks.begin() ; i < tks.end()-1 ; i++ ){
+				if(i < tks.end()-2)
+					pDirPath += (*i) + "/";
+				else
+					pDirPath += (*i) ;
+				// create directories as we go
+				#ifdef _WIN32
+					_mkdir( pDirPath.c_str() );
+				#else
+					mkdir( pDirPath.c_str(), 0777 );
+				#endif
+			}
+			//printf(  "parent directory path: %s\n", pDirPath.c_str() );
+			
+			// download the texture into http_cache
+			printf ( "Downloading Texture: %s\n", ( searchPath + temp_name + ".png" ).c_str() );
+			CURL *curl;
+			FILE *fp;
+			CURLcode res;
+			long len = 0;
+			curl = curl_easy_init();
+			if( curl ) {
+				fp = fopen( ( searchPath + temp_name + ".png" ).c_str(), "wb" );
+				if( fp != NULL ){
+					curl_easy_setopt( curl, CURLOPT_URL, filename );
+					curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, write_curl_data );
+					curl_easy_setopt( curl, CURLOPT_WRITEDATA, fp );
+					res = curl_easy_perform( curl );
+					curl_easy_cleanup( curl );
+					len = ftell(fp);
+					fclose( fp );
+					if(res != 0){
+						printf ( "Error Downloading: %s, %l\n", curl_easy_strerror(res), len );
+						//remove cached file
+						std::remove( ( searchPath + temp_name + ".png" ).c_str() );
+						//use error downloading texture
+						temp_name = "../UI/error_downloading";
+					}
+				}else{
+					printf( "Unable to open/create texture file: %s\n", ( searchPath + temp_name + ".png" ).c_str() );
+				}
+			}
+		}		
+	}
+	//---- end download and cache remote texture
+	
+	//strip .png extension - this is done again here for local textures entered with a .png extension
+	string last4 = temp_name.substr(temp_name.length()-4,4);
+	if( last4.compare(".png") == 0 ){
+		temp_name = temp_name.substr(0,temp_name.length()-4);
+	}
+
+	if( temp_name.c_str() != NULL ) {
 		osg::Texture2D* texture = NULL;
 		
 		//see if texture file exists and use a default "missing texture" if it doesn't
 		FILE * cFile;
-		cFile = fopen ( (searchPath + filename + ".png").c_str() ,"r");
+		cFile = fopen ( (searchPath + temp_name + ".png").c_str() ,"r");
 		if (cFile!=NULL) {
 			// file exists in http_cache, then close it cause we don't need it.
 			fclose (cFile);
 		}else{
-			filename = "not_found";
+			printf("Can not find texture: %s\n", (searchPath + temp_name + ".png").c_str() );
+			temp_name = "../UI/not_found";
 		}
 
-		osg::Image* image = osgDB::readImageFile( (searchPath + filename + ".png").c_str() );
+		osg::Image* image = osgDB::readImageFile( (searchPath + temp_name + ".png").c_str() );
 
 		if( image != NULL ) {	// only build the texture if the image exists!
 
