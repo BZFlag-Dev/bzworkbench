@@ -1,7 +1,18 @@
 BZWorkbench Installation Notes
 ------------------------------
 
-To compile BZWorkbench, just cd into Debug and run "make all".
+Compiling and Installation
+==========================
+
+To compile BZWorkbench, the following steps should get you up and
+running quickly if everything external to BZWorkbench is properly
+installed:
+
+    ./autogen.sh
+    ./configure
+    make
+    src/bzworkbench
+
 Aside from usual dependency on a GNU build environment, BZWorkbench has 
 the following library and source dependencies:
 
@@ -11,11 +22,5 @@ the following library and source dependencies:
 
 On Fedora Linux a "yum install fltk-devel OpenSceneGraph-devel"
 command will install the needed packages and their dependencies.
-
-To run BZWorkbench, you should either copy, move, or symlink the 
-bzworkbench binary to the root of the source tree.  Otherwise, it will 
-crash (i.e. it expects to find certain files relative to the root of the 
-source tree, rather than relative to the Debug directory).  Given that 
-this project is still in its infancy, there is no "make install" command.
 
 See the Readme.MSWindows for information on building on Windows.

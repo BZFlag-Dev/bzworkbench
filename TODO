@@ -1,1 +1,3 @@
-Add linux build system using BZFlag makefiles
+Add features.
+Fix bugs.
+Improve the unix build system.
