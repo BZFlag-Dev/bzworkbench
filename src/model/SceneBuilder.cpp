@@ -138,7 +138,6 @@ size_t write_curl_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
 	
 	// if cached, return the texture
-	printf("%i : %i\n", stateCache.count( string( filename ) ),  stateCache.size() );
 	if ( stateCache.count( string( filename ) ) > 0 ) {
 		osg::StateAttribute* sa = stateCache[ filename ].get()->getTextureAttribute(0, osg::StateAttribute::TEXTURE);
 		return dynamic_cast<osg::Texture2D*>(sa);
