@@ -140,6 +140,8 @@ public:
 
 	static bz2object* cloneBZObject( bz2object* );
 	
+	static void SceneBuilder::clearStateCache();
+	
 private:
 	
 	/*

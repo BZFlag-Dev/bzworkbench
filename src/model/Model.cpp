@@ -1473,6 +1473,9 @@ void Model::clear() {
 	if (infoData != NULL)
 		delete infoData;
 	infoData = NULL;
+	
+	//clear stateCache
+	SceneBuilder::clearStateCache();
 }
 
 BZWReadError Model::getLastError() {

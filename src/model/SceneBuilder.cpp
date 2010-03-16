@@ -131,16 +131,20 @@ size_t write_curl_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 }
 
 
-
 /**
  * Build a Texture2D from a file; return NULL if not found
  */	
 
-// FIXME - buildTexture2D function is called too much and waste memory
-// should store a list of textures an reference those 
-// load each textures only once
-
 osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
+	
+	// if cached, return the texture
+	printf("%i : %i\n", stateCache.count( string( filename ) ),  stateCache.size() );
+	if ( stateCache.count( string( filename ) ) > 0 ) {
+		osg::StateAttribute* sa = stateCache[ filename ].get()->getTextureAttribute(0, osg::StateAttribute::TEXTURE);
+		return dynamic_cast<osg::Texture2D*>(sa);
+	}
+	
+	
 	string searchPath("share/textures/");
 	string temp_name( filename );	
 
@@ -250,6 +254,13 @@ osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
 			texture->setWrap( osg::Texture::WRAP_R, osg::Texture::REPEAT );
 			texture->setWrap( osg::Texture::WRAP_S, osg::Texture::REPEAT );
 			texture->setWrap( osg::Texture::WRAP_T, osg::Texture::REPEAT );
+		}
+		
+		if (texture != NULL) {
+			// save in state cache
+			osg::StateSet* texStateSet = new osg::StateSet();
+			texStateSet->setTextureAttributeAndModes( 0, texture, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+			stateCache[ filename ] = texStateSet;
 		}
 
 		return texture;
@@ -480,4 +491,8 @@ bz2object* SceneBuilder::cloneBZObject( bz2object* obj ) {
 	}
 
 	return newObj;
+}
+
+void SceneBuilder::clearStateCache() {
+	SceneBuilder::stateCache.clear();
 }
