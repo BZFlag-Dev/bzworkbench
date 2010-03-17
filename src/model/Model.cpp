@@ -180,7 +180,24 @@ DataEntry* Model::_command(const string& _command, const string& object, const s
 
 		// handle materials
 		else if( object == "material" ) {
-			return (this->materials.count( name ) > 0 ? this->materials[name].get() : NULL );
+			// materials can also be reference by name or index
+			// look for match by name
+			DataEntry* obj = (this->materials.count( name ) > 0 ? this->materials[name].get() : NULL );
+			// if no name match, then convert name to a number and try to get material by index
+			if(obj == NULL){
+				int index = atoi( name.c_str() );
+				//printf("material index = %i\n material size: %i\n ", index, materials.size());
+				int c = 0;
+				for ( map<string, osg::ref_ptr< material > >::const_iterator it = materials.begin(); it != materials.end(); it++, c++ ) {
+					if(c == index){
+						//printf("found: %i key = %s\n", c, it->first.c_str());
+						obj = it->second.get();
+						break;
+					}
+				}
+			}
+			
+			return obj;
 		}
 
 		// handle teleporter links
