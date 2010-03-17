@@ -1,0 +1,137 @@
+
+world
+# name
+  size 400.000000
+  flagHeight 0.000000
+# noWalls
+end
+
+
+material
+  name material_0
+
+  notextures
+  ambient 0.000000 0.000000 1.000000 1.000000
+  diffuse 0.000000 0.000000 1.000000 1.000000
+  specular 0.000000 0.000000 0.000000 0.000000
+  emission 1.000000 1.000000 1.000000 0.000000
+  shininess 0.000000
+  alphathresh 0.500000
+end
+
+material
+  name material_1
+
+  notextures
+  ambient 1.000000 0.000000 0.000000 1.000000
+  diffuse 1.000000 0.000000 0.000000 1.000000
+  specular 0.000000 0.000000 0.000000 0.000000
+  emission 1.000000 1.000000 1.000000 0.000000
+  shininess 0.000000
+  alphathresh 0.500000
+end
+
+material
+  name material_2
+
+  notextures
+  ambient 1.000000 1.000000 1.000000 1.000000
+  diffuse 1.000000 1.000000 1.000000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 1.000000 1.000000 1.000000 1.000000
+  shininess 0.000000
+  alphathresh 0.000000
+end
+
+material
+
+  notextures
+  ambient 1.000000 0.000000 0.000000 0.500000
+  diffuse 1.000000 0.000000 0.000000 0.500000
+  specular 0.000000 0.000000 0.000000 0.500000
+  emission 0.000000 0.000000 0.000000 0.500000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture wall
+  matref material_2
+  matref material_3
+end
+
+
+#--Group Definitions-----------------------------
+
+
+#--Objects---------------------------------------
+
+box
+  name box_0
+  position 1.208777 28.733269 0.000000
+  size 10.000000 10.000000 10.000000
+  z+ matref 3
+end
+
+pyramid
+  name pyramid_1
+  position -30.841516 0.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  y- matref 0
+end
+
+box
+  name box_2
+  position 33.315014 0.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  x- matref 1
+  z+ matref 0
+end
+
+pyramid
+  name pyramid_3
+  position 37.192604 31.290695 0.000000
+  size 10.000000 10.000000 10.000000
+end
+
+sphere
+  name sphere_4
+  position 0.000000 0.000000 20.969460
+  size 10.000000 10.000000 10.000000
+  matref 0
+  divisions 16
+end
+
+arc
+  name arc_5
+  position 0.000000 -41.426308 0.000000
+  size 10.000000 10.000000 10.000000
+  matref 0
+  top matref 2
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize -8.000000 -8.000000 -8.000000 -8.000000
+
+end
+
+cone
+  name cone_6
+  position -25.273094 -30.544638 0.000000
+  size 10.000000 10.000000 10.000000
+  matref 1
+  divisions 16
+  angle 360.000000
+  smoothbounce
+  texsize 0.000000 0.000000
+
+end
+
+arc
+  name arc_50
+  size 10.000000 10.000000 10.000000
+  top matref 2
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize -8.000000 -8.000000 -8.000000 -8.000000
+
+end
+
