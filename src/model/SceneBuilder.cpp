@@ -19,7 +19,7 @@
 #else
 	#include <sys/stat.h>
 #endif
-#include <iostream>;
+#include <iostream>
 
 #include "model/SceneBuilder.h"
 #include "windows/View.h"
@@ -203,7 +203,7 @@ osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
 					len = ftell(fp);
 					fclose( fp );
 					if(res != 0){
-						printf ( "Error Downloading: %s, %l\n", curl_easy_strerror(res), len );
+						printf ( "Error Downloading: %s, %li\n", curl_easy_strerror(res), len );
 						//remove cached file
 						std::remove( ( searchPath + temp_name + ".png" ).c_str() );
 						//use error downloading texture
