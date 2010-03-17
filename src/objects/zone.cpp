@@ -214,8 +214,15 @@ void zone::updateGeometry() {
 	osg::ref_ptr< osg::ShapeDrawable > boxDrawable = new osg::ShapeDrawable( box.get() );
 	boxGeode->addDrawable( boxDrawable.get() );
 
-	// make material
-	boxDrawable->setColor( osg::Vec4( 0, 0, 1, 1 ) );
+	// assign material
+	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
+								 osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
+								 osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
+								 osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
+								 0.0f,
+								 1.0f,
+								 boxGeode.get() );
+	
 	osg::ref_ptr< osg::StateSet > stateset = boxDrawable->getOrCreateStateSet();
 	osg::ref_ptr< osg::PolygonMode > polyMode = new osg::PolygonMode();
 	polyMode->setMode( osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE );
