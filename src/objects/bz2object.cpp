@@ -195,6 +195,7 @@ bool bz2object::parse( std::string& line ) {
 	}
 
 	if ( isKey( "matref" ) ) {
+		bool wasHandled = false;
 		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
 			//printf("MaterialSlot first: %s\n", i->first.c_str());
 			// check for matching alias
@@ -219,7 +220,7 @@ bool bz2object::parse( std::string& line ) {
 					else
 						throw BZWReadError( this, string( "Couldn't find material, " ) + realValue );
 
-					return true;
+					wasHandled = true;
 				}
 			
 			}
@@ -235,6 +236,8 @@ bool bz2object::parse( std::string& line ) {
 				return true;
 			}
 		}
+		if(wasHandled)
+			return true;
 	}
 
 	// ran out of possibilities throw an error
