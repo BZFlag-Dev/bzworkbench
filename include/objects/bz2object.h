@@ -169,14 +169,14 @@ class bz2object : public Renderable, public DataEntry
 			std::vector< std::string > alias;
 			osg::ref_ptr< physics > phydrv;
 		};
-
+		
+		// set the material of this object from the list of materials
+		void refreshMaterial();
+	
 	protected:
 		osg::ref_ptr< BZTransform > transformations;
 		// set true if selected in the 3D scene
 		bool selected;
-
-		// set the material of this object from the list of materials
-		void refreshMaterial();
 
 		// physics/material slot
 		std::map< std::string, PhysicsSlot > physicsSlots;

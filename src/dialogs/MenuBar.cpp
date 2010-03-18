@@ -466,7 +466,7 @@ void MenuBar::configureWorldCallback_real(Fl_Widget* w) {
 }
 
 void MenuBar::materialEditorCallback_real(Fl_Widget* w) {
-	MaterialEditor* ed = new MaterialEditor( parent->getModel() );
+	MaterialEditor* ed = new MaterialEditor( parent );
 
 	ed->show();
 

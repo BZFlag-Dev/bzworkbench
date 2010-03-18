@@ -22,10 +22,11 @@
 
 #include "defines.h"
 
-MaterialEditor::MaterialEditor( Model* model ) :
+MaterialEditor::MaterialEditor( MainWindow* mw ) :
 		Fl_Dialog( "Material Editor", 310, 400, Fl_Dialog::Fl_OK )
 {
-	this->model = model;
+	this->mw = mw;
+	this->model = mw->getModel();
 
 	begin();
 
@@ -80,6 +81,21 @@ MaterialEditor::MaterialEditor( Model* model ) :
 	setOKEventHandler( OKCallback, this );
 }
 
+void MaterialEditor::refreshModelView(){
+	Model::objRefList objects = model->getObjects();
+	if(objects.size() > 0) {
+		for(Model::objRefList::iterator i = objects.begin(); i != objects.end(); i++) {
+			// would really only need to refresh the objects that use a changed material
+			(*i)->refreshMaterial();
+			// updates all materials to this one - so this is not good
+			//UpdateMessage msg( UpdateMessage::UPDATE_MATERIAL, mat );
+			//(*i)->update( msg );
+		}
+	}
+	
+	mw->getView()->redraw();
+}
+
 void MaterialEditor::refreshMaterialList() {
 	materialBrowser->clear();
 
@@ -89,6 +105,7 @@ void MaterialEditor::refreshMaterialList() {
 	for ( i = materials.begin(); i != materials.end(); i++ ) {
 		materialBrowser->add( i->first.c_str() );
 	}
+	refreshModelView();
 }
 
 void MaterialEditor::refreshTexmatList() {
@@ -100,6 +117,7 @@ void MaterialEditor::refreshTexmatList() {
 	for ( i = texmats.begin(); i != texmats.end(); i++ ) {
 		textureMatrixBrowser->add( i->first.c_str() );
 	}
+	refreshModelView();
 }
 
 void MaterialEditor::refreshDyncolList() {
@@ -111,6 +129,7 @@ void MaterialEditor::refreshDyncolList() {
 	for ( i = dyncols.begin(); i != dyncols.end(); i++ ) {
 		dyncolBrowser->add( i->first.c_str() );
 	}
+	refreshModelView();
 }
 
 // OK callback

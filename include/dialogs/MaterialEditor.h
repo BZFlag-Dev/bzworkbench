@@ -17,7 +17,9 @@
 #include "FL/Fl_Multi_Browser.H"
 #include "FL/Fl_Button.H"
 
+#include "windows/MainWindow.h"
 #include "model/Model.h"
+#include "objects/bz2object.h"
 #include "widgets/QuickLabel.h"
 
 class MaterialEditor : public Fl_Dialog {
@@ -25,7 +27,7 @@ class MaterialEditor : public Fl_Dialog {
 public:
 
 	// constructor
-	MaterialEditor( Model* model );
+	MaterialEditor( MainWindow* mw );
 
 	// destructor
 	virtual ~MaterialEditor() { }
@@ -82,6 +84,7 @@ public:
 	}
 
 protected:
+	MainWindow* mw;
 	Model* model;
 
 	// material label
@@ -116,6 +119,8 @@ protected:
 	Fl_Button* dyncolAddButton;
 	Fl_Button* dyncolRemoveButton;
 	Fl_Button* dyncolEditButton;
+	
+	void refreshModelView();
 
 private:
 	void refreshMaterialList();
