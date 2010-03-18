@@ -19,8 +19,11 @@ the following library and source dependencies:
 	(*)	FLTK 1.1.7
 	(*)	OpenSceneGraph 2.8
 	(*)	OpenGL 1.4
+	(*)	cURL 7.19
 
-On Fedora Linux a "yum install fltk-devel OpenSceneGraph-devel"
-command will install the needed packages and their dependencies.
+The required packages and their dependencies can be installed on
+Fedora Linux with this command:
 
-See the Readme.MSWindows for information on building on Windows.
+ yum install gcc-c++ fltk-devel OpenSceneGraph-devel libcurl-devel
+
+See the README.MSWindows for information on building on Windows.

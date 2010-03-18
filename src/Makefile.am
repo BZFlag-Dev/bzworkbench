@@ -1,7 +1,6 @@
 AM_CPPFLAGS = -I../include
 
 bin_PROGRAMS = bzworkbench
-bzworkbench_LDADD = -lfltk -lfltk_images -losg -losgViewer -lfltk_gl -lGL -lGLU -lcurl
 bzworkbench_SOURCES = \
 	BZWBAPI.cpp \
 	BZWBPlugins.cpp \

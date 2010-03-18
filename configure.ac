@@ -9,7 +9,7 @@
 # IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_PREREQ(2.52)
+AC_PREREQ([2.52])
 AC_INIT([BZWorkbench], [0.1], [http://BZFlag.org])
 AM_INIT_AUTOMAKE([1.6 foreign])
 AC_CONFIG_SRCDIR([src/main.cpp])
@@ -23,22 +23,16 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lGL':
-AC_CHECK_LIB([GL], [main])
-# FIXME: Replace `main' with a function in `-lGLU':
-AC_CHECK_LIB([GLU], [main])
-# FIXME: Replace `main' with a function in `-lcurl':
-AC_CHECK_LIB([curl], [main])
-# FIXME: Replace `main' with a function in `-lfltk':
-AC_CHECK_LIB([fltk], [main])
-# FIXME: Replace `main' with a function in `-lfltk_gl':
-AC_CHECK_LIB([fltk_gl], [main])
-# FIXME: Replace `main' with a function in `-lfltk_images':
-AC_CHECK_LIB([fltk_images], [main])
-# FIXME: Replace `main' with a function in `-losg':
-AC_CHECK_LIB([osg], [main])
-# FIXME: Replace `main' with a function in `-losgViewer':
-AC_CHECK_LIB([osgViewer], [main])
+AC_CHECK_LIB([OpenThreads], [OpenThreadsGetVersion])
+AC_CHECK_LIB([curl], [curl_easy_init], , AC_MSG_ERROR([curl library is required]))
+AC_CHECK_LIB([dl], [dlopen], , AC_MSG_ERROR([dl library is required]))
+AC_CHECK_LIB([fltk], [_init], , AC_MSG_ERROR([fltk library is required]))
+AC_CHECK_LIB([fltk_gl], [_init])
+AC_CHECK_LIB([fltk_images], [_init])
+AC_CHECK_LIB([osgDB], [osgDBGetVersion])
+AC_CHECK_LIB([osgGA], [osgGAGetVersion])
+AC_CHECK_LIB([osgViewer], [osgViewerGetVersion])
+AC_CHECK_LIB([osg], [osgGetVersion], , AC_MSG_ERROR([osg library is required]))
 
 # Checks for header files.
 AC_HEADER_DIRENT
