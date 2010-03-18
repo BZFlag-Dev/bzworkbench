@@ -14,7 +14,7 @@
 
 // constructor
 MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
-	ConfigurationDialog( _theMat, "Base Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
+	ConfigurationDialog( _theMat, "Material Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
 	begin();
 
 	theMat = _theMat;
