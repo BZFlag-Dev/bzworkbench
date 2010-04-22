@@ -246,15 +246,8 @@ bool bz2object::parse( std::string& line ) {
 
 // called after done parsing to finalize the changes
 void bz2object::finalize() {
-	for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
-		// assign the material
-		if ( i->second.materials.size() > 0 ) {
-			if ( i->first != "" )
-				i->second.node->setStateSet( material::computeFinalMaterial(i->second.materials) );
-			else
-				getThisNode()->setStateSet( material::computeFinalMaterial(i->second.materials) );
-		}
-	}
+	
+	refreshMaterial();
 	
 	// update the transformation stack
 	this->transformations->refreshMatrix();
@@ -497,16 +490,30 @@ vector<string> bz2object::physicsSlotNames() {
 // recompute the material
 void bz2object::refreshMaterial()
 {
+	bool didAllSides = false;
 	for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
 		osg::StateSet* mat = i->second.defaultMaterial;
 		if ( i->second.materials.size() > 0 ) {
 			mat = material::computeFinalMaterial( i->second.materials );
 		}
-
-		if ( i->first == "" )
-			SceneBuilder::assignBZMaterial( mat, getThisNode() );
-		else
-			SceneBuilder::assignBZMaterial( mat, i->second.node );
+		if ( i->first == "" ){
+			//SceneBuilder::assignBZMaterial( mat, getThisNode() );
+			// apply to all slots - this must happen prior to appling the individual sides
+			for ( map< string, MaterialSlot >::iterator ii = materialSlots.begin(); ii != materialSlots.end(); ii++ ) {
+				if(ii->first != ""){
+					SceneBuilder::assignBZMaterial( mat, ii->second.node );
+				}
+			}
+			didAllSides = true;
+		}else{
+			if( didAllSides == true ){
+				if(mat != i->second.defaultMaterial){
+					SceneBuilder::assignBZMaterial( mat, i->second.node );
+				}
+			}else{
+				SceneBuilder::assignBZMaterial( mat, i->second.node );
+			}
+		}
 	}
 }
 
