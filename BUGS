@@ -12,3 +12,11 @@ reference other materials are saved below those it references - sort material sa
 CRASH - open H2O-R1.bzw, select a group (was a group containing a mesh), 
 copy the group, create a new map and then paste goes bomb!
 
+FIXME - arcs do not appear to be correctly built, this is very noticable when you 
+compare a rotated arc in bzflag and then bzworkbench, load the Desert War map for example
+
+FIXME - sphere texture coordinents are wrong on the top and bottom
+
+FIXME - all object do not have normals, except for loaded meshes that have normals defined in the bzw file
+
+FIXME - lighting: fix/add normals to ALL models first!
