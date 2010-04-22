@@ -404,7 +404,10 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 	material* mat = new material();
 
 	osg::Material* finalMaterial = new osg::Material();
-
+	
+	//bzflag uses the diffuse color for the ambient color
+	finalMaterial->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );
+	
 	finalMaterial->setAmbient( osg::Material::FRONT, ambient );
 	finalMaterial->setDiffuse( osg::Material::FRONT, diffuse );
 	finalMaterial->setSpecular( osg::Material::FRONT, specular );
