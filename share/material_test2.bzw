@@ -1,0 +1,244 @@
+
+#--Info------------------------------------------
+
+info
+end
+
+#--World-----------------------------------------
+
+world
+  name material_test2
+  size 400.000000
+  flagHeight 0.000000
+# noWalls
+end
+
+#--Options---------------------------------------
+
+options
+  
+end
+
+#--Water Level-----------------------------------
+
+
+
+#--Physics Drivers-------------------------------
+
+
+#--Dynamic Colors--------------------------------
+
+
+#--Texture Matrices------------------------------
+
+
+#--Materials-------------------------------------
+
+material
+  name mat_0
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 1.000000 0.000000 1.000000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture boxwall
+end
+
+material
+  name mat_0_top
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 0.500000 0.000000 0.500000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture mesh
+end
+
+material
+  name mat_1
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 0.000000 0.000000 1.000000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture boxwall
+end
+
+material
+  name mat_1_top
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 0.000000 0.000000 0.500000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture mesh
+end
+
+material
+  name mat_2
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 0.000000 1.000000 0.000000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture boxwall
+end
+
+material
+  name mat_2_top
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 0.000000 0.500000 0.000000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture mesh
+end
+
+material
+  name mat_3
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 1.000000 0.000000 0.000000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture boxwall
+end
+
+material
+  name mat_3_top
+
+  notextures
+  ambient 0.250000 0.250000 0.250000 1.000000
+  diffuse 0.500000 0.000000 0.000000 1.000000
+  specular 0.000000 0.000000 0.000000 1.000000
+  emission 0.000000 0.000000 0.000000 1.000000
+  shininess 0.000000
+  alphathresh 1.000000
+  addtexture mesh
+end
+
+
+#--Group Definitions-----------------------------
+
+
+#--Objects---------------------------------------
+
+box
+  position 10.000000 10.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  x+ matref mat_0
+  x- matref mat_0
+  y+ matref mat_0
+  y- matref mat_0
+  z+ matref mat_0_top
+end
+
+box
+  position -10.000000 10.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  x+ matref mat_1
+  x- matref mat_1
+  y+ matref mat_1
+  y- matref mat_1
+  z+ matref mat_1_top
+end
+
+box
+  position 10.000000 -10.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  x+ matref mat_2
+  x- matref mat_2
+  y+ matref mat_2
+  y- matref mat_2
+  z+ matref mat_2_top
+end
+
+box
+  position -10.000000 -10.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  x+ matref mat_3
+  x- matref mat_3
+  y+ matref mat_3
+  y- matref mat_3
+  z+ matref mat_3_top
+end
+
+pyramid
+  size 10.000000 10.000000 10.000000
+end
+
+sphere
+  name sphere_35
+  position -10.000000 -10.000000 20.000000
+  size 10.000000 10.000000 10.000000
+  edge matref mat_3_top
+  divisions 16
+end
+
+sphere
+  name sphere_35
+  position 10.000000 10.000000 20.000000
+  size 10.000000 10.000000 10.000000
+  edge matref mat_0_top
+  divisions 16
+end
+
+sphere
+  name sphere_35
+  position -10.000000 10.000000 20.000000
+  size 10.000000 10.000000 10.000000
+  edge matref mat_1_top
+  divisions 16
+end
+
+sphere
+  name sphere_35
+  position 10.000000 -10.000000 20.000000
+  size 10.000000 10.000000 10.000000
+  edge matref mat_2_top
+  divisions 16
+end
+
+box
+  name box_42
+  position -44.978832 0.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  matref mat_3_top
+  z+ matref mat_1_top
+end
+
+pyramid
+  name pyramid_43
+  position 0.000000 -42.031971 0.000000
+  size 10.000000 10.000000 10.000000
+  matref mat_3_top
+  y+ matref mat_1_top
+end
+
+
+#--Teleporter Links------------------------------
+
+
+#--Unused Data-----------------------------------
+
