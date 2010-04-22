@@ -167,6 +167,7 @@ bool pyramid::parse( std::string& line ) {
 void pyramid::finalize() {
 	// just regen UV coords based on any size changes
 	Primitives::rebuildPyramidUV( (osg::Group*)getThisNode(), getSize() );
+	refreshMaterial();
 }
 
 // toString
