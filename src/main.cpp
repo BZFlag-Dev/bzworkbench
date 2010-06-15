@@ -139,7 +139,8 @@ int main(int argc, char** argv) {
 	string ibPath = "BzWorkbench.app/Contents/MacOS/BzWorkbench";
 	
 	if(strlen(rPath) > ibPath.length()){
-		if( string(rPath).compare( string(rPath).length()-ibPath.length(),ibPath.length(),ibPath,0,ibPath.length() ) ){
+		string test = string(rPath).substr(string(rPath).length()-ibPath.length(), ibPath.length());
+		if( test.compare(ibPath) == 0 ){
 			// remove "bzworkbench.app/Contents/MacOS/bzworkbench"
 			std::string fixedPath = TextUtils::replace_all( rPath, ibPath, "");
 	
