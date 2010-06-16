@@ -60,11 +60,13 @@ public:
 	void setSize( osg::Vec3 newSize);
 	osg::Vec3 getSize();
 
+	float getSweepRotation();
 	float getSweepAngle();
 	float getRatio();
 	int getDivisions();
 	Point4D getTexsize();
 
+	void setSweepRotation( float value );
 	void setSweepAngle( float value );
 	void setRatio( float value );
 	void setDivisions( int value );
@@ -75,6 +77,7 @@ protected:
 	static const char* sideNames[MaterialCount];
 
 	float angle;
+	float sweepAngle;
 	float ratio;
 	int divisions;
 	Point4D texsize;

@@ -35,7 +35,8 @@ void arc::setDefaults() {
 	// define some basic values
 	ratio = 1.0f;
 	divisions = 16;
-	angle = 360.0f;
+	angle = 0.0f;
+	sweepAngle = 360.0f;
 	texsize.set( -8.0f, -8.0f, -8.0f, -8.0f  );
 
 	osg::Group* group = new osg::Group();
@@ -83,11 +84,16 @@ int arc::update(UpdateMessage& message) {
 			break;
 
 		case UpdateMessage::SET_ROTATION:		// handle a new rotation
-			setRotationZ( message.getAsRotation()->z() );
+			// an arc's rotation is not the z rotation of the arc object 
+			// setRotationZ( message.getAsRotation()->z() );
+			setSweepRotation(message.getAsRotation()->z());
+			updateGeometry();
 			break;
 
 		case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
-			setRotationZ( getRotation().z() + message.getAsRotationFactor()->z() );
+			//setRotationZ( getRotation().z() + message.getAsRotationFactor()->z() );
+			setSweepRotation( getSweepRotation() + message.getAsRotation()->z());
+			updateGeometry();
 			break;
 
 		case UpdateMessage::SET_SCALE:		// handle a new scale
@@ -127,6 +133,9 @@ bool arc::parse( std::string& line ) {
 		divisions = atof( value.c_str() );
 	}
 	else if ( key == "angle" ) {
+		sweepAngle = atof( value.c_str() );
+	}
+	else if ( key == "rotation" ) {
 		angle = atof( value.c_str() );
 	}
 	else if ( key == "ratio" ) {
@@ -161,10 +170,12 @@ string arc::toString(void) {
 
 	// some options shouldn't be included for a meshbox
 	ret += "  divisions " + string(itoa(divisions)) + "\n" +
-		   "  angle " + string(ftoa(angle) ) + "\n" +
+		   "  angle " + string(ftoa(getSweepAngle()) ) + "\n" +
 		   "  ratio " + string(ftoa(ratio)) + "\n" +
 		   (flatshading == true ? "  flatshading\n" : "");
-
+        if(getSweepRotation() != 0.0f){
+          ret += "  rotation " + string(ftoa(getSweepRotation()) ) + "\n"; 
+        }
 	ret += string("") +
 		   (smoothbounce == true ? "  smoothbounce\n" : "") +
 		   "  texsize " + texsize.toString() + "\n" +
@@ -187,8 +198,12 @@ osg::Vec3 arc::getSize() {
 	return realSize;
 }
 
-float arc::getSweepAngle() {
+float arc::getSweepRotation() {
 	return angle;
+}
+
+float arc::getSweepAngle() {
+	return sweepAngle;
 }
 
 float arc::getRatio() {
@@ -203,8 +218,12 @@ Point4D arc::getTexsize() {
 	return texsize;
 }
 
-void arc::setSweepAngle( float value ) {
+void arc::setSweepRotation( float value ) {
 	angle = value;
+}
+
+void arc::setSweepAngle( float value ) {
+	sweepAngle = value;
 }
 
 void arc::setRatio( float value ) {
@@ -265,7 +284,8 @@ void arc::updateGeometry() {
 	}
 
 	// setup the angles
-	float a = angle;
+	float r = getSweepRotation() * (float)(M_PI / 180.0); // convert to radians
+	float a = getSweepAngle();
 	if (a > +360.0f) {
 		a = +360.0f;
 	}
@@ -274,6 +294,7 @@ void arc::updateGeometry() {
 	}
 	a = a * (float)(M_PI / 180.0); // convert to radians
 	if (a < 0.0f) {
+		r = r + a;
 		a = -a;
 	}
 
@@ -303,9 +324,9 @@ void arc::updateGeometry() {
 	const float squish = sz.y() / sz.x();
 
 	if (isPie) {
-		makePie(sides, isCircle, a, 0, sz.z(), outrad, squish, texsz);
+		makePie(sides, isCircle, a, r, sz.z(), outrad, squish, texsz);
 	} else {
-		makeRing(sides, isCircle, a, 0, sz.z(), inrad, outrad, squish, texsz);
+		makeRing(sides, isCircle, a, r, sz.z(), inrad, outrad, squish, texsz);
 	}
 
 
