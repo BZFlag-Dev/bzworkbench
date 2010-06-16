@@ -79,7 +79,7 @@ bool callOpenFileDialog ( std::string  &result, const char* file, const char *di
 
 	//if not, let the FLTK do it
 	Fl_File_Chooser* fc = new Fl_File_Chooser(dir, extension, Fl_File_Chooser::SINGLE, description);
-	fc->value(file);
+	//fc->value(file);
 	fc->show();
 
 	// wait for a value
@@ -120,9 +120,9 @@ bool callSaveFileDialog ( std::string  &result, const char* file, const char *di
 	}
 
 	Fl_File_Chooser* fc = new Fl_File_Chooser(dir, extension, Fl_File_Chooser::CREATE, description);
-	
-	if(file)
-		fc->value(file);
+
+	std::string filePath = std::string(dir).append(file);
+	fc->value(filePath.c_str());
 	fc->show();
 
 	// wait for a value
