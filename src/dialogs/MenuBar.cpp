@@ -167,8 +167,15 @@ void MenuBar::save_world_real( Fl_Widget* w ) {
 void MenuBar::save_world_as_real( Fl_Widget* w ) {
 
 	string filename;
+	//this is a save as 
+	string newName = "";
+	if(parent->getWorldName().compare("") == 0){
+		newName = "Untitled.bzw";
+	}else{
+		newName = parent->getWorldName();
+	}
 
-	if (!callSaveFileDialog(filename,parent->getWorldName().c_str(),"share/","*.bzw","Save As..."))
+	if (!callSaveFileDialog(filename,newName.c_str(),"share/","*.bzw","Save As..."))
 		return;
 
 	// set the world name
