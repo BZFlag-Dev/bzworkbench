@@ -39,7 +39,9 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	float rotation = (object->getRotation().z());
 	if(object->getHeader().compare("arc") == 0)
 		rotation = (dynamic_cast<arc*>(object))->getSweepRotation();
-	
+	if(object->getHeader().compare("cone") == 0)
+		rotation = (dynamic_cast<cone*>(object))->getSweepRotation();
+		
 	// read size
 	Point3D size = Point3D(object->getSize());
 	

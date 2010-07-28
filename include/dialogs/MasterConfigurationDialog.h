@@ -32,6 +32,7 @@
 #include "render/Point3D.h"
 #include "objects/bz2object.h"
 #include "objects/arc.h"
+#include "objects/cone.h"
 
 #include <string>
 #include <vector>

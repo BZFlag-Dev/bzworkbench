@@ -39,7 +39,7 @@ void cone::setDefaults() {
 	flatshading = false;
 	smoothbounce = true;
 	pyramidStyle = false;
-
+	angle = 0.0f;
 	sweepAngle = 360.0f;
 
 	// make group and geodes
@@ -94,6 +94,9 @@ bool cone::parse( std::string& line ) {
 	else if ( key == "angle" ) {
 		sweepAngle = atof( value.c_str() );
 	}
+	else if ( key == "rotation" ) {
+		angle = atof( value.c_str() );
+	}
 	else {
 		return bz2object::parse( line );
 	}
@@ -103,7 +106,6 @@ bool cone::parse( std::string& line ) {
 
 void cone::finalize() {
 	buildGeometry();
-
 	bz2object::finalize();
 }
 
@@ -123,11 +125,16 @@ int cone::update( UpdateMessage& message ) {
 			break;
 
 		case UpdateMessage::SET_ROTATION:		// handle a new rotation
-			setRotation( *(message.getAsRotation()) );
+			// an cone's rotation is not the z rotation of the cone object
+			//setRotation( *(message.getAsRotation()) );
+			setSweepRotation(message.getAsRotation()->z());
+			buildGeometry();
 			break;
 
 		case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
-			setRotation( getRotation() + *(message.getAsRotationFactor()) );
+			//setRotation( getRotation() + *(message.getAsRotationFactor()) );
+			setSweepRotation( getSweepRotation() + message.getAsRotation()->z());
+			buildGeometry();
 			break;
 
 		case UpdateMessage::SET_SCALE:		// handle a new scale
@@ -175,6 +182,9 @@ string cone::toString(void) {
 		ret += "  divisions " + string(itoa(divisions)) + "\n" +
 			   "  angle " + string(ftoa(sweepAngle) ) + "\n";
 
+	if(getSweepRotation() != 0.0f){
+		ret += "  rotation " + string(ftoa(getSweepRotation()) ) + "\n"; 
+	}
 	ret += string("") +
 		   (flatshading == true ? "  flatshading\n" : "") +
 		   (smoothbounce == true ? "  smoothbounce\n" : "") +
@@ -188,9 +198,15 @@ string cone::toString(void) {
 void cone::setSweepAngle(float value) {
 	if( value != sweepAngle ) {		// refresh the geometry
 		buildGeometry();
-	}
-	
+	}	
 	sweepAngle = value;
+}
+
+void cone::setSweepRotation(float value) {
+	if( value != angle ) {		// refresh the geometry
+		buildGeometry();
+	}	
+	angle = value;
 }
 	
 void cone::setDivisions(int value) {
@@ -232,7 +248,24 @@ void cone::buildGeometry() {
    	// build the base
    	float radius_x = 1.0;
    	float radius_y = 1.0;
-   	float angle;
+   	float ang;
+	
+	// setup the angles
+	float r = getSweepRotation() * (float)(M_PI / 180.0); // convert to radians
+	float a = getSweepAngle();
+	if (a > +360.0f) {
+		a = +360.0f;
+	}
+	if (a < -360.0f) {
+		a = -360.0f;
+	}
+	a = a * (float)(M_PI / 180.0); // convert to radians
+	if (a < 0.0f) {
+		r = r + a;
+		a = -a;
+	}
+	
+	const float astep = a / (float) divisions;
 
 	// build the geodes
 	osg::Geometry* coneGeometry = new osg::Geometry();
@@ -249,19 +282,20 @@ void cone::buildGeometry() {
    	// build a full cone if the sweep angle is >= 360.0 degrees
    	if( sweepAngle >= 360.0f ) {
 	   	for( int i = 0; i < divisions; i++ ) {
-	   		angle = 2.0 * osg::PI * ((float)i / (float)divisions);
+	   		//ang = 2.0 * osg::PI * ((float)i / (float)divisions);
+			ang = r + (astep * (float)i);
 
 	   		// add the vertex
-	   		points->push_back( osg::Vec3( cos(angle) * radius_x, sin(angle) * radius_y, 0 ) );
+	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, 0 ) );
 
 	   		// add the index of that vertex to the conical geometry
 	   		indices->push_back( i+1 );
 
 	   		// add the texture coordinate of that vertex to the concial geometry
-	   		texCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(angle), 0.5 + 0.5 * sin(angle) ) );
+	   		texCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
 
 	   		// add the texture coordinate of that vertex to the base geometry
-	   		baseTexCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(angle), 0.5 + 0.5 * sin(angle) ) );
+	   		baseTexCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
 	   	}
 
 	   	// add the final face to connect the last index to the first
@@ -289,21 +323,21 @@ void cone::buildGeometry() {
    		// place-holder texture coordinate
    		texCoords->push_back( osg::Vec2( 0.5, 0.5 ) );
 
-   		float sweepAngleRads = sweepAngle * osg::PI / 180.0f;
    		for( int i = 0; i <= divisions; i++ ) {
-	   		angle = sweepAngleRads * ((float)i / (float)divisions);
-
+	   		//ang = a * ((float)i / (float)divisions);
+			ang = r + (astep * (float)i);
+			
 	   		// add the vertex
-	   		points->push_back( osg::Vec3( cos(angle) * radius_x, sin(angle) * radius_y, 0 ) );
+	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, 0 ) );
 
 	   		// add the index of that vertex to the conical geometry
 	   		indices->push_back( i+2 );
 
 	   		// add the texture coordinate of that vertex to the concial geometry
-	   		texCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(angle), 0.5 + 0.5 * sin(angle) ) );
+	   		texCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
 
 	   		// add the texture coordinate of that vertex to the base geometry
-	   		baseTexCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(angle), 0.5 + 0.5 * sin(angle) ) );
+	   		baseTexCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
 	   	}
 
 

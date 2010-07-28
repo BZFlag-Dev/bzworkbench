@@ -51,10 +51,12 @@ public:
 	
 	// getters/setters
 	float getSweepAngle() { return sweepAngle; }
+	float getSweepRotation() { return angle; }
 	int getDivisions() { return divisions; }
 	
 	
 	void setSweepAngle(float value);
+	void setSweepRotation(float value);
 	
 	void setDivisions(int value);
 
@@ -72,6 +74,8 @@ protected:
 	
 	// sweep angle
 	float sweepAngle;
+	// rotation angle
+	float angle;
 
 	Point2D texsize;
 	
