@@ -19,7 +19,7 @@
 const char* sphere::sideNames[MaterialCount] = { "edge", "bottom" };
 
 sphere::sphere() :
-bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref><hemisphere><drivethrough><shootthrough><passable>" ) {
+bz2object("sphere", "<position><rotation><size><radius><flatshading><name><divisions><shift><shear><spin><scale><smoothbounce><phydrv><matref><hemisphere><drivethrough><shootthrough><passable><texsize>" ) {
 	setDefaults();
 }
 
@@ -109,7 +109,10 @@ bool sphere::parse( std::string& line ) {
 	string value = BZWParser::value( key.c_str(), line.c_str() );
 
 	// parse keys
-	if ( key == "divisions" ) {
+	if ( key == "texsize" ) {
+		texsize = Point2D( value.c_str() );
+	}
+	else if ( key == "divisions" ) {
 		divisions = atof( value.c_str() );
 	}
 	else if ( key == "radius" ) {
