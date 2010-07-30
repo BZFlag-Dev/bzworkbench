@@ -25,3 +25,8 @@ FIXME - not all Material options that should effect rendering do so
 FIXME - Texture Matrices do not effect rendering
 
 FIXME - Dynamic Colors do not effect rendering
+
+FIXME - FlipZ on Pyramid or Cone does not effect rendering
+
+FIXME - Attributes such as Texture Size, Flat Shadding, Smooth Bounce and 
+Hemishpere are lost when duplicating a sphere.
