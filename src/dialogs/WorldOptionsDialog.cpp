@@ -51,18 +51,32 @@ WorldOptionsDialog::WorldOptionsDialog( world* theWorld, options* theOptions, wa
 	worldNameField->value(nameStr.c_str());
 	
 	worldSizeLabel = new QuickLabel("Size:", 5, 35);
-	worldSizeField = new Fl_Counter(120, 35, 120, DEFAULT_TEXTSIZE + 6);
-	worldSizeField->value(size);
+	worldSizeField = new Fl_Input(120, 35, 120, DEFAULT_TEXTSIZE + 6);
+	worldSizeField->type(FL_FLOAT_INPUT);
+	worldSizeField->callback(worldSizeField_cb);
+	worldSizeField->when(FL_WHEN_CHANGED);
+	worldSizeField->tooltip("float value > 0.0; default is 400.0");
+	worldSizeField->value(ftoa(size).c_str());
 	
 	flagHeightLabel = new QuickLabel("Flag height:", 5, 65);
-	flagHeightField = new Fl_Counter(120, 65, 120, DEFAULT_TEXTSIZE + 6);
-	flagHeightField->type(FL_NORMAL_COUNTER);
-	flagHeightField->value(flagHeight);
+	flagHeightField = new Fl_Input(120, 65, 120, DEFAULT_TEXTSIZE + 6);
+	flagHeightField->type(FL_FLOAT_INPUT);
+	flagHeightField->callback(flagHeightField_cb);
+	flagHeightField->when(FL_WHEN_CHANGED);
+	flagHeightField->tooltip("float value > 0.0; default is 10.0");
+	flagHeightField->value(ftoa(flagHeight).c_str());
 	
 	waterCheckButton = new Fl_Check_Button(5, 95, DEFAULT_TEXTSIZE + 6, DEFAULT_TEXTSIZE + 6, "Water level");
 	waterCheckButton->value( waterHeight >= 0.0f ? true : false );
-	waterLevelField = new Fl_Counter(120, 95, 120, DEFAULT_TEXTSIZE + 6);
-	waterLevelField->value(waterHeight);
+	
+	waterLevelField = new Fl_Input(120, 95, 120, DEFAULT_TEXTSIZE + 6);
+	waterLevelField->type(FL_FLOAT_INPUT);
+	waterLevelField->callback(waterLevelField_cb, waterCheckButton);
+	waterLevelField->when(FL_WHEN_CHANGED);
+	waterLevelField->tooltip("float value > 0.0; -1 to disable");
+	waterLevelField->value(ftoa(waterHeight).c_str());
+		
+	waterCheckButton->callback(waterCheckButton_cb, waterLevelField);
 	
 	worldOptionsLabel = new QuickLabel("Options:", 5, 125);
 	worldOptionsField = new Fl_Input(100, 125, 200, DEFAULT_TEXTSIZE + 6);
@@ -102,6 +116,37 @@ WorldOptionsDialog::WorldOptionsDialog( world* theWorld, options* theOptions, wa
 	setCancelEventHandler(CancelButtonCallback, this);
 }
 
+void WorldOptionsDialog::worldSizeField_cb(Fl_Widget *o, void* data) {
+	float f = atof( ((Fl_Input*)o)->value() );
+	if(f <= 0.0f)
+		((Fl_Input*)o)->value("400.0");
+}
+
+void WorldOptionsDialog::flagHeightField_cb(Fl_Widget *o, void* data) {
+	float f = atof( ((Fl_Input*)o)->value() );
+	if(f <= 0.0f)
+		((Fl_Input*)o)->value("10.0");
+}
+
+void WorldOptionsDialog::waterLevelField_cb(Fl_Widget *o, void* data) {
+	float f = atof( ((Fl_Input*)o)->value() );
+	if(f > 0.0f)
+		((Fl_Check_Button*)data)->value(true);
+	if(f <= 0.0f){
+		((Fl_Check_Button*)data)->value(false);
+		((Fl_Input*)o)->value("-1.0");
+	}
+}
+
+void WorldOptionsDialog::waterCheckButton_cb(Fl_Widget *o, void* data) {
+	bool b = ((Fl_Check_Button*)o)->value();
+	if(b){
+		((Fl_Input*)data)->value("1.0");
+	}else{
+		((Fl_Input*)data)->value("-1.0");
+	}
+}
+
 WorldOptionsDialog::~WorldOptionsDialog() { 
 	
 }
@@ -115,9 +160,9 @@ void WorldOptionsDialog::OKButtonCallback_real(Fl_Widget* w) {
 	if(hasWater == 0)
 		waterLevel = -1.0f;
 	else
-		waterLevel = waterLevelField->value();
+		waterLevel = atof(waterLevelField->value());
 		
-	float flagHeight = flagHeightField->value();
+	float flagHeight = atof(flagHeightField->value());
 	
 	string worldName = string(worldNameField->value());
 	
@@ -125,7 +170,7 @@ void WorldOptionsDialog::OKButtonCallback_real(Fl_Widget* w) {
 	
 	material* waterMaterialString = dynamic_cast< material* >( Model::command( MODEL_GET, "material", string( waterTextureField->value() ) ) );
 	
-	float size = worldSizeField->value();
+	float size = atof(worldSizeField->value());
 	
 	bool noWalls = (noWallsCheckButton->value() != 0);
 	

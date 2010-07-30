@@ -38,16 +38,20 @@ ArcConfigurationDialog::ArcConfigurationDialog( arc* _theArc ) :
 	subdivisionCounter->step( 1.0 );
 	
 	sweepAngleLabel = new QuickLabel("Sweep Angle: ", 5, 55 );
-	sweepAngleCounter = new Fl_Counter( 120, 55, 120, DEFAULT_TEXTSIZE + 6 );
-	sweepAngleCounter->type( FL_NORMAL_COUNTER );
-	sweepAngleCounter->value( theArc->getSweepAngle() );
+	sweepAngle = new Fl_Input( 120, 55, 120, DEFAULT_TEXTSIZE + 6 );
+	sweepAngle->type( FL_FLOAT_INPUT );
+	sweepAngle->callback(sweepAngle_cb);
+	sweepAngle->when(FL_WHEN_CHANGED);
+	sweepAngle->tooltip("float value between -360.0 to 360.0");
+	sweepAngle->value( ftoa(theArc->getSweepAngle()).c_str() );
 
 	ratioLabel = new QuickLabel("Ratio: ", 5, 80 );
-	ratioCounter = new Fl_Counter( 120, 80, 120, DEFAULT_TEXTSIZE + 6 );
-	ratioCounter->type( FL_NORMAL_COUNTER );
-	ratioCounter->maximum( 1.0 );
-	ratioCounter->minimum( 0.0 );
-	ratioCounter->value( theArc->getRatio() );
+	ratio = new Fl_Input( 120, 80, 120, DEFAULT_TEXTSIZE + 6 );
+	ratio->type( FL_FLOAT_INPUT );
+	ratio->callback(ratio_cb);
+	ratio->when(FL_WHEN_CHANGED);
+	ratio->tooltip("float value between 0.0 to 1.0");
+	ratio->value( ftoa(theArc->getRatio()).c_str() );
 	
 	flatShadingButton = new Fl_Check_Button(5, 105, DEFAULT_WIDTH - 10, DEFAULT_TEXTSIZE + 6, "Flat Shading");
 	flatShadingButton->value( theArc->getFlatshading() == true ? 1 : 0 );
@@ -65,12 +69,28 @@ ArcConfigurationDialog::ArcConfigurationDialog( arc* _theArc ) :
 	
 }
 
+void ArcConfigurationDialog::sweepAngle_cb(Fl_Widget *o, void* data) {
+	float f = atof( ((Fl_Input*)o)->value() );
+	if(f > 360.0f)
+		((Fl_Input*)o)->value("360.0");
+	if(f < -360.0f)
+		((Fl_Input*)o)->value("-360.0");
+}
+
+void ArcConfigurationDialog::ratio_cb(Fl_Widget *o, void* data) {
+	float f = atof( ((Fl_Input*)o)->value() );
+	if(f > 1.0f)
+		((Fl_Input*)o)->value("1.0");
+	if(f < 0.0f)
+		((Fl_Input*)o)->value("0.0");
+}
+
 // OK callback
 void ArcConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 	// call cone-specific setters from the UI
 	theArc->setSmoothbounce( smoothBounceButton->value() == 1 ? true : false );
-	theArc->setSweepAngle( sweepAngleCounter->value() );
-	theArc->setRatio( ratioCounter->value() );
+	theArc->setSweepAngle( atof(sweepAngle->value()) );
+	theArc->setRatio( atof(ratio->value()) );
 	theArc->setDivisions( (int)subdivisionCounter->value() );
 	theArc->setFlatshading( flatShadingButton->value() == 1 ? true : false );
 	theArc->setTexsize( Point4D( texsizeXField->value(), texsizeYField->value(), texsizeZField->value(), texsizeWField->value() ) );

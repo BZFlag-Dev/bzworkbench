@@ -14,7 +14,6 @@
 #define WORLDOPTIONSDIALOG_H_
 
 #include <FL/Fl_Input.H>
-#include <FL/Fl_Counter.H>
 #include <FL/Fl_Check_Button.H>
 
 #include "Fl_Dialog.h"
@@ -69,7 +68,8 @@ private:
 	QuickLabel* worldSizeLabel;
 	
 	// counter field for world size
-	Fl_Counter* worldSizeField;
+	Fl_Input* worldSizeField;
+	static void worldSizeField_cb(Fl_Widget *o, void* data);
 	
 	// the text field for the world options
 	Fl_Input* worldOptionsField;
@@ -78,16 +78,19 @@ private:
 	QuickLabel* worldOptionsLabel;
 	
 	// the text field for the flag height
-	Fl_Counter* flagHeightField;
+	Fl_Input* flagHeightField;
+	static void flagHeightField_cb(Fl_Widget *o, void* data);
 	
 	// label for the flag height field
 	QuickLabel* flagHeightLabel;
 	
 	// the text field for the water level
-	Fl_Counter* waterLevelField;
+	Fl_Input* waterLevelField;
+	static void waterLevelField_cb(Fl_Widget *o, void* data);
 	
 	// the checkbox for water
 	Fl_Check_Button* waterCheckButton;
+	static void waterCheckButton_cb(Fl_Widget *o, void* data);
 	
 	// the water material
 	Fl_Input* waterTextureField;

@@ -87,13 +87,15 @@ private:
 	QuickLabel* sweepAngleLabel;
 	
 	// angle sweep counter
-	Fl_Counter* sweepAngleCounter;
+	Fl_Input* sweepAngle;
+	static void sweepAngle_cb(Fl_Widget *o, void* data);
 
 	// ratio label
 	QuickLabel* ratioLabel;
 	
 	// ratio counter
-	Fl_Counter* ratioCounter;
+	Fl_Input* ratio;
+	static void ratio_cb(Fl_Widget *o, void* data);
 	
 	// flat shading check-button
 	Fl_Check_Button* flatShadingButton;

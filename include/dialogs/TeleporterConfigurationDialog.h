@@ -15,7 +15,6 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Value_Input.H>
-#include <FL/Fl_Counter.H>
 #include <FL/Fl_Check_Button.H>
 
 #include "ConfigurationDialog.h"
