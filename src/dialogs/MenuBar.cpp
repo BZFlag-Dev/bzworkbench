@@ -135,18 +135,7 @@ void MenuBar::open_world_real( Fl_Widget* w ) {
 	bool success = BZWParser::loadFile( filename.c_str() );
 
 	if (!success) {
-		BZWReadError err = parent->getModel()->getLastError();
-		int line = parent->getModel()->getLastErrorLineNumber();
-
-		// construct error message
-		string msg;
-		msg += "Failed to load bzw file.\n\n";
-		if ( err.bzobject != NULL ) {
-			msg += err.bzobject->getHeader() + ": ";
-		}
-		msg += err.message + " at line " + itoa( line );
-
-		parent->error( msg.c_str() );
+		parent->error( parent->getModel()->getErrors().c_str() );
 	}
 }
 

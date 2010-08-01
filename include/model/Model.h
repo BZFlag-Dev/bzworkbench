@@ -47,13 +47,15 @@ class group;
 
 // thrown when there is an error reading a bzw file
 struct BZWReadError {
-	BZWReadError( DataEntry* obj, std::string message ) :
+	BZWReadError( DataEntry* obj, std::string message, int line = -1) :
 		bzobject( obj ),
-		message( message )
+		message( message ),
+		line( line )
 	{ }
 
 	DataEntry* bzobject;
 	std::string message;
+	int line;
 };
 
 class Model : public Observable
@@ -193,10 +195,6 @@ public:
 	static bool hasInitializer( DataEntry* d );
 	static bool hasConfigurationDialog( DataEntry* d );
 
-	// methods for getting the last error encountered while reading a bzw file
-	BZWReadError getLastError();
-	int getLastErrorLineNumber();
-
 	// methods to manipulate the aforementioned strings
 	static bool addObjectSupport(const char* name);
 	bool _addObjectSupport(const char* name);
@@ -230,16 +228,14 @@ public:
 	bool _hasInitializer( DataEntry* d ) { return ( cmap.count( d->getHeader() ) == 0 || cmap[ std::string(d->getHeader()) ] == NULL ) ? false : true; }
 	bool _hasConfigurationDialog( DataEntry* d ) { return ( configMap.count( d->getHeader() ) == 0 || configMap[ std::string(d->getHeader()) ] == NULL ) ? false : true; }
 
-	// methods for getting the last error encountered while reading a bzw file
-	BZWReadError _getLastError();
-	int _getLastErrorLineNumber();
-
+	// methods for errors encountered while reading a bzw file
+	void appendError( BZWReadError error );
+	std::string getErrors();
 
 private:
 
-// error exception and line
-	BZWReadError error;
-	int errorLine;
+// parse errors
+	std::string errors;
 
 // world options
 	world* worldData;

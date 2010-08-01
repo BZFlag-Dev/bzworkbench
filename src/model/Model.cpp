@@ -46,11 +46,9 @@ using namespace std;
 
 Model* Model::modRef;
 
-Model::Model() : Observable(),
-		error( NULL, "" )
+Model::Model() : Observable()
 {
 
-	this->errorLine = -1;
 	this->worldData = new world();
 	this->optionsData = new options();
 	this->waterLevelData = new waterLevel();
@@ -80,10 +78,8 @@ Model::Model() : Observable(),
 
 // constructor that takes information about which objects to support
 Model::Model(const char* _supportedObjects, const char* _objectHierarchy, const char* _objectTerminators) : 
-	Observable(),
-	error( NULL, "" ) 
+	Observable() 
 {
-	this->errorLine = -1;
 	this->worldData = new world();
 	this->optionsData = new options();
 	this->waterLevelData = new waterLevel();
@@ -226,6 +222,9 @@ DataEntry* Model::_command(const string& _command, const string& object, const s
 bool Model::build( std::istream& data ) { return modRef->_build(data); }
 
 bool Model::_build( std::istream& data ) {
+	//clear errors
+	errors = "";
+	
 	_newWorld();
 
 	string buff, header;
@@ -381,22 +380,27 @@ bool Model::_build( std::istream& data ) {
 					object->parse( buff );
 				}
 				else {
-					printf("Model::build(): Skipping undefined object \"%s\"\n", buff.c_str());
+					BZWReadError err = BZWReadError(NULL,"Model::build(): Skipping undefined object \"" + buff + "\"", lineCount);
+					appendError(err);
+					//printf("Model::build(): Skipping undefined object \"%s\"\n", buff.c_str());
 					//this->unusedData.push_back( buff );
 				}
 			}
 		}
 		catch ( BZWReadError err ) { // catch any read errors
-			error = err;
-			errorLine = lineCount;
-			return false;
+			err.line = lineCount;
+			appendError(err);
 		}
 	}
 
 	// need a world so if we didn't find one make a default one
 	if (!worldData)
 		worldData = new world();
-
+	
+	// return false to report errors
+	if(errors.length() > 0)
+		return false;
+	
 	return true;
 }
 
@@ -1495,18 +1499,16 @@ void Model::clear() {
 	SceneBuilder::clearStateCache();
 }
 
-BZWReadError Model::getLastError() {
-	return modRef->_getLastError();
+void Model::appendError( BZWReadError err ) {	
+	if (err.bzobject != NULL)
+		errors += err.bzobject->getHeader() + ": ";
+	errors += err.message + " at line " + itoa( err.line ) + "\n";
 }
 
-int Model::getLastErrorLineNumber() {
-	return modRef->_getLastErrorLineNumber();
+std::string Model::getErrors() {
+	if(errors.length() > 0)
+		return "The following parse errors occured.\n\n" + errors;
+	return "";
 }
 
-BZWReadError Model::_getLastError() {
-	return error;
-}
 
-int Model::_getLastErrorLineNumber() {
-	return errorLine;
-}
