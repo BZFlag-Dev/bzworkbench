@@ -61,7 +61,7 @@ public:
 	void setDivisions(int value);
 
 	bool getFlipz() { return flipz; }
-	void setFlipz(bool value) { flipz = value; }
+	void setFlipz(bool value) { flipz = value; buildGeometry();}
 	Point2D getTexsize() { return texsize; }
 	void setTexsize( Point2D value ) { texsize = value; }
 	

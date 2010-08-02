@@ -41,7 +41,8 @@ void cone::setDefaults() {
 	pyramidStyle = false;
 	angle = 0.0f;
 	sweepAngle = 360.0f;
-
+	flipz = false;
+	
 	// make group and geodes
 	osg::Group* group = new osg::Group();
 	for (int i = 0; i < MaterialCount; i++) {
@@ -239,8 +240,15 @@ void cone::buildGeometry() {
 	osg::DrawElementsUInt* baseIndices = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLE_STRIP, 0 );
 	osg::Vec2Array* baseTexCoords = new osg::Vec2Array();
 
+	float ztop = 1;
+	float zbottom = 0;
+	if(flipz){
+		ztop = 0;
+		zbottom = 1;
+	}
+	
    	// add the tip of the cone to the conical geometry
-   	points->push_back( osg::Vec3( 0.0, 0.0, 1.0 ) );	// the tip of the cone
+   	points->push_back( osg::Vec3( 0.0, 0.0, ztop ) );	// the tip of the cone
    	indices->push_back( 0 );	// the index of the tip of the cone
    	texCoords->push_back( osg::Vec2( 0.5, 0.5 ) );	// texture coordinate of the tip of the cone
    	baseTexCoords->push_back( osg::Vec2( 0.5, 0.5) );	// just a space-holder here
@@ -286,7 +294,7 @@ void cone::buildGeometry() {
 			ang = r + (astep * (float)i);
 
 	   		// add the vertex
-	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, 0 ) );
+	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, zbottom ) );
 
 	   		// add the index of that vertex to the conical geometry
 	   		indices->push_back( i+1 );
@@ -328,7 +336,7 @@ void cone::buildGeometry() {
 			ang = r + (astep * (float)i);
 			
 	   		// add the vertex
-	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, 0 ) );
+	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, zbottom ) );
 
 	   		// add the index of that vertex to the conical geometry
 	   		indices->push_back( i+2 );
