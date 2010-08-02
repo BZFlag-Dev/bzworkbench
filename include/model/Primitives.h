@@ -31,7 +31,7 @@ class Primitives {
 public:
 
 	// build a pyramid
-	static osg::Node* buildPyramid( osg::Vec3 size );
+	static osg::Node* buildPyramid( osg::Vec3 size, bool flipz );
 
 	// rebuild UVs for a pyr, should be called whenever the box is scaled
 	static void rebuildPyramidUV( osg::Group* pyr, osg::Vec3 size );

@@ -22,7 +22,7 @@ const char* pyramid::faceNames[FaceCount] = {
   "bottom"
 };
 
-pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin><matref><phydrv><drivethrough><shootthrough><passable>") {
+pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shift><shear><scale><spin><matref><phydrv><drivethrough><shootthrough><passable><flipz>") {
 	setDefaults();
 }
 
@@ -128,7 +128,12 @@ bool pyramid::parse( std::string& line ) {
 	// meshpyr is just an alias for pyramid
 	if ( key == "meshpyr" )
 		return true;
-
+	
+	if ( key == "flipz" ) {
+		setFlipz(true);
+		return true;
+	}
+	
 	// first parse per face keys
 	for ( int i = 0; i < FaceCount; i++ ) {
 		if ( key == faceNames[i] ) {
@@ -172,9 +177,12 @@ void pyramid::finalize() {
 
 // toString
 string pyramid::toString(void) {
-	return string("pyramid\n") +
-				  BZWLines( this ) +
-				  "end\n";
+	string ret = "pyramid\n";
+	ret += BZWLines( this );
+	if (flipz)
+		ret += "  flipz\n";
+	ret += "end\n";
+	return ret;
 }
 
 void pyramid::setSize( osg::Vec3 newSize ) {
@@ -229,10 +237,11 @@ void pyramid::setRicochet( int face, bool value ) {
 
 void pyramid::setFlipz( bool value ) {
 	flipz = value;
+	updateGeometry();
 }
 
 void pyramid::updateGeometry() {
-	osg::Node* node = Primitives::buildPyramid( osg::Vec3( 1, 1, 1 ) );
+	osg::Node* node = Primitives::buildPyramid( osg::Vec3( 1, 1, 1 ), getFlipz() );
 
 	setThisNode( node );
 }

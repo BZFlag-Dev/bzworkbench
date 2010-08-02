@@ -25,7 +25,7 @@
 using namespace std;
 
 // build a pyramid
-osg::Node* Primitives::buildPyramid( osg::Vec3 size ) {
+osg::Node* Primitives::buildPyramid( osg::Vec3 size, bool flipz ) {
 	osg::Group* pyramid = new osg::Group();
 	osg::Geode* sides[5];
 	osg::Geometry* geometry[5];
@@ -36,42 +36,49 @@ osg::Node* Primitives::buildPyramid( osg::Vec3 size ) {
 		sides[i]->addDrawable(geometry[i]);
 		pyramid->addChild( sides[i] );
 	}
+	
+	float ztop = size.z();
+	float zbottom = 0;
+	if(flipz){
+		ztop = 0;
+		zbottom = size.z();
+	}
 
 	// generate vertices for triangular sides
 	// +x
 	osg::Vec3Array* pxVerts = new osg::Vec3Array();
-	pxVerts->push_back( osg::Vec3( size.x(), -size.y(), 0 ) );
-	pxVerts->push_back( osg::Vec3( size.x(), size.y(), 0 ) );
-	pxVerts->push_back( osg::Vec3( 0, 0, size.z() ) );
+	pxVerts->push_back( osg::Vec3( size.x(), -size.y(), zbottom ) );
+	pxVerts->push_back( osg::Vec3( size.x(), size.y(), zbottom ) );
+	pxVerts->push_back( osg::Vec3( 0, 0, ztop ) );
 	geometry[0]->setVertexArray( pxVerts );
 
 	// -x
 	osg::Vec3Array* nxVerts = new osg::Vec3Array();
-	nxVerts->push_back( osg::Vec3( -size.x(), size.y(), 0 ) );
-	nxVerts->push_back( osg::Vec3( -size.x(), -size.y(), 0 ) );
-	nxVerts->push_back( osg::Vec3( 0, 0, size.z() ) );
+	nxVerts->push_back( osg::Vec3( -size.x(), size.y(), zbottom ) );
+	nxVerts->push_back( osg::Vec3( -size.x(), -size.y(), zbottom ) );
+	nxVerts->push_back( osg::Vec3( 0, 0, ztop ) );
 	geometry[1]->setVertexArray( nxVerts );
 
 	// +y
 	osg::Vec3Array* pyVerts = new osg::Vec3Array();
-	pyVerts->push_back( osg::Vec3( size.x(), size.y(), 0 ) );
-	pyVerts->push_back( osg::Vec3( -size.x(), size.y(), 0 ) );
-	pyVerts->push_back( osg::Vec3( 0, 0, size.z() ) );
+	pyVerts->push_back( osg::Vec3( size.x(), size.y(), zbottom ) );
+	pyVerts->push_back( osg::Vec3( -size.x(), size.y(), zbottom ) );
+	pyVerts->push_back( osg::Vec3( 0, 0, ztop ) );
 	geometry[2]->setVertexArray( pyVerts );
 
 	// -y
 	osg::Vec3Array* nyVerts = new osg::Vec3Array();
-	nyVerts->push_back( osg::Vec3( -size.x(), -size.y(), 0 ) );
-	nyVerts->push_back( osg::Vec3( size.x(), -size.y(), 0 ) );
-	nyVerts->push_back( osg::Vec3( 0, 0, size.z() ) );
+	nyVerts->push_back( osg::Vec3( -size.x(), -size.y(), zbottom ) );
+	nyVerts->push_back( osg::Vec3( size.x(), -size.y(), zbottom ) );
+	nyVerts->push_back( osg::Vec3( 0, 0, ztop ) );
 	geometry[3]->setVertexArray( nyVerts );
 
 	// generate verts for base (-z)
 	osg::Vec3Array* nzVerts = new osg::Vec3Array();
-	nzVerts->push_back( osg::Vec3( -size.x(), -size.y(), 0 ) );
-	nzVerts->push_back( osg::Vec3( size.x(), -size.y(), 0 ) );
-	nzVerts->push_back( osg::Vec3( size.x(), size.y(), 0 ) );
-	nzVerts->push_back( osg::Vec3( -size.x(), size.y(), 0 ) );
+	nzVerts->push_back( osg::Vec3( -size.x(), -size.y(), zbottom ) );
+	nzVerts->push_back( osg::Vec3( size.x(), -size.y(), zbottom ) );
+	nzVerts->push_back( osg::Vec3( size.x(), size.y(), zbottom ) );
+	nzVerts->push_back( osg::Vec3( -size.x(), size.y(), zbottom ) );
 	geometry[4]->setVertexArray( nzVerts );
 
 	// generate texture coordinates
