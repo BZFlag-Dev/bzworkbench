@@ -89,7 +89,10 @@ bool cone::parse( std::string& line ) {
 	string value = BZWParser::value( key.c_str(), line.c_str() );
 
 	// parse keys
-	if ( key == "divisions" ) {
+	if ( key == "flipz" ) {
+		setFlipz(true);
+	}
+	else if ( key == "divisions" ) {
 		divisions = atof( value.c_str() );
 	}
 	else if ( key == "angle" ) {
@@ -189,7 +192,7 @@ string cone::toString(void) {
 	ret += string("") +
 		   (flatshading == true ? "  flatshading\n" : "") +
 		   (smoothbounce == true ? "  smoothbounce\n" : "") +
-		   "  texsize " + texsize.toString() + "\n" +
+		   "  texsize " + texsize.toString() + //"\n" +
 		   (flipz == true ? "  flipz\n" : "") +
 		   "end\n";
 
@@ -323,7 +326,7 @@ void cone::buildGeometry() {
    	}
    	else {			// build a section of a cone
    		// add the center of the cone
-   		points->push_back( osg::Vec3( 0, 0, 0 ) );
+   		points->push_back( osg::Vec3( 0, 0, zbottom ) );
 
    		// it's texture coordinate
    		baseTexCoords->push_back( osg::Vec2( 0.5, 0.5 ) );
