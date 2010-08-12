@@ -238,10 +238,15 @@ void pyramid::setRicochet( int face, bool value ) {
 void pyramid::setFlipz( bool value ) {
 	flipz = value;
 	updateGeometry();
+	finalize();
 }
 
 void pyramid::updateGeometry() {
 	osg::Node* node = Primitives::buildPyramid( osg::Vec3( 1, 1, 1 ), getFlipz() );
-
 	setThisNode( node );
+	
+	//loop thru material slots an update the nodes
+	for (int i = 0; i < FaceCount; i++) {
+		materialSlots[ string( faceNames[i] ) ].node = ((osg::Group*)getThisNode())->getChild(i);
+	}
 }
