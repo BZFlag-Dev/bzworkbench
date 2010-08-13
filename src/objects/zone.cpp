@@ -208,25 +208,20 @@ int zone::render(void) {
 }
 
 void zone::updateGeometry() {
-	// create unit box
-	osg::ref_ptr< osg::Geode > boxGeode = new osg::Geode();
-	osg::ref_ptr< osg::Box > box = new osg::Box( osg::Vec3( 0, 0, 0.5f ), 2, 2, 1 );
-	osg::ref_ptr< osg::ShapeDrawable > boxDrawable = new osg::ShapeDrawable( box.get() );
-	boxGeode->addDrawable( boxDrawable.get() );
-
-	// assign material
+	osg::Group* group = Primitives::buildUntexturedBox( osg::Vec3( 1, 1, 1 ) );
+	
 	SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 1.0 ),
 								 osg::Vec4f( 0.0, 0.0, 0.0, 1.0 ),
 								 osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								 osg::Vec4f( 0.0, 0.0, 0.0, 0.0 ),
 								 0.0f,
 								 1.0f,
-								 boxGeode.get() );
+								 group );
 	
-	osg::ref_ptr< osg::StateSet > stateset = boxDrawable->getOrCreateStateSet();
+	osg::ref_ptr< osg::StateSet > stateset = group->getOrCreateStateSet();
 	osg::ref_ptr< osg::PolygonMode > polyMode = new osg::PolygonMode();
 	polyMode->setMode( osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE );
 	stateset->setAttribute( polyMode.get(), osg::StateAttribute::ON);
-
-	setThisNode( boxGeode.get() );
+	
+	setThisNode( group );
 }
