@@ -27,6 +27,7 @@ pyramid::pyramid() : bz2object("pyramid", "<name><position><rotation><size><shif
 }
 
 void pyramid::setDefaults() {
+	flipz = false;
 	updateGeometry();
 
 	osg::Group* group = (osg::Group*)getThisNode();
@@ -60,8 +61,6 @@ void pyramid::setDefaults() {
 		materialSlots[ string( faceNames[i] ) ] = mslot;
 		physicsSlots[ string( faceNames[i] ) ] = pslot;	
 	}
-
-	flipz = false;
 
 	this->setPos( osg::Vec3(0.0, 0.0, 0.0) );
 	this->setSize( osg::Vec3(10.0, 10.0, 10.0) );
