@@ -15,6 +15,7 @@
 
 #include "bz2object.h"
 #include "flags.h"
+#include "model/Primitives.h"
 
 /**
  * Zone object
