@@ -491,16 +491,35 @@ vector<string> bz2object::physicsSlotNames() {
 void bz2object::refreshMaterial()
 {
 	bool didAllSides = false;
+	osg::Texture2D* defaultTexture;
 	for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+		defaultTexture = NULL;
 		osg::StateSet* mat = i->second.defaultMaterial;
+		if(mat != NULL)
+			defaultTexture = dynamic_cast< osg::Texture2D* >((mat->getTextureAttribute( 0,  osg::StateAttribute::TEXTURE ) ));
 		if ( i->second.materials.size() > 0 ) {
 			mat = material::computeFinalMaterial( i->second.materials );
+			if(!((material*)mat)->getNoTextures() && ((material*)mat)->getCurrentTexture() == NULL && defaultTexture != NULL){
+				mat->setTextureMode( 0, GL_TEXTURE_2D, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+				mat->setTextureAttribute( 0, defaultTexture );
+			}
 		}
 		if ( i->first == "" ){
 			//SceneBuilder::assignBZMaterial( mat, getThisNode() );
 			// apply to all slots - this must happen prior to appling the individual sides
 			for ( map< string, MaterialSlot >::iterator ii = materialSlots.begin(); ii != materialSlots.end(); ii++ ) {
 				if(ii->first != ""){
+					defaultTexture = NULL;
+					osg::StateSet* dmat = ii->second.defaultMaterial;
+					if(dmat != NULL)
+						defaultTexture = dynamic_cast< osg::Texture2D* >((dmat->getTextureAttribute( 0,  osg::StateAttribute::TEXTURE ) ));
+					if ( i->second.materials.size() > 0 ) {
+						mat = material::computeFinalMaterial( i->second.materials );
+						if(!((material*)mat)->getNoTextures() && ((material*)mat)->getCurrentTexture() == NULL && defaultTexture != NULL){
+							mat->setTextureMode( 0, GL_TEXTURE_2D, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+							mat->setTextureAttribute( 0, defaultTexture );
+						}
+					}
 					SceneBuilder::assignBZMaterial( mat, ii->second.node );
 				}
 			}
