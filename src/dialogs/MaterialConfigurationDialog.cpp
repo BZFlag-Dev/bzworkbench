@@ -69,27 +69,33 @@ MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
 	occluderButton = new Fl_Check_Button( 5, 350, 200, DEFAULT_TEXTSIZE + 6, "Occluder" );
 	occluderButton->value( theMat->getOccluder() ? true : false );
 
-	ambientLabel = new QuickLabel( "Ambient:", 5, 375 );
+	ambientButton = new Fl_Check_Button( 5, 375, 70, DEFAULT_TEXTSIZE + 6, "Ambient:" );
+	ambientButton->value( theMat->getHasAmbient() );
 	ambientInput = new RGBAWidget( 80, 375 );
 	ambientInput->setRGBA( theMat->getAmbient() );
 
-	diffuseLabel = new QuickLabel( "Diffuse:", 5, 400 );
+	diffuseButton = new Fl_Check_Button( 5, 400, 70, DEFAULT_TEXTSIZE + 6, "Diffuse:" );
+	diffuseButton->value( theMat->getHasDiffuse() );
 	diffuseInput = new RGBAWidget( 80, 400 );
 	diffuseInput->setRGBA( theMat->getDiffuse() );
 
-	specularLabel = new QuickLabel( "Specular:", 5, 425 );
+	specularButton = new Fl_Check_Button( 5, 425, 70, DEFAULT_TEXTSIZE + 6, "Specular:" );
+	specularButton->value( theMat->getHasSpecular() );
 	specularInput = new RGBAWidget( 80, 425 );
 	specularInput->setRGBA( theMat->getSpecular() );
 
-	emissiveLabel = new QuickLabel( "Emissive:", 5, 450 );
-	emissiveInput = new RGBAWidget( 80, 450 );
-	emissiveInput->setRGBA( theMat->getEmissive() );
+	emissionButton = new Fl_Check_Button( 5, 450, 70, DEFAULT_TEXTSIZE + 6, "Emission:" );
+	emissionButton->value( theMat->getHasEmission() );
+	emissionInput = new RGBAWidget( 80, 450 );
+	emissionInput->setRGBA( theMat->getEmission() );
 
-	shininessLabel = new QuickLabel( "Shininess:", 5, 475 );
+	shininessButton = new Fl_Check_Button( 5, 475, 135, DEFAULT_TEXTSIZE + 6, "Shininess:" );
+	shininessButton->value( theMat->getHasAmbient() );
 	shininessInput = new Fl_Value_Input( 150, 475, 120, DEFAULT_TEXTSIZE + 6 );
 	shininessInput->value( theMat->getShininess() );
 
-	alphaThresholdLabel = new QuickLabel( "Alpha Threshold:", 5, 500 );
+	alphaThresholdButton = new Fl_Check_Button( 5, 500, 135, DEFAULT_TEXTSIZE + 6, "Alpha Threshold:" );
+	alphaThresholdButton->value( theMat->getHasAlphaThreshold() );
 	alphaThresholdInput = new Fl_Value_Input( 150, 500, 120, DEFAULT_TEXTSIZE + 6 );
 	alphaThresholdInput->value( theMat->getAlphaThreshold() );
 
@@ -139,11 +145,17 @@ void MaterialConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
 	theMat->setGroupAlpha( groupAlphaButton->value() == 1 ? true : false );
 	theMat->setOccluder( occluderButton->value() == 1 ? true : false );
 	theMat->setAmbient( ambientInput->getRGBA() );
+	theMat->setHasAmbient( ambientButton->value() );
 	theMat->setDiffuse( diffuseInput->getRGBA() );
+	theMat->setHasDiffuse( diffuseButton->value() );
 	theMat->setSpecular( specularInput->getRGBA() );
-	theMat->setEmissive( emissiveInput->getRGBA() );
+	theMat->setHasSpecular( specularButton->value() );
+	theMat->setEmission( emissionInput->getRGBA() );
+	theMat->setHasEmission( emissionButton->value() );
 	theMat->setShininess( shininessInput->value() );
+	theMat->setHasShininess( shininessButton->value() );
 	theMat->setAlphaThreshold( alphaThresholdInput->value() );
+	theMat->setHasAlphaThreshold( alphaThresholdButton->value() );
 	theMat->setTexture( string( textureInput->value() ) );
 	theMat->setNoTexAlpha( noAlphaButton->value() == 1 ? true : false );
 	theMat->setNoTexColor( noColorButton->value() == 1 ? true : false );

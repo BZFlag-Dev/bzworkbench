@@ -87,7 +87,7 @@ public:
 	static void assignTexture( const char* filename, osg::Node* node, unsigned int mode=osg::StateAttribute::ON );
 	
 	// assign a material to a node
-	static void assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Vec4 specular, osg::Vec4 emissive, float shininess, float alpha, osg::Node* node, osg::StateAttribute::Values val = osg::StateAttribute::OVERRIDE );
+	static void assignMaterial( osg::Vec4 ambient, osg::Vec4 diffuse, osg::Vec4 specular, osg::Vec4 emission, float shininess, float alpha, osg::Node* node, osg::StateAttribute::Values val = osg::StateAttribute::OVERRIDE );
 	
 	// assign a BZWB material to the node
 	static void assignBZMaterial( osg::StateSet* mat, osg::Node* obj );

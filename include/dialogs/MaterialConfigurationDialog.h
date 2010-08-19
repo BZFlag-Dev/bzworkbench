@@ -111,19 +111,19 @@ private:
 	Fl_Choice* dyncolChoice;
 
 	// material settings
-	QuickLabel* ambientLabel;
+	Fl_Check_Button* ambientButton;
 	RGBAWidget* ambientInput;
 
-	QuickLabel* diffuseLabel;
+	Fl_Check_Button* diffuseButton;
 	RGBAWidget* diffuseInput;
 
-	QuickLabel* specularLabel;
+	Fl_Check_Button* specularButton;
 	RGBAWidget* specularInput;
 
-	QuickLabel* emissiveLabel;
-	RGBAWidget* emissiveInput;
+	Fl_Check_Button* emissionButton;
+	RGBAWidget* emissionInput;
 
-	QuickLabel* shininessLabel;
+	Fl_Check_Button* shininessButton;
 	Fl_Value_Input* shininessInput;
 
 	// option buttons
@@ -137,8 +137,8 @@ private:
 	Fl_Check_Button* occluderButton;
 
 	// alpha threshold label
-	QuickLabel* alphaThresholdLabel;
-
+	Fl_Check_Button* alphaThresholdButton;
+	
 	// alpha threshold input
 	Fl_Value_Input* alphaThresholdInput;
 

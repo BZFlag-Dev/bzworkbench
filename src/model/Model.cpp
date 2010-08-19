@@ -59,7 +59,7 @@ Model::Model() : Observable()
 	this->defaultMaterial->setAmbient( osg::Vec4( 1.0, 1.0, 1.0, 1.0 ) );
 	this->defaultMaterial->setDiffuse( osg::Vec4( 1, 1.0, 1.0, 1.0 ) );
 	this->defaultMaterial->setSpecular( osg::Vec4( 0.0, 0.0, 0.0, 0.0) );
-	this->defaultMaterial->setEmissive( osg::Vec4( 0.0, 0.0, 0.0, 1.0) );
+	this->defaultMaterial->setEmission( osg::Vec4( 0.0, 0.0, 0.0, 1.0) );
 
 	this->defaultMaterial->setTexture( "tetrawall" );
 
@@ -90,7 +90,7 @@ Model::Model(const char* _supportedObjects, const char* _objectHierarchy, const 
 	this->defaultMaterial->setAmbient( osg::Vec4( 1.0, 1.0, 1.0, 1.0 ) );
 	this->defaultMaterial->setDiffuse( osg::Vec4( 1, 1.0, 1.0, 1.0 ) );
 	this->defaultMaterial->setSpecular( osg::Vec4( 0.0, 0.0, 0.0, 0.0) );
-	this->defaultMaterial->setEmissive( osg::Vec4( 0.0, 0.0, 0.0, 1.0) );
+	this->defaultMaterial->setEmission( osg::Vec4( 0.0, 0.0, 0.0, 1.0) );
 
 	this->defaultMaterial->setTexture( "tetrawall" );
 

@@ -309,10 +309,7 @@ void mesh::updateGeometry() {
 		if(mat == NULL){
 			// set default material of face to be invisible if there isn't one defined yet
 			mat = new material();
-			mat->setAmbient( osg::Vec4( 1.0, 1.0, 1.0, 0.0) );
 			mat->setDiffuse( osg::Vec4( 1.0, 1.0, 1.0, 0.0) );
-			mat->setSpecular( osg::Vec4( 0.0, 0.0, 0.0, 0.0) );
-			mat->setEmissive( osg::Vec4( 1.0, 1.0, 1.0, 0.0) );
 		}
 		geode->addDrawable( i->second );
 		geode->setStateSet( mat );

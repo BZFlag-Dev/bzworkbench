@@ -55,12 +55,19 @@ public:
 	// binary getters and setters
 	string getName() { return name; }
 	dynamicColor* getDynamicColor() { return dynCol; }
-
-	const osg::Vec4& getAmbient() { return getCurrentMaterial()->getAmbient( osg::Material::FRONT ); }
-	const osg::Vec4& getDiffuse() { return getCurrentMaterial()->getDiffuse(osg::Material::FRONT); }
-	const osg::Vec4& getSpecular() { return getCurrentMaterial()->getSpecular(osg::Material::FRONT); }
-	const osg::Vec4& getEmissive() { return getCurrentMaterial()->getEmission(osg::Material::FRONT); }
-	float getShininess() { return getCurrentMaterial()->getShininess(osg::Material::FRONT); }
+	
+	bool getHasAmbient() { return hasAmbient; }
+	bool getHasDiffuse() { return hasDiffuse; }
+	bool getHasSpecular() { return hasSpecular; }
+	bool getHasEmission() { return hasEmission; }
+	bool getHasShininess() { return hasShininess; }
+	bool getHasAlphaThreshold() { return hasAlphaThreshold; }
+	
+	const osg::Vec4& getAmbient() { return _ambient; }
+	const osg::Vec4& getDiffuse() { return _diffuse; }
+	const osg::Vec4& getSpecular() { return _specular; }
+	const osg::Vec4& getEmission() { return _emission; }
+	float getShininess() { return _shininess; }
 	float getAlphaThreshold() { return alphaThreshold; }
 
 	bool getNoTextures() { return noTextures; }
@@ -80,17 +87,19 @@ public:
 	void setName( const string& _name );
 	void setDynamicColor( dynamicColor* _dynCol ) { dynCol = _dynCol; }
 
-	void setAmbient( const osg::Vec4& value ) { getCurrentMaterial()->setAmbient( osg::Material::FRONT, value ); }
-	void setDiffuse( const osg::Vec4& value ) { getCurrentMaterial()->setDiffuse( osg::Material::FRONT, value ); }
-	void setSpecular( const osg::Vec4& value ) { getCurrentMaterial()->setSpecular( osg::Material::FRONT, value ); }
-	void setEmissive( const osg::Vec4& value ) { getCurrentMaterial()->setEmission( osg::Material::FRONT, value ); }
-	// setters with RGBA values
-	void setAmbient( const RGBA& value ) { setAmbient( osg::Vec4( value.x(), value.y(), value.z(), value.w() ) ); }
-	void setDiffuse( const RGBA& value ) { setDiffuse( osg::Vec4( value.x(), value.y(), value.z(), value.w() ) ); }
-	void setSpecular( const RGBA& value ) { setSpecular( osg::Vec4( value.x(), value.y(), value.z(), value.w() ) ); }
-	void setEmissive( const RGBA& value ) { setEmissive( osg::Vec4( value.x(), value.y(), value.z(), value.w() ) ); }
-	void setShininess( float value ) { getCurrentMaterial()->setShininess( osg::Material::FRONT, value );  }
-	void setAlphaThreshold( float value ) { alphaThreshold = value; }
+	void setHasAmbient( bool value ) { hasAmbient = value; }
+	void setHasDiffuse( bool value ) { hasDiffuse = value; }
+	void setHasSpecular( bool value ) { hasSpecular = value; }
+	void setHasEmission( bool value ) { hasEmission = value; }
+	void setHasShininess( bool value ) { hasShininess = value; }
+	void setHasAlphaThreshold( bool value ) { hasAlphaThreshold = value; }
+	
+	void setAmbient( const osg::Vec4& value ) { _ambient = value; hasAmbient = true; }
+	void setDiffuse( const osg::Vec4& value ) { _diffuse = value; hasDiffuse = true; }
+	void setSpecular( const osg::Vec4& value ) { _specular = value; hasSpecular = true; }
+	void setEmission( const osg::Vec4& value ) { _emission = value; hasEmission = true; }
+	void setShininess( float value ) { _shininess = value; hasShininess = true; }
+	void setAlphaThreshold( float value ) { alphaThreshold = value; hasAlphaThreshold = true;}
 
 	void setNoTextures( bool value ) { noTextures = value; }
 	void setNoShadows( bool value ) { noShadow = value; }
@@ -136,12 +145,8 @@ public:
 
 private:
 	std::string name;
-	std::string color;
-
 	std::vector< std::string > shaders;
-
 	std::list< material* > materials;
-
 	dynamicColor* dynCol;
 	bool noTextures;
 	bool noShadow;
@@ -152,6 +157,17 @@ private:
 	bool noShaders;
 	bool groupAlpha;
 	bool occluder;
+	bool hasAmbient;
+	bool hasDiffuse;
+	bool hasSpecular;
+	bool hasEmission;
+	bool hasShininess;
+	bool hasAlphaThreshold;
+	osg::Vec4 _ambient;
+	osg::Vec4 _diffuse;
+	osg::Vec4 _specular;
+	osg::Vec4 _emission;
+	float _shininess;
 	float alphaThreshold;
 
 	struct TextureInfo {
@@ -165,7 +181,7 @@ private:
 	std::vector< TextureInfo > textures;	// the various textures from "texture" and "addTexture"
 
 	// compute the final OSG texture
-	void computeFinalTexture();
+	string computeFinalTexture();
 
 	// compute the final OSG material
 	void computeFinalMaterial();
