@@ -14,7 +14,7 @@
 
 // constructor
 group::group() : 
-	bz2object("group", "<name><shift><shear><scale><spin><team><tint><drivethrough><shootthrough><passable><phydrv><matref>") {
+	bz2object("group", "<name><position><size><rotation><shift><shear><scale><spin><team><tint><drivethrough><shootthrough><passable><phydrv><matref>") {
 	this->team = 0;
 	this->def = NULL;
 	this->tintColor = RGBA(1, 1, 1, 1);
@@ -34,61 +34,33 @@ string group::get(void) {
 
 // event handler
 int group::update( UpdateMessage& message ) {
-	
 	// superclass update (i.e. handle transformation changes)
 	int result = bz2object::update( message );
-	
-	// make sure we keep the Euler "spin" transformations 0 in the group
-	// and forward any existing ones to the container node
-	osg::Vec3 rot = this->getRotation();
-	if( this->container.get() != NULL && rot.x() != 0 && rot.y() != 0 && rot.z() != 0 )
-		this->container->setRotation( rot );
-		
-	this->setRotation( osg::Vec3( 0, 0, 0 ) );
-	
 	// NOW handle the messages
-	switch( message.type ) {
-		
-		case UpdateMessage::SET_POSITION: {
-			this->setPos( *(message.getAsPosition()) );
-			
+	switch( message.type ) {		
+		case UpdateMessage::SET_POSITION: 
+			setPos( *(message.getAsPosition()) );
 			break;
-		}
-			
-		case UpdateMessage::SET_POSITION_FACTOR: {	// handle a translation
-			this->setPos( this->getPos() + *(message.getAsPositionFactor()) );
-			
+		case UpdateMessage::SET_POSITION_FACTOR: 	// handle a translation
+			setPos( this->getPos() + *(message.getAsPositionFactor()) );
 			break;
-		}
 		case UpdateMessage::SET_ROTATION:		// handle a new rotation
-			// propogate rotation events to the children objects
-			this->container->setRotation( *(message.getAsRotation()) );
-			
+			setRotation( *(message.getAsRotation()) );
 			break;
-			
 		case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
-			this->container->setRotation( this->container->getRotation() + *(message.getAsRotationFactor()) );
+			setRotation( this->getRotation() + *(message.getAsRotationFactor()) );
 			break;
-			
 		case UpdateMessage::SET_SCALE:		// handle a new scale
-			// set the scale value of the container
-			this->container->setScale( *(message.getAsScale()) );
-			// this->propogateEventToChildren( message );
-			this->buildGeometry();
-			
+			setSize( *(message.getAsScale()) );
+			buildGeometry();			
 			break;
-			
 		case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
-			this->container->setScale( *(message.getAsScaleFactor()) + this->container->getScale() );
-			// this->propogateEventToChildren( message );
-			this->buildGeometry();
-			
+			setSize( getSize() +  *(message.getAsScale()) );
+			buildGeometry();
 			break;
-			
 		default:	// unknown event; don't handle
 			return result;
 	}
-	
 	return 1;	
 }
 
@@ -134,10 +106,6 @@ string group::toString(void) {
 	if(team > 0)
 		teamString = "  team " + string(itoa(team)) + "\n";
 	
-	// temporarily set the rotation of the root group node from the container child so BZWLines() translates
-	// the rotation values into "spin" lines
-	this->setRotation( container->getRotation() );
-	
 	string ret = string("group ") + this->def->getName() + "\n" +
 				  tintString + 
 				  teamString +
@@ -145,9 +113,6 @@ string group::toString(void) {
 				  (shootthrough == true ? "  shootThrough\n" : "") +
 				  this->BZWLines( this ) +
 				  "end\n";
-				  
-	// reset the rotation to 0 (so only the container has the spin transformations)
-	this->setRotation( osg::Vec3( 0.0, 0.0, 0.0 ) );
 	
 	// return the string data
 	return ret;
@@ -261,7 +226,7 @@ void group::buildGeometry() {
 								  osg::Vec4( 1.0, 0.0, 1.0, 1.0 ),
 								  osg::Vec4( 0.0, 0.0, 0.0, 0.0 ),
 								  0.0,
-								  1.0,
+								  0.0,
 								  this->geoRing.get(),
 								  osg::StateAttribute::OVERRIDE );
 	
@@ -318,7 +283,8 @@ void group::computeChildren() {
 		// add them as children of this object
 		if( objects.size() > 0 ) {	
 			// first, compute the group's center
-			float x = 0.0f, y = 0.0f, z = 0.0f;
+			/*
+			 float x = 0.0f, y = 0.0f, z = 0.0f;
 			for( vector< osg::ref_ptr< bz2object > >::iterator i = objects.begin(); i != objects.end(); i++ ) {
 				x += i->get()->getPos().x();
 				y += i->get()->getPos().y();
@@ -332,7 +298,7 @@ void group::computeChildren() {
 			// set its position from the average positions of its children
 			osg::Vec3 position = osg::Vec3( x, y, z );
 			this->setPos( position );
-			
+			*/
 			// add the children to the container node, but offset their positions by the group's position
 			// (i.e. apply a SHIFT transformation
 			for( vector< osg::ref_ptr< bz2object > >::iterator i = objects.begin(); i != objects.end(); i++ ) {
@@ -345,7 +311,7 @@ void group::computeChildren() {
 					this->container->addChild( obj );
 
 					// set the position of this object relative to the center of the group
-					obj->setPos( obj->getPos() - position );
+					//obj->setPos( obj->getPos() - position );
 
 					printf(" added %s\n", (*i)->getName().c_str() );
 				}
