@@ -41,6 +41,8 @@ public:
 	
 	// getter
 	string get(void);
+	
+	int update( UpdateMessage& message );
 
 	// bzw methods
 	bool parse( std::string& line );

@@ -24,7 +24,7 @@ struct MeshVertex {
 
 // default constructor
 mesh::mesh(void) :
-	bz2object("mesh", "<name><vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo><drivethrough><shootthrough><passable>") {
+	bz2object("mesh", "<name><position><size><rotation><vertex><normal><texcoord><inside><outside><shift><scale><shear><spin><phydrv><smoothbounce><noclusters><face><drawinfo><drivethrough><shootthrough><passable>") {
 
 	decorative = false;
 	faces = vector<MeshFace*>();
@@ -42,6 +42,38 @@ mesh::mesh(void) :
 
 // getter
 string mesh::get(void) { return toString(); }
+
+// event handler
+int mesh::update( UpdateMessage& message ) {
+	// superclass update (i.e. handle transformation changes)
+	int result = bz2object::update( message );
+	// NOW handle the messages
+	switch( message.type ) {		
+		case UpdateMessage::SET_POSITION: 
+			setPos( *(message.getAsPosition()) );
+			break;
+		case UpdateMessage::SET_POSITION_FACTOR: 	// handle a translation
+			setPos( this->getPos() + *(message.getAsPositionFactor()) );
+			break;
+		case UpdateMessage::SET_ROTATION:		// handle a new rotation
+			setRotation( *(message.getAsRotation()) );
+			break;
+		case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
+			setRotation( this->getRotation() + *(message.getAsRotationFactor()) );
+			break;
+		case UpdateMessage::SET_SCALE:		// handle a new scale
+			setSize( *(message.getAsScale()) );
+			updateGeometry();			
+			break;
+		case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
+			setSize( getSize() +  *(message.getAsScale()) );
+			updateGeometry();
+			break;
+		default:	// unknown event; don't handle
+			return result;
+	}
+	return 1;	
+}
 
 // bzw methods
 bool mesh::parse( std::string& line ) {
@@ -184,6 +216,7 @@ string mesh::toString(void) {
 	}
 
 	return string("mesh\n") +
+				  BZWLines( this ) +
 				  insideString +
 				  outsideString +
 				  vertexString +
