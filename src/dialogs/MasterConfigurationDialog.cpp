@@ -163,7 +163,7 @@ MasterConfigurationDialog::MasterConfigurationDialog(DataEntry* obj) :
 	if(transformationFormat.length() > 0 && transforms->getData().size() > 0) {
 		
 		// add the transforms
-		for(int i = transforms->getData().size() - 1; i >= 0; i--) {
+		for(int i = 0;i<transforms->getData().size();i++) {
 			TransformData d = transforms->getData()[ i ];
 
 			// next transform widget (the dimensions of which shall be calculated in the addTransformCallback_real method
@@ -260,7 +260,7 @@ void MasterConfigurationDialog::OKButtonCallback_real(Fl_Widget* w) {
 	vector< TransformData > transforms;
 	
 	if(transformations.size() != 0) {
-		for(vector<TransformWidget*>::reverse_iterator i = transformations.rbegin(); i != transformations.rend(); i++) {
+		for(vector<TransformWidget*>::iterator i = transformations.begin(); i != transformations.end(); i++) {
 			if( (*i)->active() ) {
 				TransformData d;
 				
