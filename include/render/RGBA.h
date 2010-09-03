@@ -899,6 +899,7 @@ public:
 			if( TextUtils::tolower(namedColor.name).compare(TextUtils::tolower(data)) == 0 ){
 				printf("Found Named Color: %s\n", namedColor.name);
 				this->set(namedColor.r, namedColor.g, namedColor.b, 1.0f);
+				return;
 			}
 		}
 		this->set(1.0f, 1.0f, 1.0f, 1.0f);
