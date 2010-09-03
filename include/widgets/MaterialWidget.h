@@ -19,6 +19,8 @@
 #include <FL/Fl_Check_Button.H>
 
 #include "../defines.h"
+#include "RGBAWidget.h"
+#include "../objects/material.h"
 
 #include <vector>
 #include <string>
@@ -39,7 +41,7 @@ public:
 	MaterialWidget( const MaterialWidget& m );
 	
 	// main constructor
-	MaterialWidget( int x, int y, int width, int height, vector< string > materialChoices );
+	MaterialWidget( int x, int y, int width, int height, vector< string > materialChoices, material* mat );
 	
 	// destructor
 	virtual ~MaterialWidget() { }
@@ -60,6 +62,8 @@ public:
 	vector< string > getMaterials() { return this->materials; }
 	string getSelectedMaterial() { return string(this->materialMenu->label()); }
 	bool isActive() { return activeButton->value() == 0 ? false : true; }
+	osg::Vec4 getRGBA() { return rgbaInput->getRGBA();}
+	string getText() {return texInput->value();}
 	
 	// setters
 	void setMaterials( vector< string>& newMaterials );
@@ -73,6 +77,10 @@ private:
 	
 	// menu button of references
 	Fl_Menu_Button* materialMenu;
+	
+	RGBAWidget* rgbaInput;
+	Fl_Input* texInput;
+	material* mat;
 	
 	// the list of material choices
 	vector< string > materials;

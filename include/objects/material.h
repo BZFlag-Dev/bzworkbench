@@ -41,6 +41,15 @@ public:
 	material();
 
 	static DataEntry* init() { return new material(); }
+	
+	enum {
+		MAT_REF = 0,
+		MAT_AMBIENT,
+		MAT_DIFFUSE,
+		MAT_SPECULAR,
+		MAT_EMISSION,
+		MAT_TEXTURE
+	};
 
 	// getter
 	string get(void);
@@ -50,6 +59,7 @@ public:
 	void finalize();
 
 	// tostring
+	string toStringClean();
 	string toString(void);
 
 	// binary getters and setters
@@ -142,9 +152,13 @@ public:
 	osg::Texture2D* getCurrentTexture();
 
 	material& operator=(material const &rhs);
+	
+	int getMatType() {return type;}
+	void setMatType(int value) { type = value; }
 
 private:
 	std::string name;
+	int type;
 	std::vector< std::string > shaders;
 	std::list< material* > materials;
 	dynamicColor* dynCol;

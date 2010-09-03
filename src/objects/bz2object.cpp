@@ -186,7 +186,67 @@ bool bz2object::parse( std::string& line ) {
 			}
 		}
 	}
-
+	
+	if ( key == "ambient" ) {
+		material* mat = new material();
+		mat->setMatType(material::MAT_AMBIENT);
+		mat->setAmbient( RGBA(value.c_str()) );
+		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+			//only apply to ALL slot
+			if (mat && i->first == "")
+				i->second.materials.push_back( mat );
+		}
+		return true;
+	}
+	
+	if ( key == "color" || key == "diffuse" ) {
+		material* mat = new material();
+		mat->setMatType(material::MAT_DIFFUSE);
+		mat->setDiffuse( RGBA(value.c_str()) );
+		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+			//only apply to ALL slot
+			if (mat && i->first == "")
+				i->second.materials.push_back( mat );
+		}
+		return true;
+	}
+	
+	if ( key == "specular" ) {
+		material* mat = new material();
+		mat->setMatType(material::MAT_SPECULAR);
+		mat->setSpecular( RGBA(value.c_str()) );
+		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+			//only apply to ALL slot
+			if (mat && i->first == "")
+				i->second.materials.push_back( mat );
+		}
+		return true;
+	}
+	
+	if ( key == "emission" ) {
+		material* mat = new material();
+		mat->setMatType(material::MAT_EMISSION);
+		mat->setEmission( RGBA(value.c_str()) );
+		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+			//only apply to ALL slot
+			if (mat && i->first == "")
+				i->second.materials.push_back( mat );
+		}
+		return true;
+	}
+	
+	if ( key == "texture" ) {
+		material* mat = new material();
+		mat->setMatType(material::MAT_TEXTURE);
+		mat->setTexture( value.c_str() );
+		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
+			//only apply to ALL slot
+			if (mat && i->first == "")
+				i->second.materials.push_back( mat );
+		}
+		return true;
+	}
+	
 	if ( isKey( "matref" ) ) {
 		bool wasHandled = false;
 		for ( map< string, MaterialSlot >::iterator i = materialSlots.begin(); i != materialSlots.end(); i++ ) {
@@ -311,10 +371,22 @@ string bz2object::BZWLines( bz2object* obj )
 		for ( map< string, MaterialSlot >::iterator i = obj->materialSlots.begin(); i != obj->materialSlots.end(); i++ ) {
 			for(vector< material* >::iterator j = i->second.materials.begin(); j != i->second.materials.end(); j++) {
 				if ( *j != NULL ) {
-					if ( i->first == "" )
-						ret += "  matref " + (*j)->getName() + "\n";
-					else 
-						ret += "  " + i->first + " matref " + (*j)->getName() + "\n";
+					// see if we are a reference or an object material
+					if((*j)->getMatType() == material::MAT_REF){
+						//output matref
+						if ( i->first == "" )
+							ret += "  matref " + (*j)->getName() + "\n";
+						else 
+							ret += "  " + i->first + " matref " + (*j)->getName() + "\n";
+					}else{
+						//output object's material attributes
+						if ( i->first == "" ){
+							ret += (*j)->toStringClean();
+						}else{
+							//FIXME - prefix each line, not just the first
+							ret += "  " + i->first + " " + (*j)->toStringClean();
+						}
+					}
 				}
 			}
 		}

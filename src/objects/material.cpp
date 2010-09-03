@@ -24,6 +24,7 @@ material::material() :
 	DataEntry("material", "<name><texture><addtexture><matref><notextures><notexcolor><notexalpha><texmat><dyncol><ambient><diffuse><color><specular><emission><shininess><resetmat><spheremap><noshadow><noculling><nosort><noradar><nolighting><groupalpha><occluder><alphathresh>"),
 	osg::StateSet() {
 	name = SceneBuilder::makeUniqueName("material");
+	type = MAT_REF;
 	dynCol = NULL;
 	_ambient = RGBA();
 	_diffuse = RGBA();
@@ -169,8 +170,8 @@ void material::finalize() {
 	computeFinalTexture();
 }
 
-// tostring
-string material::toString(void) {
+
+string material::toStringClean(void) {
 	string texString = string("");
 	if( textures.size() > 0) {
 		for(vector< TextureInfo >::iterator i = textures.begin(); i != textures.end(); i++) {
@@ -179,13 +180,13 @@ string material::toString(void) {
 				texString += "  addtexture " + info.name + "\n";
 			}
 			texString += 
-				(info.matrix != NULL ? string("") + "  texmat " + info.matrix->getName() + "\n" : "") +
-				(info.noColor == true ? "  notexcolor\n" : "") +
-				(info.noAlpha == true ? "  notexalpha\n" : "") +
-				(info.sphereMap == true ? "  spheremap\n" : "");
+			(info.matrix != NULL ? string("") + "  texmat " + info.matrix->getName() + "\n" : "") +
+			(info.noColor == true ? "  notexcolor\n" : "") +
+			(info.noAlpha == true ? "  notexalpha\n" : "") +
+			(info.sphereMap == true ? "  spheremap\n" : "");
 		}
 	}
-
+	
 	string matString = string("");
 	if( materials.size() > 0 ) {
 		for(list< material* >::iterator i = materials.begin(); i != materials.end(); i++) {
@@ -194,31 +195,36 @@ string material::toString(void) {
 	}
 	// colors
 	string ambientStr, diffuseStr, specularStr, emissionStr;
+	
+	ambientStr = ( hasAmbient ? "  ambient " + RGBA(getAmbient()).toString() : "");
+	diffuseStr = ( hasDiffuse ? "  diffuse " + RGBA(getDiffuse()).toString() : "");
+	specularStr = ( hasSpecular ? "  specular " + RGBA(getSpecular()).toString() : "");
+	emissionStr = ( hasEmission ? "  emission " + RGBA(getEmission()).toString() : "");
+	
+	return (dynCol != NULL ? string("  dyncol ") + dynCol->getName() + "\n" : string("")) +
+		(noTextures == true ? "  notextures\n" : "") +
+		(noShadow == true ? "  noshadow\n" : "") +
+		(noCulling == true ? "  noculling\n" : "") +
+		(noSorting == true ? "  nosorting\n" : "") +
+		(noLighting == true ? "  nolighting\n" : "") +
+		(noRadar == true ? "  noradar\n" : "") +
+		(groupAlpha == true ? "  groupalpha\n" : "") +
+		(occluder == true ? "  occluder\n" : "") +
+		ambientStr +
+		diffuseStr +
+		specularStr +
+		emissionStr +
+		(hasShininess ? "  shininess " + string(ftoa(getShininess())) + "\n" : "") +
+		(hasAlphaThreshold ?   "  alphathresh " + string(ftoa(alphaThreshold)) + "\n" : "") +
+		texString +
+		matString ;
+}
 
-	ambientStr = ( hasAmbient ? "  ambient " + RGBA(getAmbient()).toString() + "\n" : "");
-	diffuseStr = ( hasDiffuse ? "  diffuse " + RGBA(getDiffuse()).toString() + "\n" : "");
-	specularStr = ( hasSpecular ? "  specular " + RGBA(getSpecular()).toString() + "\n" : "");
-	emissionStr = ( hasEmission ? "  emission " + RGBA(getEmission()).toString() + "\n" : "");
-
+// tostring
+string material::toString(void) {
 	return string("material\n") +
 				  (name.length() == 0 ? string("# name\n") : "  name " + name + "\n")  +
-				  (dynCol != NULL ? string("  dyncol ") + dynCol->getName() + "\n" : string("")) +
-				  (noTextures == true ? "  notextures\n" : "") +
-				  (noShadow == true ? "  noshadow\n" : "") +
-				  (noCulling == true ? "  noculling\n" : "") +
-				  (noSorting == true ? "  nosorting\n" : "") +
-				  (noLighting == true ? "  nolighting\n" : "") +
-				  (noRadar == true ? "  noradar\n" : "") +
-				  (groupAlpha == true ? "  groupalpha\n" : "") +
-				  (occluder == true ? "  occluder\n" : "") +
-				  ambientStr +
-				  diffuseStr +
-				  specularStr +
-				  emissionStr +
-	(hasShininess ? "  shininess " + string(ftoa(getShininess())) + "\n" : "") +
-	(hasAlphaThreshold ?   "  alphathresh " + string(ftoa(alphaThreshold)) + "\n" : "") +
-				  texString +
-				  matString +
+				  toStringClean() +
 				  getUnusedText() +
 				  "end\n";
 }

@@ -29,6 +29,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Pack.H>
 #include <FL/Fl_Tabs.H>
 
 #include <vector>
@@ -73,6 +74,7 @@ public:
 		Fl_Button* materialAdd;
 		Fl_Button* materialRemove;
 		Fl_Scroll* materialList;
+		Fl_Pack* listPack;
 		vector< MaterialWidget* > materialWidgets;
 	
 		// physics driver widgets

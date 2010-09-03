@@ -22,7 +22,7 @@ AdvancedOptionsDialog::AdvancedOptionsDialog( bz2object* _obj ) :
 	
 	begin();
 	
-	tabs = new Fl_Tabs( 5, 5, DEFAULT_WIDTH - 10, 300 );
+	tabs = new Fl_Tabs( 5, 5, DEFAULT_WIDTH - 10, 310 );
 	
 
 	vector<string> materialSlots = _obj->materialSlotNames();
@@ -72,22 +72,37 @@ void AdvancedOptionsDialog::CancelCallback_real( Fl_Widget* w ) {
 // add material callback
 void AdvancedOptionsDialog::AdvancedOptionsPage::addMaterialCallback_real( Fl_Widget* w ) {
 	// add material
-	MaterialWidget* mw = new MaterialWidget( materialList->x() + 5, 0, materialList->w() - 10, 2 * DEFAULT_TEXTSIZE, materialRefs );
+	MaterialWidget* mw = new MaterialWidget( materialList->x() + 5, 0, materialList->w() - 10, 2 * DEFAULT_TEXTSIZE, materialRefs, NULL );
 	addMaterial( mw );
 }
 
 void AdvancedOptionsDialog::AdvancedOptionsPage::removeMaterialCallback_real( Fl_Widget* w ) {
-	materialList->remove( materialList->child( materialList->children() ) );
+	if(listPack->children() > 0){
+		bool r = false;
+		for(int i=listPack->children()-1;i>-1;i--){
+			MaterialWidget* mw = (MaterialWidget*)listPack->child(i);
+			if(mw->isActive()){
+				listPack->remove(listPack->child(i));
+				r = true;
+			}
+		}
+		if(r)
+			materialList->scroll_to(0, 0);
+		redraw();
+	}
 }
 
 void AdvancedOptionsDialog::AdvancedOptionsPage::addMaterial( MaterialWidget* mw ) {
 	if( mw != NULL ) {
-		int x = materialList->x() + 5;
-		int y = materialList->y() + 5 + 2 * DEFAULT_TEXTSIZE * ( materialList->children() - 1 );
-		mw->position( x, y );
-		materialList->add( mw );
+		int h = listPack->h() + listPack->spacing() + mw->h();
+		listPack->add( mw );
 		materialWidgets.push_back( mw );
-
+		listPack->resize(materialList->x()+1,materialList->y()+1,materialList->w()-2,h-2);
+		int pos = h - materialList->h();
+		if(pos > 0)
+			materialList->scroll_to(0, pos + materialList->yposition());
+		else
+			materialList->scroll_to(0, 0);
 		redraw();
 	}
 }
@@ -100,19 +115,27 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 
 	begin();
 
-	materialLabel = new QuickLabel("Materials (order matters)", 5 + x, 5 + y);
+	materialLabel = new QuickLabel("Materials (order matters)", 5 + x, DEFAULT_TEXTSIZE + y);
 	materialAdd = new Fl_Button(DEFAULT_WIDTH - 180 + x, 5 + y, 55, DEFAULT_TEXTSIZE + 6, "Add" );
 	materialAdd->callback( addMaterialCallback, this );
 	materialRemove = new Fl_Button(DEFAULT_WIDTH - 120 + x, 5 + y, 65, DEFAULT_TEXTSIZE + 6, "Remove" );
-	materialList = new Fl_Scroll( 5 + x, 30 + y, DEFAULT_WIDTH - 40, 120 );
+	materialRemove->callback( removeMaterialCallback, this );
+	materialList = new Fl_Scroll( 5 + x, 30 + y, DEFAULT_WIDTH - 30, 200 );
+	listPack = new Fl_Pack( 6 + x, 31 + y, DEFAULT_WIDTH - 32, 198);
+	listPack->spacing(5);
 	materialList->end();
-	materialList->box(FL_UP_BOX);
+	materialList->box(FL_THIN_DOWN_BOX);
 	materialList->type(Fl_Scroll::VERTICAL_ALWAYS);
 	
 	// add materials
 	// first, query the model for them
 	materialRefs = vector<string>();
 	materialRefs.push_back( MaterialWidget_NONE );
+	materialRefs.push_back( "object: ambient" );
+	materialRefs.push_back( "object: diffuse" );
+	materialRefs.push_back( "object: specular" );
+	materialRefs.push_back( "object: emission" );
+	materialRefs.push_back( "object: texture" );
 	
 	map< string, osg::ref_ptr< material > > materialMap = Model::getMaterials();
 	if( materialMap.size() > 0 ) {
@@ -125,15 +148,27 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 	materialWidgets = vector< MaterialWidget* >();
 	if( mats.size() > 0 ) {
 		for( vector< material* >::iterator i = mats.begin(); i != mats.end(); i++ ) {
-			MaterialWidget* mw = new MaterialWidget( materialList->x() + 5, 0, materialList->w() - 10, 2 * DEFAULT_TEXTSIZE, materialRefs );
-			mw->setSelectedMaterial( (*i)->getName() );
+			MaterialWidget* mw = new MaterialWidget( materialList->x() + 5, 0, materialList->w() - 10, 2 * DEFAULT_TEXTSIZE, materialRefs, (*i) );
+			if((*i)->getMatType() == material::MAT_AMBIENT){
+				mw->setSelectedMaterial( "object: ambient" );
+			} else if ((*i)->getMatType() == material::MAT_DIFFUSE){
+				mw->setSelectedMaterial( "object: diffuse" );
+			} else if ((*i)->getMatType() == material::MAT_SPECULAR){
+				mw->setSelectedMaterial( "object: specular" );
+			} else if ((*i)->getMatType() == material::MAT_EMISSION){
+				mw->setSelectedMaterial( "object: emission" );
+			} else if ((*i)->getMatType() == material::MAT_TEXTURE){
+				mw->setSelectedMaterial( "object: texture" );
+			} else {
+				mw->setSelectedMaterial( (*i)->getName() );
+			}
 			addMaterial( mw );
 		}
 	}
 	
 	if (usephydrv) {
-		phydrvLabel = new QuickLabel("Physics Driver", 5 + x, 190 + y );
-		phydrvMenu = new Fl_Choice( 5 + x, 215 + y, DEFAULT_WIDTH - 40, DEFAULT_TEXTSIZE + 6 );
+		phydrvLabel = new QuickLabel("Physics Driver", 5 + x, 235 + y );
+		phydrvMenu = new Fl_Choice( 5 + x, 250 + y, DEFAULT_WIDTH - 40, DEFAULT_TEXTSIZE + 6 );
 		phydrvMenu->add( "(none)" );
 		phydrvMenu->value( 0 );
 		map< string, osg::ref_ptr< physics > > phydrvs = Model::getPhysicsDrivers();
@@ -146,6 +181,8 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 	}
 
 	end();
+	materialList->scroll_to(0, 0);
+	redraw();
 }
 
 void AdvancedOptionsDialog::AdvancedOptionsPage::commitChanges( bz2object* obj ) {
@@ -158,8 +195,33 @@ void AdvancedOptionsDialog::AdvancedOptionsPage::commitChanges( bz2object* obj )
 	obj->getMaterials( slot ).clear();
 
 	for ( vector< MaterialWidget* >::iterator i = materialWidgets.begin(); i != materialWidgets.end(); i++ ) {
-		material* mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", (*i)->getSelectedMaterial().c_str() ) );
-
+		string selected = (*i)->getSelectedMaterial();
+		material* mat = NULL;
+		if(selected.compare("object: ambient") == 0){
+			mat = new material();
+			mat->setMatType(material::MAT_AMBIENT);
+			mat->setAmbient((*i)->getRGBA());
+		} else if (selected.compare("object: diffuse") == 0){
+			mat = new material();
+			mat->setMatType(material::MAT_DIFFUSE);
+			mat->setDiffuse((*i)->getRGBA());
+		} else if (selected.compare("object: specular") == 0){
+			mat = new material();
+			mat->setMatType(material::MAT_SPECULAR);
+			mat->setSpecular((*i)->getRGBA());
+		} else if (selected.compare("object: emission") == 0){
+			mat = new material();
+			mat->setMatType(material::MAT_EMISSION);
+			mat->setEmission((*i)->getRGBA());
+		} else if (selected.compare("object: texture") == 0){
+			mat = new material();
+			mat->setMatType(material::MAT_TEXTURE);
+			string tex = (*i)->getText();
+			if(tex.length() > 0)
+				mat->setTexture(tex);
+		} else if(!selected.compare(MaterialWidget_NONE)){
+			mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", (*i)->getSelectedMaterial().c_str() ) );
+		}
 		if ( mat != NULL ) {
 			obj->addMaterial( mat, slot );
 		}
