@@ -88,7 +88,7 @@ void AdvancedOptionsDialog::AdvancedOptionsPage::removeMaterialCallback_real( Fl
 		}
 		if(r)
 			materialList->scroll_to(0, 0);
-		redraw();
+		parent()->redraw();
 	}
 }
 
@@ -103,7 +103,7 @@ void AdvancedOptionsDialog::AdvancedOptionsPage::addMaterial( MaterialWidget* mw
 			materialList->scroll_to(0, pos + materialList->yposition());
 		else
 			materialList->scroll_to(0, 0);
-		redraw();
+		parent()->redraw();
 	}
 }
 
@@ -182,7 +182,7 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 
 	end();
 	materialList->scroll_to(0, 0);
-	redraw();
+	parent()->redraw();
 }
 
 void AdvancedOptionsDialog::AdvancedOptionsPage::commitChanges( bz2object* obj ) {

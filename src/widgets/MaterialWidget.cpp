@@ -143,6 +143,4 @@ void MaterialWidget::changeMaterialCallback_real( MaterialWidget* mw, Fl_Menu_Bu
 	if(mw->parent() != NULL)
 		if(mw->parent()->parent() != NULL)
 			mw->parent()->parent()->redraw();
-	//mb->label(menu[mb->value()].label());
-	//mb->redraw();
 }
