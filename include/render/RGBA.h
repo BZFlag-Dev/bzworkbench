@@ -125,16 +125,17 @@ public:
 		this->set( _r, _g, _b, _a );
 	}
 	
-	void parseNamedColor(const char* data){
-		parseNamedColor(string(data));
+	void parseNamedColor(const char* name, const char* alpha){
+		parseNamedColor(string(name), string(alpha));
 	}
-	void parseNamedColor(string data){
+	void parseNamedColor(string data, string alpha){
 		struct ColorArrayData {
 			const char* name;
 			float r;
 			float g;
 			float b;
 		};
+		float a = atof(alpha.c_str());
 		
 		// these name/color pairs were generated using the X11 rgb.txt file
 		const ColorArrayData colorArray[] = {
@@ -898,7 +899,7 @@ public:
 			const ColorArrayData& namedColor = colorArray[i];
 			if( TextUtils::tolower(namedColor.name).compare(TextUtils::tolower(data)) == 0 ){
 				printf("Found Named Color: %s\n", namedColor.name);
-				this->set(namedColor.r, namedColor.g, namedColor.b, 1.0f);
+				this->set(namedColor.r, namedColor.g, namedColor.b, a);
 				return;
 			}
 		}
@@ -910,20 +911,24 @@ public:
 	 * #rgb, #rgba, #rrggbb, #rrggbbaa, 
 	 * 0xRGB, 0xRGBA, 0xRRGGBB, 0xRRGGBBAA, 
 	 * 3 or 4 floating point values
-	 * or a named color
+	 * named color or named color with alpha
 	 */
 	
 	RGBA(const char* data) {
-		vector<string> points = BZWParser::getLineElements(data);
+		vector<string> tokens = BZWParser::getLineElements(data);
 		if( data[0] == '#' ) {
 			parseHexFormat(data + 1);
 		}else if( (data[0] == '0') && (data[1] == 'x') ) {
 			parseHexFormat(data + 2);
-		}else if(points.size() >= 3) {
+		}else if(tokens.size() >= 3) {
 			parseFloatFormat(data);
-		}else if(points.size() == 1) {
-			// must be a named color - look it up
-			parseNamedColor(data);
+		}else if(tokens.size() == 1) {
+			//named color
+			parseNamedColor(data, "1");
+		}else if(tokens.size() == 2) {
+			//named color with alpha
+			parseNamedColor(tokens[0], tokens[1]);
+			
 		}
 	}
 	
