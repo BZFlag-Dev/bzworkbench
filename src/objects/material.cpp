@@ -177,7 +177,10 @@ string material::toStringClean(void) {
 		for(vector< TextureInfo >::iterator i = textures.begin(); i != textures.end(); i++) {
 			TextureInfo info = *i;
 			if( info.name.compare("") != 0 ){
-				texString += "  addtexture " + info.name + "\n";
+				if (i == textures.begin())
+					texString += "  texture " + info.name + "\n";
+				else
+					texString += "  addtexture " + info.name + "\n";
 			}
 			texString += 
 			(info.matrix != NULL ? string("") + "  texmat " + info.matrix->getName() + "\n" : "") +
