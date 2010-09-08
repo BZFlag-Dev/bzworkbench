@@ -158,11 +158,11 @@ void Primitives::rebuildBoxUV(osg::Group* box, osg::Vec3 size)
 	for (int i = 0; i < 6; i++)
 		sideUVs[i] = new osg::Vec2Array();
 
-	float xSideUV = size.x()*2/9.42f;
-	float ySideUV = size.y()*2/9.42f;
-	float zSideUV = size.z()/9.42f;
-	float xTopUV = xSideUV*5;
-	float yTopUV = ySideUV*5;
+	float xSideUV = size.x()*2*0.125f;
+	float ySideUV = size.y()*2*0.125f;
+	float zSideUV = size.z()*0.125f;
+	float xTopUV = xSideUV*2;
+	float yTopUV = ySideUV*2;
 
 	// +x -x
 	for ( int i = 0; i < 2; i++ ) {
