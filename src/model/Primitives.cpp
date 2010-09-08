@@ -121,35 +121,34 @@ void Primitives::rebuildPyramidUV( osg::Group* pyr, osg::Vec3 size ) {
 		osg::Geometry* geometry = (osg::Geometry*)geode->getDrawable( 0 );
 		geometry->setTexCoordArray( 0, texcoords[i] );
 	}
-
-	static const float Scale = 7.55f;
-
-	float dist = size.length();
-	float diagonalScale = dist/Scale;
-	float xScale = size.x()*2/Scale;
-	float yScale = size.y()*2/Scale;
+	
+	float xSideUV = size.x()*2*0.125f;
+	float ySideUV = size.y()*2*0.125f;
+	float zSideUV = size.z()*0.125f;
+	float xzSideUV = 0.125f*sqrtf(size.x()*size.x()+size.z()*size.z());
+	float yzSideUV = 0.125f*sqrtf(size.y()*size.y()+size.z()*size.z());
 
 	// +x
 	texcoords[0]->push_back( osg::Vec2( 0, 0 ) );
-	texcoords[0]->push_back( osg::Vec2( yScale, 0 ) );
-	texcoords[0]->push_back( osg::Vec2( 0, diagonalScale ) );
+	texcoords[0]->push_back( osg::Vec2( ySideUV, 0 ) );
+	texcoords[0]->push_back( osg::Vec2( ySideUV*0.5, xzSideUV ) );
 	// -x
 	texcoords[1]->push_back( osg::Vec2( 0, 0 ) );
-	texcoords[1]->push_back( osg::Vec2( yScale, 0 ) );
-	texcoords[1]->push_back( osg::Vec2( 0, diagonalScale ) );
+	texcoords[1]->push_back( osg::Vec2( ySideUV, 0 ) );
+	texcoords[1]->push_back( osg::Vec2( ySideUV*0.5, xzSideUV ) );
 	// +y
 	texcoords[2]->push_back( osg::Vec2( 0, 0 ) );
-	texcoords[2]->push_back( osg::Vec2( xScale, 0 ) );
-	texcoords[2]->push_back( osg::Vec2( 0, diagonalScale ) );
+	texcoords[2]->push_back( osg::Vec2( xSideUV, 0 ) );
+	texcoords[2]->push_back( osg::Vec2( xSideUV*0.5, yzSideUV ) );
 	// -y
 	texcoords[3]->push_back( osg::Vec2( 0, 0 ) );
-	texcoords[3]->push_back( osg::Vec2( xScale, 0 ) );
-	texcoords[3]->push_back( osg::Vec2( 0, diagonalScale ) );
+	texcoords[3]->push_back( osg::Vec2( xSideUV, 0 ) );
+	texcoords[3]->push_back( osg::Vec2( xSideUV*0.5, yzSideUV ) );
 	// -z
-	texcoords[4]->push_back( osg::Vec2( xScale, yScale ) );
-	texcoords[4]->push_back( osg::Vec2( 0, yScale ) );
+	texcoords[4]->push_back( osg::Vec2( xSideUV, ySideUV ) );
+	texcoords[4]->push_back( osg::Vec2( 0, ySideUV ) );
 	texcoords[4]->push_back( osg::Vec2( 0, 0 ) );
-	texcoords[4]->push_back( osg::Vec2( xScale, 0 ) );
+	texcoords[4]->push_back( osg::Vec2( xSideUV, 0 ) );
 }
 
 void Primitives::rebuildBoxUV(osg::Group* box, osg::Vec3 size)
