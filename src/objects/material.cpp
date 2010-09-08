@@ -506,7 +506,7 @@ string material::computeFinalTexture() {
 	if( textures.size() > 0 && textures[ 0 ].name.compare("") != 0) {
 		finalTexture = SceneBuilder::buildTexture2D( textures[ 0 ].name.c_str() );		
 		if ( finalTexture ) {
-			printf("material %s using final Texture: %s\n", name.c_str(), textures[ 0 ].name.c_str());
+			//printf("material %s using final Texture: %s\n", name.c_str(), textures[ 0 ].name.c_str());
 			setTextureMode( 0, GL_TEXTURE_2D, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 			setTextureAttribute( 0, finalTexture );
 			finalTexName = textures[ 0 ].name.c_str();
@@ -531,7 +531,7 @@ string material::computeFinalTexture() {
 			}
 		}
 		if( finalTexture ){
-			printf("ref material %s using final Texture: %s\n", tempMatName.c_str(),finalTexName.c_str());
+			//printf("ref material %s using final Texture: %s\n", tempMatName.c_str(),finalTexName.c_str());
 			setTextureMode( 0, GL_TEXTURE_2D, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 			setTextureAttribute( 0, finalTexture );
 			return finalTexName;
