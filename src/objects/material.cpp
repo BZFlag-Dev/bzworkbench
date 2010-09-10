@@ -362,6 +362,7 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 			  emission = osg::Vec4( 0, 0, 0, 0);
 	float shiny = 0.0;
 	float alphaThreshold = 1.0;
+	bool nocull = false;
 	string tex;
 	bool foundTexture = false;
 	bool notex = false;
@@ -401,9 +402,9 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 
 				shiny = mat->getShininess( osg::Material::FRONT );
 			}
-			
 			alphaThreshold = (*i)->getAlphaThreshold();
-
+			if( (*i)->getNoCulling() )
+				nocull = true;
 		}
 	}
 
@@ -430,6 +431,9 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 	
 	mat->setAttribute( finalMaterial, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 	
+	if(!nocull)
+	 mat->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+	
 	if( foundTexture ) {
 		mat->setTexture( tex );
 	}
@@ -444,6 +448,7 @@ void material::computeFinalMaterial() {
 		emission = osg::Vec4( 0, 0, 0, 0);
 	float shiny = 0.0;
 	float alphaThreshold = 1.0;
+	bool nocull = false;
 	
 	// apply reference material color's if any
 	if( materials.size() > 0 ) {
@@ -463,6 +468,8 @@ void material::computeFinalMaterial() {
 					shiny = mat->getShininess();
 				if( mat->getHasAlphaThreshold() )
 					alphaThreshold = (*i)->getAlphaThreshold();
+				if( mat->getNoCulling() )
+					nocull = true;
 			}
 		}
 	}
@@ -482,6 +489,9 @@ void material::computeFinalMaterial() {
 	
 	osg::Material* finalMaterial = new osg::Material();
 	
+	//bzflag uses the diffuse color for the ambient color
+	finalMaterial->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );
+	
 	finalMaterial->setAmbient( osg::Material::FRONT, ambient );
 	finalMaterial->setDiffuse( osg::Material::FRONT, diffuse );
 	finalMaterial->setSpecular( osg::Material::FRONT, specular );
@@ -495,6 +505,9 @@ void material::computeFinalMaterial() {
 		finalMaterial->setAlpha( osg::Material::FRONT, alphaThreshold );
 	
 	setAttribute( finalMaterial, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+	
+	if(!nocull)
+	  setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 }
 
 // compute the final texture
