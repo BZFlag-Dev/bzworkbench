@@ -219,8 +219,8 @@ void AdvancedOptionsDialog::AdvancedOptionsPage::commitChanges( bz2object* obj )
 			string tex = (*i)->getText();
 			if(tex.length() > 0)
 				mat->setTexture(tex);
-		} else if(!selected.compare(MaterialWidget_NONE)){
-			mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", (*i)->getSelectedMaterial().c_str() ) );
+		} else if(selected.compare(MaterialWidget_NONE) != 0){
+			mat = dynamic_cast< material* >( Model::command( MODEL_GET, "material", selected.c_str() ) );
 		}
 		if ( mat != NULL ) {
 			obj->addMaterial( mat, slot );
