@@ -217,38 +217,38 @@ osg::Group* Primitives::buildUntexturedBox( osg::Vec3 size ) {
 
 	// add vertices for all sides
 	osg::Vec3Array* pxVerts = new osg::Vec3Array();
-	pxVerts->push_back( osg::Vec3( size.x(), -size.y(), 0 ) );
-	pxVerts->push_back( osg::Vec3( size.x(), -size.y(), size.z() ) );
-	pxVerts->push_back( osg::Vec3( size.x(), size.y(), size.z() ) );
 	pxVerts->push_back( osg::Vec3( size.x(), size.y(), 0 ) );
+	pxVerts->push_back( osg::Vec3( size.x(), size.y(), size.z() ) );
+	pxVerts->push_back( osg::Vec3( size.x(), -size.y(), size.z() ) );
+	pxVerts->push_back( osg::Vec3( size.x(), -size.y(), 0 ) );
 	sideGeometry[0]->setVertexArray(pxVerts);
 
 	osg::Vec3Array* nxVerts = new osg::Vec3Array();
-	nxVerts->push_back( osg::Vec3( -size.x(), size.y(), 0 ) );
-	nxVerts->push_back( osg::Vec3( -size.x(), size.y(), size.z() ) );
-	nxVerts->push_back( osg::Vec3( -size.x(), -size.y(), size.z() ) );
 	nxVerts->push_back( osg::Vec3( -size.x(), -size.y(), 0 ) );
+	nxVerts->push_back( osg::Vec3( -size.x(), -size.y(), size.z() ) );
+	nxVerts->push_back( osg::Vec3( -size.x(), size.y(), size.z() ) );
+	nxVerts->push_back( osg::Vec3( -size.x(), size.y(), 0 ) );
 	sideGeometry[1]->setVertexArray(nxVerts);
 
 	osg::Vec3Array* pyVerts = new osg::Vec3Array();
-	pyVerts->push_back( osg::Vec3( size.x(), size.y(), 0 ) );
-	pyVerts->push_back( osg::Vec3( size.x(), size.y(), size.z() ) );
-	pyVerts->push_back( osg::Vec3( -size.x(), size.y(), size.z() ) );
 	pyVerts->push_back( osg::Vec3( -size.x(), size.y(), 0 ) );
+	pyVerts->push_back( osg::Vec3( -size.x(), size.y(), size.z() ) );
+	pyVerts->push_back( osg::Vec3( size.x(), size.y(), size.z() ) );
+	pyVerts->push_back( osg::Vec3( size.x(), size.y(), 0 ) );
 	sideGeometry[2]->setVertexArray(pyVerts);
 
 	osg::Vec3Array* nyVerts = new osg::Vec3Array();
-	nyVerts->push_back( osg::Vec3( -size.x(), -size.y(), 0 ) );
-	nyVerts->push_back( osg::Vec3( -size.x(), -size.y(), size.z() ) );
-	nyVerts->push_back( osg::Vec3( size.x(), -size.y(), size.z() ) );
 	nyVerts->push_back( osg::Vec3( size.x(), -size.y(), 0 ) );
+	nyVerts->push_back( osg::Vec3( size.x(), -size.y(), size.z() ) );
+	nyVerts->push_back( osg::Vec3( -size.x(), -size.y(), size.z() ) );
+	nyVerts->push_back( osg::Vec3( -size.x(), -size.y(), 0 ) );
 	sideGeometry[3]->setVertexArray(nyVerts);
 
 	osg::Vec3Array* pzVerts = new osg::Vec3Array();
-	pzVerts->push_back( osg::Vec3( size.x(), size.y(), size.z() ) );
-	pzVerts->push_back( osg::Vec3( size.x(), -size.y(), size.z() ) );
-	pzVerts->push_back( osg::Vec3( -size.x(), -size.y(), size.z() ) );
 	pzVerts->push_back( osg::Vec3( -size.x(), size.y(), size.z() ) );
+	pzVerts->push_back( osg::Vec3( -size.x(), -size.y(), size.z() ) );
+	pzVerts->push_back( osg::Vec3( size.x(), -size.y(), size.z() ) );
+	pzVerts->push_back( osg::Vec3( size.x(), size.y(), size.z() ) );
 	sideGeometry[4]->setVertexArray(pzVerts);
 
 	osg::Vec3Array* nzVerts = new osg::Vec3Array();
