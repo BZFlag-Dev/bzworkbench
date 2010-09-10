@@ -75,10 +75,10 @@ osg::Node* Primitives::buildPyramid( osg::Vec3 size, bool flipz ) {
 
 	// generate verts for base (-z)
 	osg::Vec3Array* nzVerts = new osg::Vec3Array();
-	nzVerts->push_back( osg::Vec3( -size.x(), -size.y(), zbottom ) );
-	nzVerts->push_back( osg::Vec3( size.x(), -size.y(), zbottom ) );
-	nzVerts->push_back( osg::Vec3( size.x(), size.y(), zbottom ) );
 	nzVerts->push_back( osg::Vec3( -size.x(), size.y(), zbottom ) );
+	nzVerts->push_back( osg::Vec3( size.x(), size.y(), zbottom ) );
+	nzVerts->push_back( osg::Vec3( size.x(), -size.y(), zbottom ) );
+	nzVerts->push_back( osg::Vec3( -size.x(), -size.y(), zbottom ) );
 	geometry[4]->setVertexArray( nzVerts );
 
 	// generate texture coordinates
@@ -87,17 +87,30 @@ osg::Node* Primitives::buildPyramid( osg::Vec3 size, bool flipz ) {
 	// generate vertex indices for sides
 	osg::DrawElementsUInt* side =
 			new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
-	side->push_back( 0 );
-	side->push_back( 1 );
-	side->push_back( 2 );
+	if(flipz){
+		side->push_back( 2 );
+		side->push_back( 1 );
+		side->push_back( 0 );
+	}else{
+		side->push_back( 0 );
+		side->push_back( 1 );
+		side->push_back( 2 );
+	}
 
 	// generate vertex indices for base
 	osg::DrawElementsUInt* bottom =
 		new osg::DrawElementsUInt( osg::PrimitiveSet::QUADS, 0 );
-	bottom->push_back( 0 );
-	bottom->push_back( 1 );
-	bottom->push_back( 2 );
-	bottom->push_back( 3 );
+	if(flipz){
+		bottom->push_back( 3 );
+		bottom->push_back( 2 );
+		bottom->push_back( 1 );
+		bottom->push_back( 0 );		
+	}else{
+		bottom->push_back( 0 );
+		bottom->push_back( 1 );
+		bottom->push_back( 2 );
+		bottom->push_back( 3 );
+	}
 
 
 	for (int i = 0; i < 4; i++)
