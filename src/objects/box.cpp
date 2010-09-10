@@ -63,6 +63,7 @@ void box::setDefaults() {
 			pslot.alias.push_back("bottom");
 		}
 		mslot.defaultMaterial = group->getChild(i)->getStateSet();
+		mslot.defaultMaterial->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 		mslot.node = group->getChild(i);
 		pslot.phydrv = NULL;
 
