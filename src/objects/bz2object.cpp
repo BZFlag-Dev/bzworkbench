@@ -384,6 +384,7 @@ string bz2object::BZWLines( bz2object* obj )
 							ret += (*j)->toStringClean();
 						}else{
 							//FIXME - prefix each line, not just the first
+							// also trim off extra indent spaces
 							ret += "  " + i->first + " " + (*j)->toStringClean();
 						}
 					}
@@ -408,7 +409,7 @@ int bz2object::update( UpdateMessage& message )
 
 			vector< TransformData >* newTransformations = message.getAsTransformationStack();
 			transformations->setData( *newTransformations );
-			transformations->refreshMatrix();
+			finalize();
 			break;
 		}
 
