@@ -16,6 +16,8 @@
 #include <osg/Node>
 #include <osg/Geode>
 #include <osg/Texture2D>
+#include "render/Point2D.h"
+#include "Transform.h"
 
 #include <string>
 
@@ -36,7 +38,9 @@ public:
 	// rebuild UVs for a pyr, should be called whenever the box is scaled
 	static void rebuildPyramidUV( osg::Group* pyr, osg::Vec3 size );
 
-	static void rebuildBoxUV(osg::Group* box, osg::Vec3 size);
+	static void rebuildBoxUV(osg::Group* box, osg::Vec3 size, 
+							 Point2D texSizes[],  Point2D texOffsets[], 
+							 osg::Vec3 pos, osg::ref_ptr<BZTransform> transforms);
 
 	static osg::Group* buildUntexturedBox( osg::Vec3 size );
 };

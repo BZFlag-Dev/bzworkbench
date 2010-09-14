@@ -164,41 +164,155 @@ void Primitives::rebuildPyramidUV( osg::Group* pyr, osg::Vec3 size ) {
 	texcoords[4]->push_back( osg::Vec2( xSideUV, 0 ) );
 }
 
-void Primitives::rebuildBoxUV(osg::Group* box, osg::Vec3 size)
+void Primitives::rebuildBoxUV(osg::Group* box, osg::Vec3 size, 
+							  Point2D texSizes[], Point2D texOffsets[], 
+							  osg::Vec3 pos, osg::ref_ptr<BZTransform> transforms)
 {
 	// generate UVs
 	osg::Vec2Array* sideUVs[6];
 	for (int i = 0; i < 6; i++)
 		sideUVs[i] = new osg::Vec2Array();
-
-	float xSideUV = size.x()*2*0.125f;
-	float ySideUV = size.y()*2*0.125f;
-	float zSideUV = size.z()*0.125f;
-	float xTopUV = xSideUV*2;
-	float yTopUV = ySideUV*2;
+	
+	osg::Vec3 mp = pos;
+	osg::Vec3 ms = size;
+	// apply transforms scale and shift only for world space calulation
+	// note: texoffset does not effect world space, only object space
+	// FIXME!! - texoffset seems to be applied based on the object size, not the texture size
+	vector<TransformData> d = transforms->getData();
+	for(vector<TransformData>::iterator i = d.begin(); i != d.end(); i++) {
+		if ( (*i).type == ShiftTransform ){
+			mp.set( mp.x() + (*i).data.x(), mp.y() + (*i).data.y(), mp.z() + (*i).data.z());
+		}else if ( (*i).type == ScaleTransform ){
+			mp.set( mp.x() * (*i).data.x(), mp.y() * (*i).data.y(), mp.z() * (*i).data.z());
+			ms.set( ms.x() * (*i).data.x(), ms.y() * (*i).data.y(), ms.z() * (*i).data.z());
+		}/*else if ( (*i).type == ShearTransform ){
+			// should do something
+		}else if ( (*i).type == SpinTransform )
+			// do nothing
+		}*/
+	}
 
 	// +x -x
 	for ( int i = 0; i < 2; i++ ) {
-		sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
-		sideUVs[i]->push_back( osg::Vec2( 0, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( ySideUV, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( ySideUV, 0 ) );
+		
+		// calculate texture sizes
+		osg::Vec2f tpos = osg::Vec2f(0.0f, 0.0f);
+		osg::Vec2f texsz = osg::Vec2f(texSizes[i][0], texSizes[i][1]);
+		
+		// object or world space
+		if ( (texsz[0] > 0.0f) && ((ms.y() * 2 / texsz[0]) != 0.0f) ){ 
+			texsz[0] = (1.0f / (ms.y() * 2 / texsz[0]));
+			tpos[0] = -(ms.y() * 2 * texOffsets[i][0]) * texsz[0];			
+			texsz[0] = texsz[0] * (ms.y() * 2) + tpos[0];
+		}else if(texsz[0] < 0.0f){
+			float tf = (i == 0 ? mp.y()-ms.y() : mp.y()+ms.y());
+			tpos[0] = tf * 0.125f;
+			tpos[0] = (i == 0 ? tpos[0] : -tpos[0]);
+			if(texsz[0] != 0)
+				texsz[0] = (1.0f / -texsz[0]) * (ms.y() * 2) + tpos[0];
+			else
+				texsz[0] = 0.125f * (ms.y() * 2) + tpos[0];
+		}
+		
+		// object or world space
+		if ( (texsz[1] > 0.0f) && ((size.z() / texsz[1]) != 0.0f)){ 
+			texsz[1] = (1.0f / (ms.z() / texsz[1]));
+			tpos[1] = -(ms.z() * texOffsets[i][1]) * texsz[1];
+			texsz[1] = texsz[1] * ms.z() + tpos[1];
+		}else if(texsz[1] < 0.0f){
+			tpos[1] = mp.z() * 0.125f;
+			if(texsz[1] != 0)
+				texsz[1] = (1.0f / -texsz[1]) * ms.z() + tpos[1];
+			else
+				texsz[1] = 0.125f * ms.z() + tpos[1];
+		}
+		
+		sideUVs[i]->push_back( osg::Vec2( texsz[0], tpos[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( texsz[0], texsz[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( tpos[0], texsz[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( tpos[0], tpos[1]) );
 	}
 
 	// +y -y
 	for ( int i = 2; i < 4; i++ ) {
-		sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
-		sideUVs[i]->push_back( osg::Vec2( 0, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xSideUV, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xSideUV, 0 ) );
+		
+		// calculate texture sizes
+		osg::Vec2f tpos = osg::Vec2f(0.0f, 0.0f);
+		osg::Vec2f texsz = osg::Vec2f(texSizes[i][0], texSizes[i][1]);
+		
+		// object or world space
+		if ( (texsz[0] > 0.0f) && ((size.x() * 2 / texsz[0]) != 0.0f) ){
+			texsz[0] = (1.0f / (ms.x() * 2 / texsz[0]));
+			tpos[0] =  -(ms.x() * 2 * texOffsets[i][0]) * texsz[0];	
+			texsz[0] = texsz[0] * (ms.x() * 2) + tpos[0];
+		}else if(texsz[0] <= 0.0f){
+			float tf = (i == 3 ? mp.x()-ms.x() : mp.x()+ms.x());
+			tpos[0] = tf * 0.125f;
+			tpos[0] = (i == 3 ? tpos[0] : -tpos[0]);
+			if(texsz[0] != 0)
+				texsz[0] = (1.0f / -texsz[0]) * (ms.x() * 2) + tpos[0];
+			else
+				texsz[0] = 0.125f * (ms.x() * 2) + tpos[0];
+		}
+		
+		// object or world space
+		if ( (texsz[1] > 0.0f) && ((size.z() / texsz[1]) != 0.0f)){
+			texsz[1] = (1.0f / (ms.z() / texsz[1]));
+			tpos[1] =  -(ms.z() * texOffsets[i][1]) * texsz[1];
+			texsz[1] = texsz[1] * ms.z() + tpos[1];
+		}else if(texsz[1] <= 0.0f){
+			tpos[1] = mp.z() * 0.125f;
+			if(texsz[1] != 0)
+				texsz[1] = (1.0f / -texsz[1]) * ms.z() + tpos[1];
+			else
+				texsz[1] = 0.125f * ms.z() + tpos[1];
+		}
+		
+		sideUVs[i]->push_back( osg::Vec2( texsz[0], tpos[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( texsz[0], texsz[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( tpos[0], texsz[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( tpos[0], tpos[1] ) );
 	}
 
 	// +z -z
 	for ( int i = 4; i < 6; i++ ) {
-		sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
-		sideUVs[i]->push_back( osg::Vec2( 0, yTopUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xTopUV, yTopUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xTopUV, 0 ) );
+		
+		// calculate texture sizes
+		osg::Vec2f tpos = osg::Vec2f(0.0f, 0.0f);
+		osg::Vec2f texsz = osg::Vec2f(texSizes[i][0], texSizes[i][1]);
+		
+		// object or world space
+		if ( (texsz[0] > 0.0f) && ((size.x() * 2 / texsz[0]) != 0.0f) ){
+			texsz[0] = (1.0f / (ms.x() * 2 / texsz[0]));
+			tpos[0] =  -(ms.x() * 2 * texOffsets[i][0]) * texsz[0];
+			texsz[0] = texsz[0] * (ms.x() * 2) + tpos[0];
+		}else if(texsz[0] <= 0.0f){
+			float tf = (i == 4 ? mp.x()-ms.x() : mp.x()+ms.x());
+			tpos[0] = tf * 0.25f;
+			tpos[0] = (i == 4 ? tpos[0] : -tpos[0]);
+			if(texsz[0] != 0)
+				texsz[0] = (0.5 * (1.0f / -texsz[0])) * (ms.x() * 2) + tpos[0];
+			else
+				texsz[0] = 0.25f * (ms.x() * 2) + tpos[0];
+		}
+		
+		// object or world space
+		if ( (texsz[1] > 0.0f) && ((size.y() * 2 / texsz[1]) != 0.0f)){
+			texsz[1] = (1.0f / (ms.y() * 2 / texsz[1]));
+			tpos[1] =  -(ms.y() * 2 * texOffsets[i][1]) * texsz[1];	
+			texsz[1] = texsz[1] * (ms.y() * 2) + tpos[1];
+		}else if(texsz[1] <= 0.0f){
+			tpos[1] = (mp.y()-ms.y()) * 0.25f;
+			if(texsz[1] != 0)
+				texsz[1] = (0.5 * (1.0f / -texsz[1])) * (ms.y() * 2) + tpos[1];
+			else
+				texsz[1] = 0.25 * (ms.y() * 2) + tpos[1];
+		}
+		
+		sideUVs[i]->push_back( osg::Vec2( tpos[0], texsz[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( tpos[0], tpos[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( texsz[0], tpos[1] ) );
+		sideUVs[i]->push_back( osg::Vec2( texsz[0], texsz[1] ) );
 	}
 
 	for ( int i = 0; i < 6; i++ ) {

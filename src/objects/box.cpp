@@ -131,7 +131,9 @@ bool box::parse( std::string& line ) {
 
 void box::finalize() {
 	// just regen UV coords based on any size changes
-	Primitives::rebuildBoxUV( (osg::Group*)getThisNode(), getSize() );
+	Primitives::rebuildBoxUV( (osg::Group*)getThisNode(), getSize(), 
+							 texSizes, texOffsets, 
+							 getPos(), getTransformations() );
 
 	bz2object::finalize();
 }
@@ -145,10 +147,16 @@ int box::update(UpdateMessage& message) {
 	switch( message.type ) {
 		case UpdateMessage::SET_POSITION: 	// handle a new position
 			setPos( *(message.getAsPosition()) );
+			Primitives::rebuildBoxUV((osg::Group*)getThisNode(), getSize(), 
+									 texSizes, texOffsets, 
+									 getPos(), getTransformations());
 			break;
 
 		case UpdateMessage::SET_POSITION_FACTOR:	// handle a translation
 			setPos( getPos() + *(message.getAsPositionFactor()) );
+			Primitives::rebuildBoxUV((osg::Group*)getThisNode(), getSize(), 
+									 texSizes, texOffsets, 
+									 getPos(), getTransformations());
 			break;
 
 		case UpdateMessage::SET_ROTATION:		// handle a new rotation
@@ -208,7 +216,9 @@ string box::toString(void) {
 }
 
 void box::setSize( osg::Vec3 newSize ) {
-	Primitives::rebuildBoxUV((osg::Group*)getThisNode(), newSize);
+	Primitives::rebuildBoxUV((osg::Group*)getThisNode(), newSize, 
+							 texSizes, texOffsets, 
+							 getPos(), getTransformations());
 	bz2object::setSize( newSize );
 }
 
@@ -259,7 +269,9 @@ void box::updateGeometry() {
 	osg::Group* group = Primitives::buildUntexturedBox( osg::Vec3( 1, 1, 1 ) );
 
 	// make UV coordinates
-	Primitives::rebuildBoxUV( group, getSize() );
+	Primitives::rebuildBoxUV( group, getSize(), 
+							 texSizes, texOffsets, 
+							 getPos(), getTransformations() );
 
 	setThisNode( group );
 }
