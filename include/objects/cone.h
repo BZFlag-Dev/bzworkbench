@@ -76,8 +76,6 @@ protected:
 	float sweepAngle;
 	// rotation angle
 	float angle;
-
-	Point2D texsize;
 	
 	// helper method to build the geometry
 	void buildGeometry();

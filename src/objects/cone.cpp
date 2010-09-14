@@ -42,6 +42,7 @@ void cone::setDefaults() {
 	angle = 0.0f;
 	sweepAngle = 360.0f;
 	flipz = false;
+	texsize.set( -8.0f, -8.0f );
 	
 	// make group and geodes
 	osg::Group* group = new osg::Group();
@@ -63,6 +64,7 @@ void cone::setDefaults() {
 
 		MaterialSlot mslot;
 		mslot.defaultMaterial = group->getChild( i )->getStateSet();
+		mslot.defaultMaterial->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 		mslot.node = group->getChild( i );
 		materialSlots[ string( sideNames[i] ) ] = mslot;
 	}
@@ -243,6 +245,22 @@ void cone::buildGeometry() {
 	osg::DrawElementsUInt* baseIndices = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLE_STRIP, 0 );
 	osg::Vec2Array* baseTexCoords = new osg::Vec2Array();
 
+	// adjust the texture sizes
+	osg::Vec2f texsz = osg::Vec2f(texsize[0], texsize[1]);
+	if (texsz[0] < 0.0f) {
+		// unless you want to do elliptic integrals, here's
+		// the Ramanujan approximation for the circumference
+		// of an ellipse  (it will be rounded anyways)
+		const float circ =
+		(float)M_PI * ((3.0f * (getSize().x() + getSize().y())) -
+					   sqrtf ((getSize().x() + (3.0f * getSize().y())) * (getSize().y() + (3.0f * getSize().x()))));
+		// make sure it's an integral number so that the edges line up
+		texsz[0] = -floorf(circ / texsz[0]);
+	}
+	if (texsz[1] < 0.0f) {
+		texsz[1] = -(getSize().z() / texsz[1]);
+	}
+	
 	float ztop = 1;
 	float zbottom = 0;
 	if(flipz){
@@ -253,8 +271,8 @@ void cone::buildGeometry() {
    	// add the tip of the cone to the conical geometry
    	points->push_back( osg::Vec3( 0.0, 0.0, ztop ) );	// the tip of the cone
    	indices->push_back( 0 );	// the index of the tip of the cone
-   	texCoords->push_back( osg::Vec2( 0.5, 0.5 ) );	// texture coordinate of the tip of the cone
-   	baseTexCoords->push_back( osg::Vec2( 0.5, 0.5) );	// just a space-holder here
+   	texCoords->push_back( osg::Vec2( texsz[0] * 0.5, texsz[1] * 0.5 ) );	// texture coordinate of the tip of the cone
+   	baseTexCoords->push_back( osg::Vec2( texsz[0] * 0.5, texsz[1] * 0.5) );	// just a space-holder here
 
    	// build the base
    	float radius_x = 1.0;
@@ -293,8 +311,10 @@ void cone::buildGeometry() {
    	// build a full cone if the sweep angle is >= 360.0 degrees
    	if( sweepAngle >= 360.0f ) {
 	   	for( int i = 0; i < divisions; i++ ) {
-	   		//ang = 2.0 * osg::PI * ((float)i / (float)divisions);
-			ang = r + (astep * (float)i);
+	   		if(flipz)
+				ang = r + (astep * (float)((divisions - 1) - i) );
+			else
+				ang = r + (astep * (float)i);
 
 	   		// add the vertex
 	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, zbottom ) );
@@ -303,40 +323,44 @@ void cone::buildGeometry() {
 	   		indices->push_back( i+1 );
 
 	   		// add the texture coordinate of that vertex to the concial geometry
-	   		texCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
+	   		texCoords->push_back( osg::Vec2( texsz[0] * (0.5 + (0.5 * cos(ang))), texsz[1] * (0.5 + (0.5 * sin(ang))) ) );
 
 	   		// add the texture coordinate of that vertex to the base geometry
-	   		baseTexCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
+	   		baseTexCoords->push_back( osg::Vec2( texsz[0] * (0.5 + (0.5 * cos(ang))), texsz[1] * (0.5 + (0.5 * sin(ang))) ) );
 	   	}
 
 	   	// add the final face to connect the last index to the first
 	   	indices->push_back( 1 );
 
 	   	// build the base indices
-	   	baseIndices->push_back(1);
-	   	baseIndices->push_back(2);
-	   	for( int i = 3; i <= (divisions >> 1) + 1; i++ ) {
-	   		baseIndices->push_back( divisions - i + 3 );
-	   		baseIndices->push_back( i );
-	   	}
-	   	// if we have an odd # of divisions, add the final face
+	   
+		// if we have an odd # of divisions, add the final face
 	   	if( divisions % 2 == 1 ) {
 	   		baseIndices->push_back( (divisions>>1) + 2 );
 	   	}
+	   	for( int i = (divisions >> 1) + 1; i >= 3; i-- ) {
+	   		baseIndices->push_back( divisions - i + 3 );
+	   		baseIndices->push_back( i );
+	   	}
+	   	baseIndices->push_back(2);
+		baseIndices->push_back(1);
    	}
    	else {			// build a section of a cone
    		// add the center of the cone
    		points->push_back( osg::Vec3( 0, 0, zbottom ) );
 
    		// it's texture coordinate
-   		baseTexCoords->push_back( osg::Vec2( 0.5, 0.5 ) );
+   		baseTexCoords->push_back( osg::Vec2( texsz[0] * 0.5, texsz[1] * 0.5 ) );
 
    		// place-holder texture coordinate
-   		texCoords->push_back( osg::Vec2( 0.5, 0.5 ) );
+   		texCoords->push_back( osg::Vec2( texsz[0] * 0.5, texsz[1] * 0.5 ) );
 
    		for( int i = 0; i <= divisions; i++ ) {
 	   		//ang = a * ((float)i / (float)divisions);
-			ang = r + (astep * (float)i);
+			if(flipz)
+				ang = r + (astep * (float)((divisions - 1) - i) );
+			else
+				ang = r + (astep * (float)i);
 			
 	   		// add the vertex
 	   		points->push_back( osg::Vec3( cos(ang) * radius_x, sin(ang) * radius_y, zbottom ) );
@@ -345,10 +369,10 @@ void cone::buildGeometry() {
 	   		indices->push_back( i+2 );
 
 	   		// add the texture coordinate of that vertex to the concial geometry
-	   		texCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
+	   		texCoords->push_back( osg::Vec2( texsz[0] * (0.5 + (0.5 * cos(ang))), texsz[1] * (0.5 + (0.5 * sin(ang))) ) );
 
 	   		// add the texture coordinate of that vertex to the base geometry
-	   		baseTexCoords->push_back( osg::Vec2( 0.5 + 0.5 * cos(ang), 0.5 + 0.5 * sin(ang) ) );
+	   		baseTexCoords->push_back( osg::Vec2( texsz[0] * (0.5 + (0.5 * cos(ang))), texsz[1] * (0.5 + (0.5 * sin(ang))) ) );
 	   	}
 
 
@@ -359,7 +383,7 @@ void cone::buildGeometry() {
 	   	// make the indices
 	   	// the first point should index the center of the cone
 	   	baseIndices->push_back( 1 );	// the 1st point is the center
-	   	for( int i = 2; i <= divisions + 2; i++ ) {
+	    for( int i = divisions + 2; i >= 2; i-- ) {
 	   		baseIndices->push_back( i );
 	   	}
 
@@ -381,14 +405,21 @@ void cone::buildGeometry() {
 	   	osg::Vec2Array* crossSectionTexCoords = new osg::Vec2Array();
 
 	   	// make sure we correspond to the indices
-	   	crossSectionTexCoords->push_back( osg::Vec2( 0.0, 0.0 ) );
-	   	crossSectionTexCoords->push_back( osg::Vec2( 0.0, 0.5 ) );
-	   	crossSectionTexCoords->push_back( osg::Vec2( 1.0, 0.5 ) );
-	   	// insert place-holders
-	   	for( int i = 0; i <= divisions + 3; i++ )
-	   		crossSectionTexCoords->push_back( osg::Vec2( 1.0, 0.0 ) );
+	   	crossSectionTexCoords->push_back( osg::Vec2( texsz[0] * 0.0, texsz[1] * 1.0 ) );
+	   	crossSectionTexCoords->push_back( osg::Vec2( texsz[0] * 0.0, texsz[1] * 0.0 ) );
+	   	crossSectionTexCoords->push_back( osg::Vec2( texsz[0] * 1.0, texsz[1] * 0.0 ) );
+		
+	   	osg::Vec2Array* endCrossSectionTexCoords = new osg::Vec2Array();
+		endCrossSectionTexCoords->push_back( osg::Vec2( texsz[0] * 1.0, texsz[1] * 1.0 ) );
+	   	endCrossSectionTexCoords->push_back( osg::Vec2( texsz[0] * 1.0, texsz[1] * 0.0 ) );
+		
+		// insert place-holders
+	   	for( int i = 2; i <= divisions + 3; i++ )
+	   		endCrossSectionTexCoords->push_back( osg::Vec2( texsz[0] * 0.0, texsz[1] * 0.0 ) );
 
-	   	crossSectionTexCoords->push_back( osg::Vec2( 0.0, 0.0 ) );
+	   	endCrossSectionTexCoords->push_back( osg::Vec2( texsz[0] * 0.0, texsz[1] * 0.0 ) );
+		
+		
 
 	   	// make the crossSection geode
 	   	osg::Geometry* startGeometry = new osg::Geometry();
@@ -399,7 +430,7 @@ void cone::buildGeometry() {
 		startGeometry->addPrimitiveSet( startIndices );
 		endNode->addDrawable( endGeometry );
 		endGeometry->setVertexArray( points );
-		endGeometry->setTexCoordArray( 0, crossSectionTexCoords );
+		endGeometry->setTexCoordArray( 0, endCrossSectionTexCoords );
 		endGeometry->addPrimitiveSet( endIndices );
    	}
 }
