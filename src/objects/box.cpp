@@ -98,12 +98,13 @@ bool box::parse( std::string& line ) {
 	for ( int i = 0; i < FaceCount; i++ ) {
 		if ( key == faceNames[i] ) {
 			string realKey = BZWParser::key( value.c_str() );
-
+			string realValue = BZWParser::value( realKey.c_str(), value.c_str() );
+			
 			if ( realKey == "texsize" ) {
-				texSizes[i] = Point2D( value.c_str() );
+				texSizes[i] = Point2D( realValue.c_str() );
 			}
 			else if ( realKey == "texoffset" ) {
-				texOffsets[i] = Point2D( value.c_str() );
+				texOffsets[i] = Point2D( realValue.c_str() );
 			}
 			else if ( realKey == "drivethrough" ) {
 				driveThroughs[i] = true;
