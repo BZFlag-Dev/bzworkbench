@@ -41,6 +41,7 @@
 #include "objects/zone.h"
 
 #include "objects/bz2object.h"
+#include <FL/Fl_Progress.H>
 
 using namespace std;
 
@@ -224,7 +225,7 @@ bool Model::build( std::istream& data ) { return modRef->_build(data); }
 bool Model::_build( std::istream& data ) {
 	//clear errors
 	errors = "";
-	
+	int oc = 0;
 	_newWorld();
 
 	string buff, header;
@@ -241,15 +242,37 @@ bool Model::_build( std::istream& data ) {
 	Tlink* linkObj = NULL;
 	texturematrix* texmatObj = NULL;
 	bz2object* object = NULL;
+	
+	// get length of file:
+	data.seekg (0, ios::end);
+	int filelength = data.tellg();
+	data.seekg (0, ios::beg);
+	int amountParsed = 0;
+	string lastObj;
+	//setup progress bar window
+	Fl_Window* progressWin = new Fl_Window(320,90, "Loading BZW File");
+	progressWin->begin();                         // add progress bar to it..
+	Fl_Box* pbox = new Fl_Box(FL_FLAT_BOX,10,20,300,30,"...");
+	pbox->align(FL_ALIGN_LEFT | FL_ALIGN_TOP| FL_ALIGN_INSIDE| FL_ALIGN_CLIP | FL_ALIGN_WRAP);
+	pbox->labelfont(FL_BOLD);
+	pbox->labelsize(12);
+    Fl_Progress* progress = new Fl_Progress(10,50,300,30);
+    progress->minimum(0);               // set progress bar attribs..
+    progress->maximum(filelength);
+    progressWin->end();                           // end of adding to window
+	
+	//show progress
+	progress->value(0);
+	progressWin->set_modal();
+	progressWin->show();
 
 	while(!data.eof()) {
 		// read in lines until we find a key
 		getline( data, buff );
-
+		amountParsed +=	buff.length();
 		lineCount++;
 		buff = BZWParser::cutWhiteSpace( buff );
 		header = BZWParser::key( buff.c_str() );
-		
 
 		try {
 			if ( header == "" )
@@ -344,38 +367,49 @@ bool Model::_build( std::istream& data ) {
 
 			// find what object to parse based on its header
 			else if( header == "world" ) {
+				lastObj = header;
 				worldObj = (world*)this->cmap["world"]();
 			}
 			else if( header == "waterlevel" ) {
+				lastObj = header;
 				waterLevelObj = (waterLevel*)this->cmap["waterLevel"]();
 			}
 			else if( header == "options" ) {
+				lastObj = header;
 				optionsObj = (options*)this->cmap["options"]();
 			}
 			else if( header == "info" ) {
+				lastObj = header;
 				infoObj = (info*)this->cmap["info"]();
 			}
 			else if( header == "material" ) {
+				lastObj = header;
 				materialObj = (material*)this->cmap["material"]();
 			}
 			else if( header == "physics" ) {
+				lastObj = header;
 				physicsObj = (physics*)this->cmap["physics"]();
 			}
 			else if( header == "dynamiccolor" ) {
+				lastObj = header;
 				dyncolObj = (dynamicColor*)this->cmap["dynamicColor"]();
 			}
 			else if( header == "define" ) {
+				lastObj = header;
 				defineObj = (define*)this->cmap["define"]();
 				defineObj->parse(buff);
 			}
 			else if( header == "link" ) {
+				lastObj = header;
 				linkObj = (Tlink*)this->cmap["link"]();
 			}
 			else if( header == "texturematrix" ) {
+				lastObj = header;
 				texmatObj = (texturematrix*)this->cmap["texturematrix"]();
 			}
 			else {
 				if( this->cmap.count(header) > 0 ) {
+					lastObj = header;
 					object = (bz2object*)cmap[header]();
 					object->parse( buff );
 				}
@@ -391,11 +425,34 @@ bool Model::_build( std::istream& data ) {
 			err.line = lineCount;
 			appendError(err);
 		}
+		// update progress bar
+		if(header == "end"){ //limit how often progress is updated
+			oc++;
+			if(oc == 10){// limit to every 10 objects
+				oc = 0;
+				progress->value(amountParsed);
+				float percentage = ((float)amountParsed/(float)filelength)*100;
+				printf("%f\n", percentage);
+				string progressLabel = itoa((int)percentage) + "%";
+				progress->label( progressLabel.c_str() );
+				string progressText = "Processed: " + lastObj;
+				pbox->label(progressText.c_str());
+				Fl::check();
+			}
+		}
 	}
 
 	// need a world so if we didn't find one make a default one
 	if (!worldData)
 		worldData = new world();
+	
+	//cleanup progress bar window
+	progress->value(filelength);
+	progress->label( "100%" );
+	Fl::wait(0.22);
+	progressWin->hide();
+	delete(progress);
+	delete(progressWin);
 	
 	// return false to report errors
 	if(errors.length() > 0)
