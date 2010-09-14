@@ -11,6 +11,7 @@
  */
 
 #include "objects/group.h"
+#include <FL/Fl_Progress.H>
 
 // constructor
 group::group() : 
@@ -281,7 +282,26 @@ void group::computeChildren() {
 		vector< osg::ref_ptr< bz2object > > objects = this->def->getObjects();
 		// put each object inside a PositionAttitudeTransform
 		// add them as children of this object
-		if( objects.size() > 0 ) {	
+		if( objects.size() > 0 ) {
+			//setup progress bar window
+			Fl_Window* progressWin = new Fl_Window(320,90, "Constructing Group");
+			progressWin->begin();                         // add progress bar to it..
+			Fl_Box* pbox = new Fl_Box(FL_FLAT_BOX,10,20,300,30,"...");
+			pbox->align(FL_ALIGN_LEFT | FL_ALIGN_TOP| FL_ALIGN_INSIDE| FL_ALIGN_CLIP | FL_ALIGN_WRAP);
+			pbox->labelfont(FL_BOLD);
+			pbox->labelsize(12);
+			Fl_Progress* progress = new Fl_Progress(10,50,300,30);
+			progress->minimum(0);               // set progress bar attribs..
+			progress->maximum(objects.size());
+			progressWin->end();                           // end of adding to window
+			
+			//show progress
+			progress->value(0);
+			progressWin->set_modal();
+			string progressText = "Calculating Center";
+			progressWin->show();
+			progressWin->position(progressWin->x(), progressWin->y() + 130);
+			
 			// first, compute the group's center
 			/*
 			 float x = 0.0f, y = 0.0f, z = 0.0f;
@@ -289,31 +309,55 @@ void group::computeChildren() {
 				x += i->get()->getPos().x();
 				y += i->get()->getPos().y();
 				z += i->get()->getPos().z();
+				
+				// update progress bar
+				progress->value(progress->value()+1);
+				float percentage = ((float)progress->value()/(float)objects.size())*100;
+				printf("%f\n", percentage);
+				string progressLabel = itoa((int)percentage) + "%";
+				progress->label( progressLabel.c_str() );
+				pbox->label(progressText.c_str());
+				Fl::check();
 			}
 			
 			x /= objects.size();
 			y /= objects.size();
 			z /= objects.size();
 			
-			// set its position from the average positions of its children
-			osg::Vec3 position = osg::Vec3( x, y, z );
-			this->setPos( position );
+			// average positions of children
+			container->setPosition( osg::Vec3( x, y, z ) );
 			*/
+			 
+			progressText = "Adding Children";
+			// update progress bar
+			progress->value(0);
+			float percentage = ((float)progress->value()/(float)objects.size())*100;
+			printf("%f\n", percentage);
+			string progressLabel = itoa((int)percentage) + "%";
+			progress->label( progressLabel.c_str() );
+			pbox->label(progressText.c_str());
+			Fl::check();
+			
 			// add the children to the container node, but offset their positions by the group's position
 			// (i.e. apply a SHIFT transformation
 			for( vector< osg::ref_ptr< bz2object > >::iterator i = objects.begin(); i != objects.end(); i++ ) {
 				// if this is a bzw2 object, then just add it to the container
 				if( (*i)->isKey("spin") || (*i)->isKey("shift") || (*i)->isKey("scale") || (*i)->isKey("shear") ) {
+					progressText = "Adding " + (*i)->getHeader() + " named " + (*i)->getName();
+					// update progress bar
+					pbox->label(progressText.c_str());
+					Fl::check();
 					// make a clone of the object
 					bz2object* obj = SceneBuilder::cloneBZObject( i->get() );
-
+					
 					// add the object to the container
 					this->container->addChild( obj );
 
 					// set the position of this object relative to the center of the group
-					//obj->setPos( obj->getPos() - position );
-
-					printf(" added %s\n", (*i)->getName().c_str() );
+					//obj->setPos( obj->getPos() - container->getPosition() );
+					
+					//printf(" added %s\n", (*i)->getName().c_str() );
+					progressText = "Added: " + (*i)->getHeader() + " named " + (*i)->getName();
 				}
 					
 				// otherwise, create a bzw1 container (i.e. a transformation node that has the inverse
@@ -334,7 +378,23 @@ void group::computeChildren() {
 					// add the bzw1 container to the main container.
 					this->container->addChild( r );
 				}*/
+				
+				// update progress bar
+				progress->value(progress->value()+1);
+				float percentage = ((float)progress->value()/(float)objects.size())*100;
+				printf("%f\n", percentage);
+				string progressLabel = itoa((int)percentage) + "%";
+				progress->label( progressLabel.c_str() );
+				pbox->label(progressText.c_str());
+				Fl::check();
 			}
+			//cleanup progress bar window
+			progress->value(progress->maximum());
+			progress->label( "100%" );
+			Fl::wait(0.22);
+			progressWin->hide();
+			delete(progress);
+			delete(progressWin);
 		}
 	}
 	
