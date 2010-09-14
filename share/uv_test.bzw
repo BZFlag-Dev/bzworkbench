@@ -1,0 +1,371 @@
+
+#--Info------------------------------------------
+
+info
+end
+
+#--World-----------------------------------------
+
+world
+# name
+  size 400.000000
+  flagHeight 0.000000
+# noWalls
+end
+
+#--Options---------------------------------------
+
+options
+  
+end
+
+#--Water Level-----------------------------------
+
+
+
+#--Physics Drivers-------------------------------
+
+
+#--Dynamic Colors--------------------------------
+
+
+#--Texture Matrices------------------------------
+
+
+#--Materials-------------------------------------
+
+material
+  name material_567
+  noculling
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+end
+
+
+#--Group Definitions-----------------------------
+
+
+#--Objects---------------------------------------
+
+box
+  name box_0
+  position 48.090267 0.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  matref material_567
+end
+
+box
+  name box_1
+  position -22.386705 0.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+x+  texsize 4.000000 2.000000
+x-  texsize 4.000000 2.000000
+y+  texsize 4.000000 2.000000
+y-  texsize 4.000000 2.000000
+z+  texsize 2.000000 2.000000
+z-  texsize 2.000000 2.000000
+end
+
+box
+  name box_2
+  size 10.000000 10.000000 10.000000
+  shift 10.000000 0.000000 0.000000
+  matref material_567
+end
+
+sphere
+  name sphere_1
+  position 100.000000 100.000000 20.000000
+  size 16.000000 16.000000 16.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 16
+end
+
+arc
+  name arc_1
+  position -30.000000 50.000000 6.752190
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 16
+  angle 270.000000
+  ratio 1.000000
+  texsize -8.000000 -8.000000 -8.000000 -8.000000
+
+end
+
+cone
+  name cone_1
+  position 0.000000 85.000000 6.752190
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 16
+  angle 360.000000
+  smoothbounce
+  texsize -8.000000 -8.000000
+end
+
+pyramid
+  name pyramid_1
+  position 0.000000 -70.476997 0.000000
+  size 49.877708 10.000000 10.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+end
+
+pyramid
+  name pyramid_2
+  position -0.105037 -114.202957 0.000000
+  size 32.000000 8.000000 8.000000
+end
+
+pyramid
+  name pyramid_3
+  position 35.000000 -35.000000 0.000000
+  size 16.000000 16.000000 16.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+end
+
+pyramid
+  name pyramid_4
+  position 0.000000 -35.000000 0.000000
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+end
+
+box
+  name box_107
+  position -78.376564 0.000000 7.706194
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+end
+
+box
+  name box_3
+  position 10.000000 0.000000 10.000000
+  size 10.000000 10.000000 10.000000
+  matref material_567
+end
+
+box
+  name box_4
+  size 10.000000 10.000000 10.000000
+  scale 2.000000 2.000000 2.000000
+  shift 10.000000 0.000000 20.000000
+  matref material_567
+end
+
+cone
+  name cone_2
+  position -60.000000 85.000000 6.752190
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 16
+  angle 270.000000
+  smoothbounce
+  texsize 8.000000 8.000000
+end
+
+cone
+  name cone_3
+  position -30.000000 85.000000 6.752190
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 16
+  angle 270.000000
+  smoothbounce
+  texsize -8.000000 -8.000000
+end
+
+sphere
+  name sphere_2
+  position 10.000000 0.000000 50.000000
+  size 16.000000 16.000000 16.000000
+  matref material_567
+  divisions 16
+  hemisphere
+end
+
+arc
+  name arc_2
+  position -60.000000 50.000000 6.752190
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 16
+  angle 270.000000
+  ratio 1.000000
+  texsize 8.000000 2.000000 4.000000 4.000000
+
+end
+
+sphere
+  name sphere_3
+  position 100.000000 100.000000 20.000000
+  size 16.000000 16.000000 16.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 1
+end
+
+box
+  name box_5
+  position -48.603394 0.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  matref material_567
+x+  texsize 4.000000 2.000000
+x+  texoffset 0.100000 0.100000
+x-  texsize 4.000000 2.000000
+x-  texoffset 0.100000 0.100000
+y+  texsize 4.000000 2.000000
+y+  texoffset 0.100000 0.100000
+y-  texsize 4.000000 2.000000
+y-  texoffset 0.100000 0.100000
+z+  texsize 2.000000 2.000000
+z+  texoffset 0.100000 0.100000
+z-  texsize 2.000000 2.000000
+z-  texoffset 0.100000 0.100000
+end
+
+box
+  name box_6
+  position 74.944839 0.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  matref material_567
+x+  texoffset 0.100000 0.100000
+x-  texoffset 0.100000 0.100000
+y+  texoffset 0.100000 0.100000
+y-  texoffset 0.100000 0.100000
+z+  texoffset 0.100000 0.100000
+z-  texoffset 0.100000 0.100000
+end
+
+arc
+  name arc_3
+  position 0.000000 50.000000 6.752190
+  size 8.000000 8.000000 8.000000
+  texture http://images.bzflag.org/rthutmose/abox1024.png
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize -8.000000 -8.000000 -8.000000 -8.000000
+
+end
+
+arc
+  name arc_4
+  position 10.000000 10.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+arc
+  name arc_5
+  position 10.000000 -10.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+arc
+  name arc_6
+  position 0.000000 -10.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+arc
+  name arc_7
+  position 20.000000 -10.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+arc
+  name arc_8
+  position 0.000000 10.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+arc
+  name arc_9
+  position 20.000000 10.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+arc
+  name arc_10
+  position 0.000000 0.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+arc
+  name arc_11
+  position 20.000000 0.000000 40.000000
+  size 1.000000 1.000000 10.000000
+  matref material_567
+  divisions 16
+  angle 360.000000
+  ratio 1.000000
+  texsize 4.000000 8.000000 2.000000 2.000000
+
+end
+
+box
+  name box_7
+  position 129.105148 -100.029152 0.000000
+  size 10.000000 10.000000 10.000000
+end
+
+box
+  name box_8
+  position 150.000000 -90.000000 0.000000
+  size 10.000000 10.000000 10.000000
+  scale 1.000000 1.000000 2.000000
+end
+
+box
+  name box_9
+  position 120.105148 -120.029152 0.000000
+  size 10.000000 10.000000 20.000000
+end
+
+
+#--Teleporter Links------------------------------
+
+
+#--Unused Data-----------------------------------
+
