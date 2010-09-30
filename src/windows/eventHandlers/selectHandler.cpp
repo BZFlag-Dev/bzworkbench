@@ -37,8 +37,8 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     	case osgGA::GUIEventAdapter::DRAG :
 
     		viewer = dynamic_cast<View*>(&aa);
-
-    		if( viewer != NULL && lastSelected != NULL && lastSelected->getName() == Selection_NODE_NAME ) {
+			Renderable* lsobj = (Renderable*)lastSelected;
+    		if( viewer != NULL && lsobj != NULL && lsobj->getName() == Selection_NODE_NAME ) {
     			// if the last event was a DRAG event, we need to update the dx and dy
     			if( prevEvent == osgGA::GUIEventAdapter::DRAG ) {
 	    			dx = ea.getXnormalized() - prev_x;
