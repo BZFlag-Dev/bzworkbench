@@ -18,11 +18,12 @@
  */
 
 #include "DataEntry.h"
+#include "model/Model.h"
 #include "model/BZWParser.h"
+#include "render/Point2D.h"
 #include "render/Point3D.h"
+#include "render/Point4D.h"
 #include "render/Index3D.h"
-#include "render/TexCoord2D.h"
-#include "render/Vector3D.h"
 #include "LOD.h"
 #include "LODCommand.h"
 
@@ -49,7 +50,18 @@ public:
 	int render(void);
 	
 	// binary getters
-	vector<Point3D>& getVertices();
+	vector<Point3D>& getVertices() { return vertices; }
+	vector<Point3D>& getNormals() { return normals; }
+	vector<Point2D>& getTexcoords() { return texcoords; }
+	vector<Index3D>& getCorners() { return corners; }
+	vector<LOD>& getLods() { return lods; }
+	Point3D getMinExtents() { return minExtents; }
+	Point3D getMaxExtents() { return maxExtents; }
+	Point3D getSpherePosition() { return spherePosition; }
+	float getAngvel() { return angvel; }
+	float getSphereRadius() { return sphereRadius; }
+	bool isDlist() { return dlist; }
+	bool isDecorative() { return decorative; }
 
 	bool parse( std::string& line );
 	
@@ -66,16 +78,18 @@ private:
 	string stringify(vector<float>& values);
 
 	vector<Point3D> vertices;
-	vector<Vector3D> normals;
-	vector<TexCoord2D> texcoords;
+	vector<Point3D> normals;
+	vector<Point2D> texcoords;
 	vector<Index3D> corners;
 	vector<LOD> lods;
 	
-	Point3D minExtends, maxExtends, spherePosition;
+	Point3D minExtents, maxExtents, spherePosition;
 	
 	float angvel, sphereRadius;
 	
 	bool dlist, decorative;
+	
+	LOD* currentLOD;
 };
 
 #endif /*DRAWINFO_H_*/

@@ -14,6 +14,7 @@
 #define LOD_H_
 
 #include "DataEntry.h"
+#include "model/Model.h"
 #include "model/BZWParser.h"
 #include "LODCommand.h"
 
@@ -23,20 +24,26 @@
 class LOD : public DataEntry {
 
 public:
+	
+	struct MaterialSet {
+		string matref;
+		vector<LODCommand> commands;
+	};
 
 	// default constructor
-	LOD() : DataEntry("lod", "<matref><lengthPerPixel>") {
-		commands = vector<LODCommand>();
-		matref = string("");
-		pixelLength = 0;
+	LOD() : DataEntry("lod", "<matref><lengthperpixel>") {
+		lengthPerPixel = 0;
+		currentMatSet = NULL;
+		currentCommand = NULL;
+		matSets.empty();
 	}
 	
 	// constructor with data
-	LOD(string& data) : DataEntry("lod", "<matref><lengthPerPixel>", data.c_str()) {
-		commands = vector<LODCommand>();
-		matref = string("");
-		pixelLength = 0;
-		
+	LOD(string& data) : DataEntry("lod", "<matref><lengthperpixel>", data.c_str()) {
+		lengthPerPixel = 0;
+		currentMatSet = NULL;
+		currentCommand = NULL;
+		matSets.empty();		
 		this->update(data);
 	}
 	
@@ -61,65 +68,110 @@ public:
 		
 		// get the lengthPerPixel values
 		vector<string> lppVals = BZWParser::getValuesByKey("lengthPerPixel", _header, lodData);
+		//use last lengthPerPixel
+		this->lengthPerPixel = (lppVals.size() != 0 ? atoi( lppVals[lppVals.size()-1].c_str() ) : 0);
 			
 		// get the sections beginning with matref and create LODCommand lists from them
 		vector<string> matrefSections = BZWParser::getSectionsByHeader("matref", lodData);
-		if(matrefSections.size() > 1) {
-			printf("mesh::LOD::update(): Error! Defined \"matref\" %d times!\n", (int)matrefSections.size());
-			return 0;	
-		}
-		
-		// parse each LOD command
-		vector<string> lodLines = BZWParser::getLines("matref", matrefSections[0].c_str());
-		vector<LODCommand> cmds = vector<LODCommand>();
-		if(lodLines.size() > 1) {
-			for(vector<string>::iterator i = lodLines.begin() + 1; i != lodLines.end(); i++) {
-				if(LODCommand::isValidCommand( *i )) {
-					cmds.push_back( LODCommand(*i) );
-				}
-				else {
-					printf("mesh::LOD::update(): Error! Unsupported LOD entry \"%s\"\n", i->c_str());
-					return 0;
+		for(vector<string>::iterator m = matrefSections.begin() + 1; m != matrefSections.end(); m++){
+			currentMatSet = new MaterialSet();
+			currentMatSet->matref = BZWParser::value( "matref", m[0].c_str() );
+			// parse each LOD command
+			vector<string> lodLines = BZWParser::getLines("matref", matrefSections[0].c_str());
+			vector<LODCommand> cmds = vector<LODCommand>();
+			if(lodLines.size() > 1) {
+				for(vector<string>::iterator i = lodLines.begin() + 1; i != lodLines.end(); i++) {
+					if(LODCommand::isValidCommand( *i )) {
+						currentMatSet->commands.push_back( LODCommand(*i) );
+					}
+					else {
+						printf("mesh::LOD::update(): Error! Unsupported LOD entry \"%s\"\n", i->c_str());
+						//return 0;
+					}
 				}
 			}
+			matSets.push_back(currentMatSet);
 		}
-		
 		// do base class update
 		if(!DataEntry::update(data))
 			return 0;
-			
-		// set data
-		this->pixelLength = (lppVals.size() != 0 ? atoi( lppVals[0].c_str() ) : 0);
-		this->matref = (lodLines.size() > 0 ? BZWParser::value( "matref", lodLines[0].c_str() ) : string(""));
-		this->commands = cmds;
 		
 		return 1;
 	}
 	
 	// toString
 	string toString(void) {
-		string lods = string("");
-		if(commands.size() > 0) {
-			for( vector<LODCommand>::iterator i = commands.begin(); i != commands.end(); i++) {
-				lods += string("        ") + i->toString().c_str() + "\n";	
+		string matsets = string("");
+		if(matSets.size() > 0) {
+			for( vector<MaterialSet*>::iterator i = matSets.begin(); i != matSets.end(); i++) {
+				if((*i)->commands.size() > 0 && (*i)->matref.length() > 0) {
+					matsets += "      matref " + (*i)->matref + "\n";
+					for( vector<LODCommand>::iterator j = (*i)->commands.begin(); j != (*i)->commands.end(); j++) {
+						matsets += "        " + j->toString() + "\n";	
+					}
+					matsets += "      end\n";
+				}
 			}
 		}
-		return string("lod\n") +
-					  "      lengthPerPixel " + string(itoa(pixelLength)) + "\n" +
-					  (matref.length() > 0 ? string("      matref ") + matref + "\n" + lods + "      end\n" : string("")) + "\n" +
-					  "    end\n";
+		return string("lod\n") + 
+				"      lengthPerPixel " + string(ftoa(lengthPerPixel)) + "\n" +
+				matsets + "    end\n";
 	}
+	
+	bool parse( string& line ) { 
+		string key = BZWParser::key( line.c_str() );
+		string value = BZWParser::value( key.c_str(), line.c_str() );
+		
+		if ( currentCommand ) {
+			if ( !currentCommand->parse( line ) ) {
+				matSets.push_back(currentMatSet);
+				currentCommand = NULL;
+				currentMatSet = NULL;
+			}else{
+				currentMatSet->commands.push_back(*currentCommand);
+				currentCommand = new LODCommand();
+			}
+			return true;
+		}
+		else if ( key == "lengthperpixel"){
+			// lengthPerPixel <value>
+			value = BZWParser::value( key.c_str(), TextUtils::tolower(line.c_str()).c_str() );
+			lengthPerPixel = atof(value.c_str());
+			return true; 
+		}
+		else if ( key == "matref"){
+			// matref <name> (repeatable)
+			currentMatSet = new MaterialSet();
+			currentMatSet->matref = value;
+			currentMatSet->commands = vector<LODCommand>();
+			currentCommand = new LODCommand();
+			return true; 
+		}
+		else if( key == "end" ){
+			// end matref, lod or drawinfo
+			return false;
+		}
+		throw BZWReadError( this, string( "Unknown LOD Command: " ) + line );
+		return true;
+	} 
 	
 	// render
 	int render(void) {
 		return 0;	
 	}
 	
+	vector<MaterialSet*>& getMaterialSets() {return matSets;}
+	float getLengthPerPixel() {return lengthPerPixel;}
+	
 private:
 	
-	vector<LODCommand> commands;
-	string matref;
-	int pixelLength;
+	
+	
+	vector<MaterialSet*> matSets;
+	MaterialSet* currentMatSet;
+	LODCommand* currentCommand;
+	float lengthPerPixel;
+	
 };
 
 #endif /*LOD_H_*/

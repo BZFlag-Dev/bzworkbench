@@ -14,6 +14,7 @@
 #define LODCOMMAND_H_
 
 #include "DataEntry.h"
+#include "model/Model.h"
 
 class LODCommand : public DataEntry {
 	
@@ -118,16 +119,12 @@ public:
 			  		
 		vector<string> values = BZWParser::getLineElements( val.c_str() );
 		
-		// dlist gets 0 args (values[0] will be the same as the key in that case)
-		if(commandName == "dlist" && values[0] != commandName)
-			return false;
-		
 		// sphere gets four args
 		if(commandName == "sphere" && values.size() != 4)
 			return false;
 			
 		// points gets at least one arg
-		if(commandName == "point" && values[0] != commandName)
+		if(commandName == "point" && values[0].size() > 0)
 			return false;
 			
 		// lines gets at least 2 args
@@ -172,16 +169,93 @@ public:
 	
 	// toString
 	string toString(void) {
-		if(name == "sphere")
+		if(name == "dlist")
+			return name;
+		else if(name == "sphere")
 			return name + " " + string(ftoa(x)) + " " + string(ftoa(y)) + " " + string(ftoa(z)) + " " + string(ftoa(rad));
 		else
 			return name + " " + stringify(args);
 	}
 	
+	bool parse( string& line ) { 
+		string key = BZWParser::key( line.c_str() );
+		string value = BZWParser::value( key.c_str(), line.c_str() );
+		
+		if ( key == "dlist"){
+			// dlist # display list for this material set
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "sphere"){ 
+			// sphere <x> <y> <z> <radiusSquared>
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "points"){ 
+			// points    0            (repeatable)
+			//vertices = BZWParser::getIntList( value.c_str() );
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "lines"){ 
+			// lines     0 1          (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "lineloop"){ 
+			// lineloop  0 1          (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "linestrip"){ 
+			// linestrip 0 1          (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "tris"){ 
+			// tris      0 1 2        (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "tristrip"){ 
+			// tristrip  0 1 2        (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "trifan"){ 
+			// trifan    0 1 2        (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "quads"){ 
+			// quads     0 1 2 3      (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "quadstrip"){ 
+			// quadstrip 0 1 2 3      (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if ( key == "polygon"){ 
+			// polygon   0 1 2        (repeatable)
+			if(update(line))
+			return true; 
+		}
+		else if( key == "end" ){
+			return false;
+		}
+		throw BZWReadError( this, string( "Unknown MaterialSet(LODCommand) Command: " ) + line );
+		return true;
+	} 
+	
 	// render
 	int render(void) {
 		return 0;	
 	}
+	
+	string getName() {return name;}
+	vector<int> getArgs() {return args;}
 	
 private:
 

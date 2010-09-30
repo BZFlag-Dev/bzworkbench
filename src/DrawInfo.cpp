@@ -15,35 +15,37 @@
 
 // default constructor
 DrawInfo::DrawInfo() :
-	DataEntry("drawinfo", "<dlist><decorative><angvel><extends><sphere><corner><vertex><normal><texcoord><lod>") {
+	DataEntry("drawinfo", "<dlist><decorative><angvel><extents><sphere><corner><vertex><normal><texcoord><lod>") {
 
 	vertices = vector<Point3D>();
-	normals = vector<Vector3D>();
-	texcoords = vector<TexCoord2D>();
+	normals = vector<Point3D>();
+	texcoords = vector<Point2D>();
 	corners = vector<Index3D>();
 
-	minExtends = Point3D(0.0f, 0.0f, 0.0f);
-	maxExtends = Point3D(0.0f, 0.0f, 0.0f);
+	minExtents = Point3D(0.0f, 0.0f, 0.0f);
+	maxExtents = Point3D(0.0f, 0.0f, 0.0f);
 	spherePosition = Point3D(0.0f, 0.0f, 0.0f);
 
 	angvel = 0.0f;
 	sphereRadius = 0.0f;
 
-	dlist = true;
+	dlist = false;
 	decorative = false;
+		
+	currentLOD = NULL;
 }
 
 // constructor with data
 DrawInfo::DrawInfo(string& data) :
-DataEntry("drawinfo", "<dlist><decorative><angvel><extends><sphere><corner><vertex><normal><texcoord><lod>", data.c_str()) {
+DataEntry("drawinfo", "<dlist><decorative><angvel><extents><sphere><corner><vertex><normal><texcoord><lod>", data.c_str()) {
 
 	vertices = vector<Point3D>();
-	normals = vector<Vector3D>();
-	texcoords = vector<TexCoord2D>();
+	normals = vector<Point3D>();
+	texcoords = vector<Point2D>();
 	corners = vector<Index3D>();
 
-	minExtends = Point3D(0.0f, 0.0f, 0.0f);
-	maxExtends = Point3D(0.0f, 0.0f, 0.0f);
+	minExtents = Point3D(0.0f, 0.0f, 0.0f);
+	maxExtents = Point3D(0.0f, 0.0f, 0.0f);
 	spherePosition = Point3D(0.0f, 0.0f, 0.0f);
 
 	angvel = 0.0f;
@@ -111,13 +113,13 @@ int DrawInfo::update(string& data) {
 	if(sphereVals.size() > 0 && !hasNumElements(sphereVals[0], 4))
 		return 0;
 
-	// get extends
-	vector<string> extendsVals = BZWParser::getValuesByKey("extends", _header, drawInfoData);
-	if(extendsVals.size() > 1) {
-		printf("mesh::DrawInfo::update(): Error! Defined \"extends\" %d times!\n", (int)sphereVals.size());
+	// get extents
+	vector<string> extentsVals = BZWParser::getValuesByKey("extents", _header, drawInfoData);
+	if(extentsVals.size() > 1) {
+		printf("mesh::DrawInfo::update(): Error! Defined \"extents\" %d times!\n", (int)sphereVals.size());
 		return 0;	
 	}
-	if(extendsVals.size() > 0 && !hasNumElements(extendsVals[0], 6))
+	if(extentsVals.size() > 0 && !hasNumElements(extentsVals[0], 6))
 		return 0;
 
 	// need same amount of corners as vertexes
@@ -135,8 +137,8 @@ int DrawInfo::update(string& data) {
 	// parse the values
 	vector<Point3D> vertexData = vector<Point3D>();
 	vector<Index3D> cornerData = vector<Index3D>();
-	vector<Vector3D> vectorData = vector<Vector3D>();
-	vector<TexCoord2D> texCoordData = vector<TexCoord2D>();
+	vector<Point3D> vectorData = vector<Point3D>();
+	vector<Point2D> texCoordData = vector<Point2D>();
 
 	// validate the vertexes (i.e. make sure they all have 3 values)
 	if(vertexVals.size() > 0) {
@@ -173,7 +175,7 @@ int DrawInfo::update(string& data) {
 				printf("mesh::DrawInfo::update(): Error! \"normal\" in \"normal %s\" needs 3 values!\n", i->c_str());
 				return 0;
 			}
-			vectorData.push_back( Vector3D( i->c_str() ) );
+			vectorData.push_back( Point3D( i->c_str() ) );
 		}
 	}
 
@@ -186,16 +188,16 @@ int DrawInfo::update(string& data) {
 				printf("mesh::DrawInfo::update(): Error! \"texcoord\" in \"texcoord %s\" needs 2 values!\n", i->c_str());
 				return 0;
 			}
-			texCoordData.push_back( TexCoord2D( i->c_str() ) );
+			texCoordData.push_back( Point2D( i->c_str() ) );
 		}
 	}
 
-	// get the "extends" if it exists
+	// get the "extents" if it exists
 	Point3D eLow = Point3D(0.0f, 0.0f, 0.0f), eHigh = Point3D(0.0f, 0.0f, 0.0f);
-	if(extendsVals.size() > 0) {
-		vector<string> extendsParams = BZWParser::getLineElements( extendsVals[0].c_str() );
-		string eLowString = extendsParams[0] + " " + extendsParams[1] + " " + extendsParams[2];
-		string eHighString = extendsParams[3] + " " + extendsParams[4] + " " + extendsParams[5];
+	if(extentsVals.size() > 0) {
+		vector<string> extentsParams = BZWParser::getLineElements( extentsVals[0].c_str() );
+		string eLowString = extentsParams[0] + " " + extentsParams[1] + " " + extentsParams[2];
+		string eHighString = extentsParams[3] + " " + extentsParams[4] + " " + extentsParams[5];
 		eLow = Point3D(eLowString.c_str());
 		eHigh = Point3D(eHighString.c_str());
 	}
@@ -227,8 +229,8 @@ int DrawInfo::update(string& data) {
 	this->texcoords = texCoordData;
 	this->corners = cornerData;
 	this->normals = vectorData;
-	this->minExtends = eLow;
-	this->maxExtends = eHigh;
+	this->minExtents = eLow;
+	this->maxExtents = eHigh;
 	this->sphereRadius = sphereRad;
 	this->spherePosition = spherePoint;
 	this->angvel = (angvelVals.size() > 0 ? atof( angvelVals[0].c_str() ) : 0.0f);
@@ -251,13 +253,13 @@ string DrawInfo::toString(void) {
 	}
 
 	if(normals.size() > 0) {
-		for(vector<Vector3D>::iterator i = normals.begin(); i != normals.end(); i++) {
+		for(vector<Point3D>::iterator i = normals.begin(); i != normals.end(); i++) {
 			normalString += "    normal " + i->toString();
 		}		
 	}
 
 	if(texcoords.size() > 0) {
-		for(vector<TexCoord2D>::iterator i = texcoords.begin(); i != texcoords.end(); i++) {
+		for(vector<Point2D>::iterator i = texcoords.begin(); i != texcoords.end(); i++) {
 			texcoordString += "    texcoord " + i->toString() + "\n";	
 		}
 	}
@@ -273,10 +275,26 @@ string DrawInfo::toString(void) {
 			lodString += "    " + i->toString();
 		}
 	}
+	
+	string extentsString = "    extents " + 
+							ftoa(minExtents.x()) + " " + 
+							ftoa(minExtents.y()) + " " + 
+							ftoa(minExtents.z()) + " " + 
+							ftoa(maxExtents.x()) + " " + 
+							ftoa(maxExtents.y()) + " " + 
+							ftoa(maxExtents.z()) + "\n";
+	string sphereString = "    sphere "+ 
+							ftoa(spherePosition.x()) + " " + 
+							ftoa(spherePosition.y()) + " " + 
+							ftoa(spherePosition.z()) + " " + 
+							ftoa(sphereRadius) + "\n";
 
 	return string("drawinfo\n") +
 		(dlist == true ? "    dlist\n" : "") +
 		(decorative == true ? "    decorative\n" : "") +
+		(angvel > 0 ? ("    angvel " + ftoa(angvel) + " \n") : "") +
+		extentsString +
+		sphereString +
 		vertexString +
 		normalString +
 		cornerString +
@@ -290,19 +308,82 @@ int DrawInfo::render(void) {
 	return 0;	
 }
 
-// binary getters
-vector<Point3D>& DrawInfo::getVertices() { return vertices; }
-
 bool DrawInfo::parse( string& line ) { 
 	string key = BZWParser::key( line.c_str() );
 	string value = BZWParser::value( key.c_str(), line.c_str() );
 	
-	// check if we reached the end of the section
-	if ( key == "end" )
-		return false; 
-	else
-		return true;	
-	// FIXME: implement
+	if ( currentLOD ) {
+		if ( !currentLOD->parse( line ) ) {
+			lods.push_back(*currentLOD);
+			currentLOD = NULL;
+		} 
+		return true;
+	}
+	else if ( key == "dlist" ){
+		// display list for all material sets
+		dlist = true;
+		return true; 
+	}
+	else if ( key == "decorative" ){
+		// older clients with not see this mesh
+		decorative = true;
+		return true; 
+	}
+	else if ( key == "angvel" ){
+		// <degrees/sec> rotation about initial Z axis
+		angvel = atof( value.c_str() );
+		return true; 
+	}
+	else if ( key == "extents" ){
+		// <minX> <minY> <minZ> <maxX> <maxY> <maxZ>
+		vector<string> values = BZWParser::getLineElements( value.c_str() );
+		if(values.size() == 6){
+			minExtents.set( atof(values[0].c_str()), atof(values[1].c_str()), atof(values[2].c_str()) );
+			maxExtents.set( atof(values[3].c_str()), atof(values[4].c_str()), atof(values[5].c_str()) ); 
+		} else
+			throw BZWReadError( this, string( "extents should be followed by 6 floats: " ) + line );
+		return true;
+	}
+	else if ( key == "sphere" ){
+		// <x> <y> <z> <radiusSquared>
+		Point4D temp = Point4D(value.c_str());
+		spherePosition.set(temp.x(), temp.y(), temp.z());
+		sphereRadius = temp.w();
+		return true; 
+	}
+	else if ( key == "corner" ){
+		// <v> <n> <t>         (repeatable)
+		corners.push_back( Index3D( value.c_str() ) );
+		return true; 
+	}
+	else if ( key == "vertex" ){
+		// vertex 0.0 0.0 0.0         (repeatable)
+		// if none present, uses mesh's vertices
+		vertices.push_back( Point3D( value.c_str() ) );
+		return true; 
+	}
+	else if ( key == "normal" ){
+		// normal 0.0 0.0 0.0         (repeatable)
+		// if none present, uses mesh's normals
+		normals.push_back( Point3D( value.c_str() ) );
+		return true; 
+	}
+	else if ( key == "texcoord" ){
+		// texcoord 0.0 0.0           (repeatable)
+		// if none present, uses mesh's texcoords
+		texcoords.push_back( Point2D( value.c_str() ) );
+		return true; 
+	}
+	else if ( key == "lod" ){
+		// lod                        (repeatable)
+		currentLOD = new LOD();
+		return true; 
+	}
+	else if( key == "end" ){
+		return false;
+	}
+	throw BZWReadError( this, string( "Unknown DrawInfo Command: " ) + line );
+	return true;
 } 
 
 /**
