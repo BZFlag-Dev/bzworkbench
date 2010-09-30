@@ -182,7 +182,7 @@ string mesh::toString(void) {
 
 	if(texCoords.size() > 0) {
 		for(vector<Point2D>::iterator i = texCoords.begin(); i != texCoords.end(); i++) {
-			texcoordString += "  texcoord " + i->toString() + "\n";
+			texcoordString += "  texcoord " + i->toString();
 		}
 	}
 
@@ -190,7 +190,7 @@ string mesh::toString(void) {
 	// make sure to keep the order of faces and materials constant
 	if(faces.size() > 0) {
 		for(vector<MeshFace*>::iterator i = faces.begin(); i != faces.end(); i++) {
-			faceString += (*i)->toString();
+			faceString += "  " + (*i)->toString();
 		}
 	}
 
