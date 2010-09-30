@@ -224,7 +224,7 @@ string mesh::toString(void) {
 				  texcoordString +
 				  passabilityString +
 				  faceString +
-				  (drawInfo != NULL ? "  " + drawInfo->toString() : "") + "\n" +
+				  (drawInfo != NULL ? "  " + drawInfo->toString() : "") +
 				  "end\n";
 }
 
@@ -237,7 +237,108 @@ void mesh::updateGeometry() {
 	osg::Group* group = new osg::Group();
 
 	map< material*, osg::Geometry* > geomMap;
-
+	
+	bool hideDrawInfo = false;
+	// drawinfo replaces faces 
+	if(drawInfo && !hideDrawInfo){
+		//build drawInfo
+		osg::Geometry* geom = new osg::Geometry();
+		vector<Point3D> vs, ns;
+		vector<Point2D> ts;
+		vector<Index3D> corners = drawInfo->getCorners();
+		// drawInfo has vertices 
+			if(drawInfo->getVertices().size() > 0){
+				// use drawInfo defined vertices, normals and texcoords
+				vs = drawInfo->getVertices();
+				ns = drawInfo->getNormals();
+				ts = drawInfo->getTexcoords();
+			}else{ // drawInfo has no vertices
+				// use mesh's original vertices, normals and texcoords
+				vs = vertices;
+				ns = normals;
+				ts = texCoords;
+			}
+		bool hasNormals = (ns.size() > 0 ? true : false);
+		bool hasTexcoords = (ts.size() > 0 ? true : false);
+		geom->setVertexArray( new osg::Vec3Array() );
+		osg::Vec3Array* verts = (osg::Vec3Array*)geom->getVertexArray();
+		if(ns.size() > 0)
+			geom->setNormalArray( new osg::Vec3Array() );
+		osg::Vec3Array* norms = (osg::Vec3Array*)geom->getNormalArray();
+		if(ts.size() > 0)
+			geom->setTexCoordArray(0,  new osg::Vec2Array() );
+		osg::Vec2Array* tcoords = NULL;
+		if ( geom->getNumTexCoordArrays() > 0 )
+			tcoords = (osg::Vec2Array*)geom->getTexCoordArray( 0 );
+		
+		vector<LOD> lods = drawInfo->getLods();
+		for ( vector<LOD>::iterator i = lods.begin(); i != lods.end(); i++ ) {
+			// FIXME: need to know distance mesh is from camara to determine which LOD to show
+			float lpp = i->getLengthPerPixel();
+			// process Material Sets in LOD
+			vector<LOD::MaterialSet*> matSets = i->getMaterialSets();
+			for ( vector<LOD::MaterialSet*>::iterator m = matSets.begin(); m != matSets.end(); m++ ) {
+					// get matref name
+				bool useDlist = false;
+				string matName = (*m)->matref;
+				material* mat = (material*)Model::command( MODEL_GET, "material", matName );
+				for ( vector<LODCommand>::iterator c = (*m)->commands.begin(); c != (*m)->commands.end(); c++ ) {
+					//create geometry
+					osg::DrawElementsUInt* drawElem = NULL;
+					if(c->getName().compare("dlist") == 0){
+						useDlist = true;
+					} else if(c->getName().compare("points") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::POINTS, 0 );
+					} else if(c->getName().compare("lines") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::LINES, 0 );
+					} else if(c->getName().compare("lineloop") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::LINE_LOOP, 0 );
+					} else if(c->getName().compare("linestrip") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::LINE_STRIP, 0 );
+					} else if(c->getName().compare("tris") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLES, 0 );
+					} else if(c->getName().compare("trifan") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_FAN, 0 );
+					} else if(c->getName().compare("tristrip") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::TRIANGLE_STRIP, 0 );
+					} else if(c->getName().compare("quads") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::QUADS, 0 );
+					} else if(c->getName().compare("quadstrip") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::QUAD_STRIP, 0 );
+					} else if(c->getName().compare("polygon") == 0){
+						drawElem = new osg::DrawElementsUInt( osg::DrawElements::POLYGON, 0 );
+					}
+					if(drawElem){	
+					vector<int> indices = c->getArgs();
+						for ( vector<int>::iterator j = indices.begin(); j != indices.end(); j++ ) {
+							Index3D cc = corners[*j];
+							verts->push_back( vs[cc.a] );
+							if ( hasNormals ) norms->push_back( ns[cc.b] );
+							if ( hasTexcoords ) tcoords->push_back( ts[cc.c] );
+							drawElem->push_back( verts->size() - 1 );
+						}
+						geom->addPrimitiveSet( drawElem );
+						if(!drawInfo->isDlist() && !useDlist)
+							geom->setUseDisplayList( false ); 
+						osg::Geode* geode = new osg::Geode();
+						geode->addDrawable( geom );
+						if(mat == NULL){
+							// set default material
+							mat = new material();
+							mat->setTexture("mesh");
+						}
+						SceneBuilder::assignBZMaterial(mat, geode);
+						group->addChild( geode );
+					} // end if drawElem
+				} // end commands
+			} // end matSets
+			//bail out after first lod - instead of drawing all lods
+			//break;
+		}
+	}else{
+		//build faces
+	
+	
 	for ( vector< MeshFace* >::iterator i = faces.begin(); i != faces.end(); i++ ) {
 		MeshFace* face = *i;
 		material* mat = face->getMaterial();
@@ -340,15 +441,17 @@ void mesh::updateGeometry() {
 		osg::Geode* geode = new osg::Geode();
 		material* mat = i->first;
 		if(mat == NULL){
-			// set default material of face to be invisible if there isn't one defined yet
+			// set default material
 			mat = new material();
-			mat->setDiffuse( osg::Vec4( 1.0, 1.0, 1.0, 0.0) );
+			mat->setTexture("mesh");
 		}
 		geode->addDrawable( i->second );
-		geode->setStateSet( mat );
+		//geode->setStateSet( mat );
+		SceneBuilder::assignBZMaterial(mat, geode);
 		group->addChild( geode );
 	}
-
+	}
+	
 	setThisNode( group );
 }
 
