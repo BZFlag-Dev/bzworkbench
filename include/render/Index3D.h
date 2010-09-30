@@ -31,9 +31,9 @@ class Index3D {
 		a = _a;
 		b = _b;
 		c = _c;
-		t1 = _a;
-		t2 = _b;
-		t3 = _c;
+		t1 = -1;
+		t2 = -1;
+		t3 = -1;
 	}
 	
 	Index3D(int _a, int _b, int _c, int _t1, int _t2, int _t3) {
@@ -53,6 +53,9 @@ class Index3D {
 			a = atoi( points[0].c_str() );
 			b = atoi( points[1].c_str() );
 			c = atoi( points[2].c_str() );
+			t1 = -1;
+			t2 = -1;
+			t3 = -1;
 		}
 		else if(points.size() == 6) {
 			a = atoi( points[0].c_str() );
