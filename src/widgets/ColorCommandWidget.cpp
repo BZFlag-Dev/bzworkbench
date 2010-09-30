@@ -99,8 +99,8 @@ ColorCommandWidget::ColorCommandWidget( int x, int y, std::string color, ColorCo
 	commandChoice = new Fl_Choice( x + 65, y + DEFAULT_TEXTSIZE, 60, DEFAULT_TEXTSIZE + 6 );
 	commandChoice->add( "limits", 0, TypeChangedCallback, this );
 	commandChoice->add( "sinusoid", 0, TypeChangedCallback, this );
-	commandChoice->add( "clampUp", 0, TypeChangedCallback, this );
-	commandChoice->add( "clampDown", 0, TypeChangedCallback, this );
+	commandChoice->add( "clampup", 0, TypeChangedCallback, this );
+	commandChoice->add( "clampdown", 0, TypeChangedCallback, this );
 	commandChoice->add( "sequence", 0, TypeChangedCallback, this );
 	string type = cmd.getName();
 
@@ -118,8 +118,8 @@ ColorCommandWidget::ColorCommandWidget( int x, int y, std::string color, ColorCo
 
 	if ( type == "limits" ) commandChoice->value( 0 );
 	else if ( type == "sinusoid" ) commandChoice->value( 1 );
-	else if ( type == "clampUp" ) commandChoice->value( 2 );
-	else if ( type == "clampDown" ) commandChoice->value( 3 );
+	else if ( type == "clampup" ) commandChoice->value( 2 );
+	else if ( type == "clampdown" ) commandChoice->value( 3 );
 	else if ( type == "sequence" ) commandChoice->value( 4 );
 	else commandChoice->value( 1 );
 
@@ -128,7 +128,7 @@ ColorCommandWidget::ColorCommandWidget( int x, int y, std::string color, ColorCo
 		firstParamInput->value( values[0] );
 		secondParamInput->value( values[1] );
 	}
-	else if (type == "sinusoid" || type == "clampUp" || type == "clampDown") {
+	else if (type == "sinusoid" || type == "clampup" || type == "clampdown") {
 		firstParamInput->value( values[0] );
 		secondParamInput->value( values[1] );
 		thirdParamInput->value( values[2] );
@@ -167,7 +167,7 @@ ColorCommand ColorCommandWidget::getEditedCommand() {
 		params.push_back( firstParamInput->value() );
 		params.push_back( secondParamInput->value() );
 	}
-	else if (type == "sinusoid" || type == "clampUp" || type == "clampDown") {
+	else if (type == "sinusoid" || type == "clampup" || type == "clampdown") {
 		params.push_back( firstParamInput->value() );
 		params.push_back( secondParamInput->value() );
 		params.push_back( thirdParamInput->value() );
@@ -221,7 +221,7 @@ void ColorCommandWidget::switchCommandType( std::string type ) {
 		thirdParamInput->show();
 		editSequence->hide();
 	}
-	else if (type == "clampUp" || type == "clampDown") {
+	else if (type == "clampup" || type == "clampdown") {
 		firstParamLabel->label( "period" );
 		firstParamInput->show();
 		secondParamLabel->label( "offset" );

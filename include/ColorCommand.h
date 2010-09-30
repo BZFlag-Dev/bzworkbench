@@ -24,7 +24,7 @@
  * Like Transform assists bz2objects, ColorCommand assists
  * materials in that it provides the data for a command
  * that can be passed to a color channel.  Supported commands are
- * "limit", "sinusoid", "clampUp", "clampDown", and "sequence".
+ * "limit", "sinusoid", "clampup", "clampdown", and "sequence".
  * This class also stores the values that go with these keys
  */
 
@@ -34,7 +34,7 @@ class ColorCommand : public DataEntry {
 public:
 
 	// default constructor
-	ColorCommand() : DataEntry("", "<limits><clampUp><clampDown><sinusoid><sequence>") {
+	ColorCommand() : DataEntry("", "<limits><clampup><clampdown><sinusoid><sequence>") {
 		this->name = string("limits");
 		this->commands = vector<float>();
 		commands.push_back( 0 );
@@ -43,7 +43,7 @@ public:
 
 	// constructor with data
 	ColorCommand(string& data) :
-		DataEntry("", "<limits><clampUp><clampDown><sinusoid><sequence>", data.c_str() ) {
+		DataEntry("", "<limits><clampup><clampdown><sinusoid><sequence>", data.c_str() ) {
 
 		// init
 		commands = vector<float>();
@@ -74,8 +74,8 @@ public:
 
 		// compare the name against supported commands (break if unrecognized)
 		if(! (cmdName == "limits" ||
-			  cmdName == "clampUp" ||
-			  cmdName == "clampDown" ||
+			  cmdName == "clampup" ||
+			  cmdName == "clampdown" ||
 			  cmdName == "sinusoid" ||
 			  cmdName == "sequence"))
 			  return false;
@@ -93,11 +93,11 @@ public:
 		if(cmdName == "limits" && numCommands != 2)
 			return false;
 
-		// "sinusoid", "clampUp", and "clampDown" should be followed by 3 commands
+		// "sinusoid", "clampup", and "clampdown" should be followed by 3 commands
 		if(numCommands != 3 &&
 		   (cmdName == "sinusoid" ||
-		    cmdName == "clampUp" ||
-		    cmdName == "clampDown"))
+		    cmdName == "clampup" ||
+		    cmdName == "clampdown"))
 				return false;
 
 		// "sequence" needs at least three commands
