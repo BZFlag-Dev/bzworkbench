@@ -173,11 +173,12 @@ void Primitives::rebuildBoxUV(osg::Group* box, osg::Vec3 size,
 	for (int i = 0; i < 6; i++)
 		sideUVs[i] = new osg::Vec2Array();
 	
+	// apply transforms scale and shift
 	osg::Vec3 mp = pos;
 	osg::Vec3 ms = size;
-	// apply transforms scale and shift only for world space calulation
+	
+	// FIXME - need to adjust for Shear still
 	// note: texoffset does not effect world space, only object space
-	// FIXME!! - texoffset seems to be applied based on the object size, not the texture size
 	vector<TransformData> d = transforms->getData();
 	for(vector<TransformData>::iterator i = d.begin(); i != d.end(); i++) {
 		if ( (*i).type == ShiftTransform ){
@@ -384,10 +385,50 @@ osg::Group* Primitives::buildUntexturedBox( osg::Vec3 size ) {
 	nzVerts->push_back( osg::Vec3( -size.x(), -size.y(), 0 ) );
 	nzVerts->push_back( osg::Vec3( -size.x(), size.y(), 0 ) );
 	sideGeometry[5]->setVertexArray(nzVerts);
-
+	
+	//add normals 
+	osg::Vec3Array* pxNorms = new osg::Vec3Array();
+	for(int i=0;i<4;i++)
+		pxNorms->push_back( osg::Vec3( 1, 0, 0 ) );
+	sideGeometry[0]->setNormalArray(pxNorms);
+	
+	osg::Vec3Array* nxNorms = new osg::Vec3Array();
+	for(int i=0;i<4;i++)
+		nxNorms->push_back( osg::Vec3( -1, 0, 0 ) );
+	sideGeometry[1]->setNormalArray(nxNorms);
+	
+	osg::Vec3Array* pyNorms = new osg::Vec3Array();
+	for(int i=0;i<4;i++)
+		pyNorms->push_back( osg::Vec3( 0, 1, 0 ) );
+	sideGeometry[2]->setNormalArray(pyNorms);
+	
+	osg::Vec3Array* nyNorms = new osg::Vec3Array();
+	for(int i=0;i<4;i++)
+		nyNorms->push_back( osg::Vec3( 0, -1, 0 ) );
+	sideGeometry[3]->setNormalArray(nyNorms);
+	
+	osg::Vec3Array* pzNorms = new osg::Vec3Array();
+	for(int i=0;i<4;i++)
+		pzNorms->push_back( osg::Vec3( 0, 0, 1 ) );
+	sideGeometry[4]->setNormalArray(pzNorms);
+	
+	osg::Vec3Array* nzNorms = new osg::Vec3Array();
+	for(int i=0;i<4;i++)
+		nzNorms->push_back( osg::Vec3( 0, 0, -1 ) );
+	sideGeometry[5]->setNormalArray(nzNorms);
+	
+	// specify the normal indices, this is the same for all sides
+	osg::TemplateIndexArray<GLuint, osg::Array::UIntArrayType, 24, 4> *normalIndexArray;
+	normalIndexArray = new osg::TemplateIndexArray<GLuint, osg::Array::UIntArrayType, 24, 4>();
+	
+	normalIndexArray->push_back( 0 );
+	normalIndexArray->push_back( 1 );
+	normalIndexArray->push_back( 2 );
+	normalIndexArray->push_back( 3 );
+	
 	// specify the vertex indices, this is the same for all sides
 	osg::DrawElementsUInt* side =
-		new osg::DrawElementsUInt( osg::PrimitiveSet::QUADS, 0 );
+	new osg::DrawElementsUInt( osg::PrimitiveSet::QUADS, 0 );
 	side->push_back( 0 );
 	side->push_back( 1 );
 	side->push_back( 2 );
@@ -396,8 +437,11 @@ osg::Group* Primitives::buildUntexturedBox( osg::Vec3 size ) {
 	// add vertex indices for each side
 	for ( int i = 0; i < 6; i++ ) {
 		sideGeometry[i]->setVertexAttribBinding( 0, osg::Geometry::BIND_PER_VERTEX );
+		sideGeometry[i]->setNormalIndices(normalIndexArray);
+		sideGeometry[i]->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 		sideGeometry[i]->addPrimitiveSet( side );
 	}
 
 	return group;
 }
+
