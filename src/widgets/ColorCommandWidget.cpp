@@ -44,7 +44,7 @@ vector<int> ColorCommandWidget::SequenceEditor::getSequence() {
 
 	list<Fl_Choice*>::iterator i;
 	for ( i = sequence.begin(); i != sequence.end(); i++ ) {
-		params.push_back( (*i)->value() - 1 );
+		params.push_back( (*i)->value() );
 	}
 
 	return params;
@@ -56,11 +56,11 @@ void ColorCommandWidget::SequenceEditor::addToSequence( int type ) {
 			seqArea->y() + 5 + (DEFAULT_TEXTSIZE + 6) * sequence.size(),
 			150, DEFAULT_TEXTSIZE + 6);
 
-	sequenceItem->add( "active clampDown" );
-	sequenceItem->add( "no clamps" );
-	sequenceItem->add( "active clampUp" );
+	sequenceItem->add( "Clamp Down" );
+	sequenceItem->add( "No Clamps" );
+	sequenceItem->add( "Clamp Up" );
 
-	sequenceItem->value( type + 1 );
+	sequenceItem->value( type );
 
 	sequence.push_back( sequenceItem );
 	seqArea->add( sequenceItem );
