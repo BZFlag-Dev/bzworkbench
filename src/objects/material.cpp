@@ -399,10 +399,11 @@ material* material::computeFinalMaterial( vector< material* >& materialList ) {
 				if(IS_VALID_COLOR( mat->getEmission( osg::Material::FRONT ) ) ) {
 					emission = mat->getEmission( osg::Material::FRONT );
 				}
-
-				shiny = mat->getShininess( osg::Material::FRONT );
+				if((*i)->getHasShininess())
+					shiny = mat->getShininess( osg::Material::FRONT );
 			}
-			alphaThreshold = (*i)->getAlphaThreshold();
+			if((*i)->getHasAlphaThreshold())
+				alphaThreshold = (*i)->getAlphaThreshold();
 			if( (*i)->getNoCulling() )
 				nocull = true;
 		}
@@ -481,11 +482,11 @@ void material::computeFinalMaterial() {
 	if(hasSpecular)
 		specular = getSpecular();
 	if(hasEmission)
-		emission = getSpecular();
+		emission = getEmission();
 	if(hasShininess)
 		shiny = getShininess();
 	if(hasAlphaThreshold)
-		alphaThreshold = getAlphaThreshold();	
+		alphaThreshold = getAlphaThreshold();
 	
 	osg::Material* finalMaterial = new osg::Material();
 	

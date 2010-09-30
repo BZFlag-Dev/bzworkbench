@@ -90,7 +90,7 @@ MaterialConfigurationDialog::MaterialConfigurationDialog( material* _theMat ) :
 	emissionInput->setRGBA( theMat->getEmission() );
 
 	shininessButton = new Fl_Check_Button( 5, 475, 135, DEFAULT_TEXTSIZE + 6, "Shininess:" );
-	shininessButton->value( theMat->getHasAmbient() );
+	shininessButton->value( theMat->getHasShininess() );
 	shininessInput = new Fl_Value_Input( 150, 475, 120, DEFAULT_TEXTSIZE + 6 );
 	shininessInput->value( theMat->getShininess() );
 
