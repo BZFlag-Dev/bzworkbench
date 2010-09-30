@@ -294,11 +294,15 @@ int DrawInfo::render(void) {
 vector<Point3D>& DrawInfo::getVertices() { return vertices; }
 
 bool DrawInfo::parse( string& line ) { 
-	// FIXME: implement
-	if ( line == "end" )
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
+	// check if we reached the end of the section
+	if ( key == "end" )
 		return false; 
 	else
-		return true;
+		return true;	
+	// FIXME: implement
 } 
 
 /**

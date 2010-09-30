@@ -83,12 +83,12 @@ string box::get(void) {
 
 // bzw methods
 bool box::parse( std::string& line ) {
-	// first check if this is the end
-	if ( line == "end" )
-		return false;
-
 	string key = BZWParser::key( line.c_str() );
 	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
+	// check if we reached the end of the section
+	if ( key == "end" )
+		return false;
 
 	// meshbox is just an alias for box
 	if ( key == "meshbox" )

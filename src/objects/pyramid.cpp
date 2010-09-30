@@ -118,12 +118,12 @@ int pyramid::update(UpdateMessage& message) {
 
 // bzw methods
 bool pyramid::parse( std::string& line ) {
-	// first check if this is the end
-	if ( line == "end" )
-		return false;
-
 	string key = BZWParser::key( line.c_str() );
 	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
+	// check if we reached the end of the section
+	if ( key == "end" )
+		return false;
 
 	// meshpyr is just an alias for pyramid
 	if ( key == "meshpyr" )

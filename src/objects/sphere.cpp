@@ -101,12 +101,12 @@ int sphere::update(UpdateMessage& message) {
 
 // bzw methods
 bool sphere::parse( std::string& line ) {
-	// check if we reached the end of the section
-	if ( line == "end" )
-		return false;
-
 	string key = BZWParser::key( line.c_str() );
 	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
+	// check if we reached the end of the section
+	if ( key == "end" )
+		return false;
 
 	// parse keys
 	if ( key == "texsize" ) {

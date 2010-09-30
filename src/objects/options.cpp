@@ -24,8 +24,11 @@ string options::get(void) {
 
 // bzw methods
 bool options::parse( std::string& line ) {
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
 	// check if we reached the end of the section
-	if ( line == "end" )
+	if ( key == "end" )
 		return false;
 
 	// otherwise add to the optionsString

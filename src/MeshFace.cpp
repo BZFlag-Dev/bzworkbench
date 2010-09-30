@@ -44,12 +44,12 @@ MeshFace::~MeshFace() {
 string MeshFace::get(void) { return this->toString(); }
 
 bool MeshFace::parse( string& line ) {
-	// check if we're at the end of the face
-	if ( line == "endface" )
-		return false;
-
 	string key = BZWParser::key( line.c_str() );
 	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
+	// check if we reached the end of the section
+	if ( key == "endface" )
+		return false;
 
 	if ( key == "vertices" ) {
 		vertices = BZWParser::getIntList( value.c_str() );

@@ -20,8 +20,11 @@ string info::get(void) {
 
 // bzw methods
 bool info::parse( std::string& line ) {
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
 	// check if we reached the end of the section
-	if ( line == "end" )
+	if ( key == "end" )
 		return false;
 
 	// if we aren't at the end add the line

@@ -132,7 +132,7 @@ string BZWParser::value(const char* _key, const char* _text) {
 	string line = cutWhiteSpace(string(_text));
 	string key = string(_key);
 
-	size_t startIndex = line.find(key, 0);
+	size_t startIndex = TextUtils::tolower(line).find(TextUtils::tolower(key), 0);
 
 	// stop if we didn't find the key
 	if(startIndex == string::npos)
@@ -143,7 +143,7 @@ string BZWParser::value(const char* _key, const char* _text) {
 
 	// stop if the first key is the value
 	if(startIndex > line.length())
-		return key;
+		return TextUtils::tolower(key);
 
 	// get the value
 	string value = line.substr(startIndex);

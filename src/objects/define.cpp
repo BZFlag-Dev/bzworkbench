@@ -30,8 +30,11 @@ string define::get(void) { return toString(); }
 
 // bzw methods
 bool define::parse( std::string& line ) {
-	// check if we are at the end of the define
-	if ( line == "enddef" )
+	string key = BZWParser::key( line.c_str() );
+	string value = BZWParser::value( key.c_str(), line.c_str() );
+	
+	// check if we reached the end of the section
+	if ( key == "enddef" )
 		return false;
 
 	if ( currentObject ) {
@@ -41,13 +44,11 @@ bool define::parse( std::string& line ) {
 			currentObject = NULL;
 		}
 	}
-	else if ( BZWParser::key( line.c_str() ) == "define" ) {
-		name = BZWParser::value( "define", line.c_str() );
+	else if ( key == "define" ) {
+		name = value;
 	}
 	else {
-		string header = BZWParser::key( line.c_str() );
-
-		bz2object* obj = dynamic_cast< bz2object* >( Model::buildObject( header.c_str() ) );
+		bz2object* obj = dynamic_cast< bz2object* >( Model::buildObject( key.c_str() ) );
 
 		if ( obj != NULL ) {
 			obj->parse( line );
