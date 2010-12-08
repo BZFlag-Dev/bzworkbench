@@ -37,39 +37,40 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
     	case osgGA::GUIEventAdapter::DRAG :
 
     		viewer = dynamic_cast<View*>(&aa);
+		if( viewer != NULL ) {
 			Renderable* lsobj = (Renderable*)lastSelected;
-    		if( viewer != NULL && lsobj != NULL && lsobj->getName() == Selection_NODE_NAME ) {
-    			// if the last event was a DRAG event, we need to update the dx and dy
-    			if( prevEvent == osgGA::GUIEventAdapter::DRAG ) {
-	    			dx = ea.getXnormalized() - prev_x;
-	    			dy = ea.getYnormalized() - prev_y;
-    			}
-    			// otherwise, they should be zero
-    			else {
-    				dx = 0;
-    				dy = 0;
-    			}
-    			// set the prev_x and prev_y values so we can re-compute dx and dy on the next event
-	    		prev_x = ea.getXnormalized();
-    			prev_y = ea.getYnormalized();
-
-    			// log this event
-    			prevEvent = osgGA::GUIEventAdapter::DRAG;
-
-				// handle a selector
-				switch( viewer->getSelectionNode()->getState() ) {
-					case Selection::ROTATE:
-						return rotateSelector( view, ea );
-					case Selection::SCALE:
-						return scaleSelector( view, ea );
-					case Selection::SHIFT:
-						return shiftSelector( view, ea );
-					case Selection::SHEAR:
-						return shearSelector( view, ea );
-					default:
-						return dragSelector( view, ea );
+			if( lsobj != NULL && lsobj->getName() == Selection_NODE_NAME ) {
+				// if the last event was a DRAG event, we need to update the dx and dy
+				if( prevEvent == osgGA::GUIEventAdapter::DRAG ) {
+					dx = ea.getXnormalized() - prev_x;
+					dy = ea.getYnormalized() - prev_y;
 				}
+				// otherwise, they should be zero
+				else {
+					dx = 0;
+					dy = 0;
+				}
+				// set the prev_x and prev_y values so we can re-compute dx and dy on the next event
+				prev_x = ea.getXnormalized();
+				prev_y = ea.getYnormalized();
 
+				// log this event
+				prevEvent = osgGA::GUIEventAdapter::DRAG;
+
+					// handle a selector
+					switch( viewer->getSelectionNode()->getState() ) {
+						case Selection::ROTATE:
+							return rotateSelector( view, ea );
+						case Selection::SCALE:
+							return scaleSelector( view, ea );
+						case Selection::SHIFT:
+							return shiftSelector( view, ea );
+						case Selection::SHEAR:
+							return shearSelector( view, ea );
+						default:
+							return dragSelector( view, ea );
+					}
+			}
     		}
     		return false;
 
