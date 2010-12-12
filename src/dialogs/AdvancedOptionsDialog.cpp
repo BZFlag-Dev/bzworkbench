@@ -10,8 +10,8 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include "config.h"
 #include "dialogs/AdvancedOptionsDialog.h"
-
 #include "objects/bz2object.h"
 
 // main constructor
@@ -86,8 +86,10 @@ void AdvancedOptionsDialog::AdvancedOptionsPage::removeMaterialCallback_real( Fl
 				r = true;
 			}
 		}
+#ifdef HAVE_SCROLL_TO
 		if(r)
 			materialList->scroll_to(0, 0);
+#endif
 		parent()->redraw();
 	}
 }
@@ -99,10 +101,12 @@ void AdvancedOptionsDialog::AdvancedOptionsPage::addMaterial( MaterialWidget* mw
 		materialWidgets.push_back( mw );
 		listPack->resize(materialList->x()+1,materialList->y()+1,materialList->w()-2,h-2);
 		int pos = h - materialList->h();
+#ifdef HAVE_SCROLL_TO
 		if(pos > 0)
 			materialList->scroll_to(0, pos + materialList->yposition());
 		else
 			materialList->scroll_to(0, 0);
+#endif
 		parent()->redraw();
 	}
 }
@@ -181,7 +185,9 @@ AdvancedOptionsDialog::AdvancedOptionsPage::AdvancedOptionsPage(int x, int y, st
 	}
 
 	end();
+#if HAVE_SCROLL_TO
 	materialList->scroll_to(0, 0);
+#endif
 	parent()->redraw();
 }
 
