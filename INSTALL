@@ -26,4 +26,8 @@ Fedora Linux with this command:
 
  yum install gcc-c++ fltk-devel OpenSceneGraph-devel libcurl-devel
 
+For Ubuntu the command is:
+
+ apt-get install g++ libfltk1.1-dev libopenscenegraph-dev libcurl3-dev
+
 See the README.MSWindows for information on building on Windows.
