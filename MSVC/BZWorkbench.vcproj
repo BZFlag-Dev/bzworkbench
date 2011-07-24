@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\;..\include;&quot;$(OSG_ROOT)\include&quot;;&quot;$(FLTK_ROOT)&quot;;&quot;$(CURL_ROOT)\include&quot;"
+				AdditionalIncludeDirectories=".\;..\include;&quot;$(OSG_28_ROOT)\include&quot;;&quot;$(FLTK_ROOT)\include&quot;;&quot;$(CURL_ROOT)\include&quot;;&quot;$(FLTK_ROOT)\&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;INSIDE_BZWB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,7 +65,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="fltkd.lib fltkgld.lib fltkimagesd.lib fltkpngd.lib fltkzd.lib opengl32.lib wsock32.lib comctl32.lib osgd.lib osgGAd.lib osgViewerd.lib osgDBd.lib libcurl.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(OSG_ROOT)\lib&quot;;&quot;$(FLTK_ROOT)\lib&quot;;&quot;$(CURL_ROOT)&quot;"
+				AdditionalLibraryDirectories="&quot;$(OSG_28_ROOT)\lib&quot;;&quot;$(FLTK_ROOT)\lib&quot;;&quot;$(CURL_ROOT)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\;..\include;&quot;$(OSG_ROOT)\include&quot;;&quot;$(FLTK_ROOT)&quot;;&quot;$(CURL_ROOT)\include&quot;"
+				AdditionalIncludeDirectories=".\;..\include;&quot;$(OSG_28_ROOT)\include&quot;;&quot;$(FLTK_ROOT)\include&quot;;&quot;$(CURL_ROOT)\include&quot;;&quot;$(FLTK_ROOT)\&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;INSIDE_BZWB"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -139,9 +139,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="fltk.lib fltkgl.lib fltkimages.lib fltkpng.lib fltkz.lib opengl32.lib wsock32.lib comctl32.lib osg.lib osgGA.lib osgViewer.lib osgDB.lib libcurl.lib"
+				AdditionalDependencies="fltk.lib fltkgl.lib fltkimages.lib fltkpng.lib zlib.lib opengl32.lib wsock32.lib comctl32.lib osg.lib osgGA.lib osgViewer.lib osgDB.lib libcurl.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OSG_ROOT)\lib&quot;;&quot;$(FLTK_ROOT)\lib&quot;;&quot;$(CURL_ROOT)&quot;"
+				AdditionalLibraryDirectories="&quot;$(OSG_28_ROOT)\lib&quot;;&quot;$(FLTK_ROOT)\lib&quot;;&quot;$(CURL_ROOT)&quot;"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
