@@ -24,7 +24,7 @@
 #include "model/SceneBuilder.h"
 #include "windows/View.h"
 #include "model/Primitives.h"
-
+#include "OSFile.h"
 
 int SceneBuilder::nameCount;
 
@@ -144,7 +144,7 @@ osg::Texture2D* SceneBuilder::buildTexture2D( const char* filename ) {
 	}
 	
 	
-	string searchPath("share/textures/");
+	string searchPath(FindShareFile("textures/"));
 	string temp_name( filename );	
 
 	//---- download and cache remote texture

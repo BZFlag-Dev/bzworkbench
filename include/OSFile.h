@@ -131,6 +131,8 @@ protected:
   bool linuxAddFileStack(std::string pathName, std::string fileMask, bool bRecursive);
 };
 
+const char* FindShareFile ( const char* name );
+
 
 #endif//_OSFILE_H_
 

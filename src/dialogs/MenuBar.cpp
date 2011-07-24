@@ -26,6 +26,8 @@
 #include "dialogs/InfoConfigurationDialog.h"
 #include "dialogs/GroupConfigurationDialog.h"
 
+#include "OSFile.h"
+
 void MenuBar::buildMenu(void) {
 
 	add("File", 0, 0, 0, FL_SUBMENU);
@@ -113,7 +115,7 @@ void MenuBar::open_world_real( Fl_Widget* w ) {
 
 	string filename ;
 
-	if (!callOpenFileDialog(filename,"*.bzw","share/","*.bzw","Open..."))
+	if (!callOpenFileDialog(filename,"*.bzw",FindShareFile(""),"*.bzw","Open..."))
 		return;
 
 	/*Fl_File_Chooser* fc = new Fl_File_Chooser("share/", "*.bzw", Fl_File_Chooser::SINGLE, "Open..." );
@@ -164,7 +166,7 @@ void MenuBar::save_world_as_real( Fl_Widget* w ) {
 		newName = parent->getWorldName();
 	}
 
-	if (!callSaveFileDialog(filename,newName.c_str(),"share/","*.bzw","Save As..."))
+	if (!callSaveFileDialog(filename,newName.c_str(),FindShareFile(""),"*.bzw","Save As..."))
 		return;
 
 	// set the world name

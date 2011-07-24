@@ -30,6 +30,44 @@
 // local implementation headers
 #include "TextUtils.h"
 
+
+
+std::string shareDir;
+
+bool fileExists ( const char* path )
+{
+	FILE *fp = fopen(path,"rb");
+	if (!fp)
+		return false;
+
+	fclose(fp);
+	return true;
+}
+
+const char* FindShareFile ( const char* name )
+{
+	if (shareDir.size() == 0)
+	{
+#ifdef _WIN32
+		if(fileExists("share/exists.txt"))
+			shareDir = "share/";
+		else if (fileExists("../share/exists.txt"))
+			shareDir = "../share/";
+		else if (fileExists("../../share/exists.txt"))
+			shareDir = "../../share/";
+		else
+			shareDir = "./";
+
+#else
+		shareDir = "./share/";
+#endif
+	}
+
+	static std::string temp;
+	temp = shareDir + name;
+	return temp.c_str();
+}
+
 typedef std::vector<std::string> fileNameList;
 
 // These are the core file name conversions

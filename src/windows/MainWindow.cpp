@@ -13,6 +13,7 @@
 #include "windows/MainWindow.h"
 
 #include "dialogs/SnapSettings.h"
+#include "OSFile.h"
 
 bool MainWindow::initialized = false;
 
@@ -24,9 +25,9 @@ void MainWindow::buildButtonPanel() {
 	objectButtonGroup->align( FL_ALIGN_LEFT | FL_ALIGN_TOP );
 
 	// create the buttons
-	addBoxButton = new Fl_ImageButton( BUTTON_PANEL_X, BUTTON_PANEL_Y, 36, 36, "share/UI/box.png");
-	addPyramidButton = new Fl_ImageButton( BUTTON_PANEL_X + 36, BUTTON_PANEL_Y, 36, 36, "share/UI/pyramid.png");
-	addTeleporterButton = new Fl_ImageButton( BUTTON_PANEL_X, BUTTON_PANEL_Y + 36, 36, 36, "share/UI/teleporter.png");
+	addBoxButton = new Fl_ImageButton( BUTTON_PANEL_X, BUTTON_PANEL_Y, 36, 36, FindShareFile("UI/box.png"));
+	addPyramidButton = new Fl_ImageButton( BUTTON_PANEL_X + 36, BUTTON_PANEL_Y, 36, 36, FindShareFile("UI/pyramid.png"));
+	addTeleporterButton = new Fl_ImageButton( BUTTON_PANEL_X, BUTTON_PANEL_Y + 36, 36, 36, FindShareFile("UI/teleporter.png"));
 
 	// assign them callbacks
 	addBoxButton->callback( addBoxCallback, this );
@@ -45,10 +46,10 @@ void MainWindow::buildButtonPanel() {
 	baseButtonGroup->align( FL_ALIGN_LEFT | FL_ALIGN_TOP );
 
 	// create the base buttons
-	addBlueBaseButton = new Fl_ImageButton( BASE_PANEL_X, BASE_PANEL_Y, 36, 36, "share/UI/bluebase.png");
-	addGreenBaseButton = new Fl_ImageButton( BASE_PANEL_X + 36, BASE_PANEL_Y, 36, 36, "share/UI/greenbase.png");
-	addPurpleBaseButton = new Fl_ImageButton( BASE_PANEL_X, BASE_PANEL_Y + 36, 36, 36, "share/UI/purplebase.png");
-	addRedBaseButton = new Fl_ImageButton( BASE_PANEL_X + 36, BASE_PANEL_Y + 36, 36, 36, "share/UI/redbase.png");
+	addBlueBaseButton = new Fl_ImageButton( BASE_PANEL_X, BASE_PANEL_Y, 36, 36, FindShareFile("UI/bluebase.png"));
+	addGreenBaseButton = new Fl_ImageButton( BASE_PANEL_X + 36, BASE_PANEL_Y, 36, 36, FindShareFile("UI/greenbase.png"));
+	addPurpleBaseButton = new Fl_ImageButton( BASE_PANEL_X, BASE_PANEL_Y + 36, 36, 36, FindShareFile("UI/purplebase.png"));
+	addRedBaseButton = new Fl_ImageButton( BASE_PANEL_X + 36, BASE_PANEL_Y + 36, 36, 36, FindShareFile("UI/redbase.png"));
 
 	// assign the base buttons callbacks
 	addBlueBaseButton->callback( addBlueBaseCallback, this );
