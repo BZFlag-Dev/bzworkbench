@@ -5,6 +5,8 @@ You will need 2 third party librarys to be able to build the editor.
 
 Open SceneGraph (OSG) for the 3d drawing.
 	It can be found at http://www.openscenegraph.org/
+	
+NOTE that BZWorkbench requires OpenSceneGraph 2.8.x, it will NOT work with 3.0 or later
 
 The Fast Light Toolkit (FLTK) for the interface
 	it can be found at http://www.fltk.org/

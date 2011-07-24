@@ -3,3 +3,5 @@ http://www.BZFlag.org
 
 It is currently under heavy development after being initaly written for the
 google summer of code program.
+
+NOTE that BZWorkbench requires OpenSceneGraph 2.8.x, it will NOT work with 3.0 or later
