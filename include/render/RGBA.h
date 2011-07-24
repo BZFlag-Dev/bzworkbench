@@ -106,7 +106,7 @@ public:
 		}
 	}
 	
-	osg::Vec4 parseFloatFormat(const char* data){
+	void parseFloatFormat(const char* data){
 		vector<string> points = BZWParser::getLineElements(data);
 		float _r, _g, _b, _a;
 		if(points.size() >= 4) {

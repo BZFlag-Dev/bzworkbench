@@ -12,6 +12,9 @@
 
 #include "objects/cone.h"
 
+// FIXME: This is needed to get the M_PI constant on Windows (and elsewhere?)
+#include "model/Primitives.h"
+
 #include <osg/Node>
 #include <osg/Geode>
 #include <osg/Geometry>
